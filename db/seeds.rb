@@ -3,7 +3,6 @@ UserBadge.destroy_all
 Badge.destroy_all
 HabitLog.destroy_all
 Tag.destroy_all
-Difficulty.destroy_all
 Habit.destroy_all
 User.destroy_all
 
@@ -38,11 +37,6 @@ users.each do |user|
       title: ["Run", "Read", "Meditate", "Workout", "Drink Water"].sample,
       description: "Daily self improvement habit",
       user: user
-    )
-
-    Difficulty.create!(
-      title: ["Easy", "Medium", "Hard"].sample,
-      habit: habit
     )
 
     Tag.create!(
