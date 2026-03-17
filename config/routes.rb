@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  get "pages/home"
   # Devise routes for authentication (sign up, login, logout, etc.)
   devise_for :users
 
