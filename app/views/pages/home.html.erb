@@ -1,2 +1,53 @@
-<h1>Pages#home</h1>
-<p>Find me in app/views/pages/home.html.erb</p>
+<div class="stars-bg" id="stars"></div>
+
+<nav class="top-nav">
+  <div class="nav-inner">
+    <a class="brand" href="<%= root_path %>">
+      <div class="brand-icon">&#x1F680;</div>
+      <span class="brand-text">Questonaut</span>
+    </a>
+    <div class="nav-actions">
+      <% if user_signed_in? %>
+        <a class="btn btn-ghost" href="<%= dashboard_path %>">Dashboard</a>
+        <%= button_to "Logout", destroy_user_session_path, method: :delete, class: "btn btn-primary" %>
+      <% else %>
+        <a class="btn btn-primary" href="<%= new_user_session_path %>">Start Mission</a>
+      <% end %>
+    </div>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-grid">
+    <div class="hero-content">
+      <h1 class="text-5xl md:text-7xl font-bold leading-tight brand-font text-white">
+        Become the <span>Commander</span> of Your Habits
+      </h1>
+      <p>
+        Questonaut turns your daily routine into a space adventure. Track your habits and earn badges as you progress.
+      </p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="<%= user_signed_in? ? dashboard_path : new_user_session_path %>">
+          Launch Mission
+        </a>
+        <a class="btn btn-secondary" href="<%= user_signed_in? ? dashboard_path : new_user_session_path %>">
+          Explore
+        </a>
+      </div>
+    </div>
+
+    <!-- Optional: illustration card, but remove fake stats -->
+    <div class="hero-card">
+      <div class="card-glow animate-pulse"></div>
+      <div class="relative glass-panel rounded-3xl p-8 neon-glow">
+        <div class="card-header">
+          <div class="card-icon">&#x1F4CA;</div>
+          <div>
+            <div class="card-title">Mission Dashboard</div>
+            <div class="card-sub">Track your habits & badges</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
