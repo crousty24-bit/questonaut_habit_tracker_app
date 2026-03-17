@@ -22,8 +22,10 @@ class HabitLogsController < ApplicationController
   # POST /habit_logs or /habit_logs.json
   def create
     @habit_log = HabitLog.new(habit_log_params)
-
-    respond_to do |format|
+    if @habit_log.save
+      BadgeAwarder.call(current_user, context: :habit_logged, habit: @habit)
+    end
+      respond_to do |format|
       if @habit_log.save
         format.html { redirect_to @habit_log, notice: "Habit log was successfully created." }
         format.json { render :show, status: :created, location: @habit_log }
