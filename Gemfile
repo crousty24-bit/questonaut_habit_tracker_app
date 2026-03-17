@@ -72,6 +72,8 @@ gem 'dotenv-rails'
 gem 'rspec'
 gem 'table_print'
 
+gem 'sass-embedded', '~> 1.98'
+gem 'tailwindcss-rails'
 
 group :development do   
   gem "better_errors"   

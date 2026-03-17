@@ -139,6 +139,21 @@ GEM
       raabro (~> 1.4)
     globalid (1.3.0)
       activesupport (>= 6.1)
+    google-protobuf (4.34.0)
+      bigdecimal
+      rake (~> 13.3)
+    google-protobuf (4.34.0-aarch64-linux-gnu)
+      bigdecimal
+      rake (~> 13.3)
+    google-protobuf (4.34.0-aarch64-linux-musl)
+      bigdecimal
+      rake (~> 13.3)
+    google-protobuf (4.34.0-x86_64-linux-gnu)
+      bigdecimal
+      rake (~> 13.3)
+    google-protobuf (4.34.0-x86_64-linux-musl)
+      bigdecimal
+      rake (~> 13.3)
     i18n (1.14.8)
       concurrent-ruby (~> 1.0)
     importmap-rails (2.2.3)
@@ -352,6 +367,18 @@ GEM
       rubocop-rails (>= 2.30)
     ruby-progressbar (1.13.0)
     rubyzip (3.2.2)
+    sass-embedded (1.98.0-aarch64-linux-gnu)
+      google-protobuf (~> 4.31)
+    sass-embedded (1.98.0-aarch64-linux-musl)
+      google-protobuf (~> 4.31)
+    sass-embedded (1.98.0-arm-linux-gnueabihf)
+      google-protobuf (~> 4.31)
+    sass-embedded (1.98.0-arm-linux-musleabihf)
+      google-protobuf (~> 4.31)
+    sass-embedded (1.98.0-x86_64-linux-gnu)
+      google-protobuf (~> 4.31)
+    sass-embedded (1.98.0-x86_64-linux-musl)
+      google-protobuf (~> 4.31)
     securerandom (0.4.1)
     selenium-webdriver (4.41.0)
       base64 (~> 0.2)
@@ -393,6 +420,14 @@ GEM
     stringio (3.2.0)
     stripe (18.4.2)
     table_print (1.5.7)
+    tailwindcss-rails (4.4.0)
+      railties (>= 7.0.0)
+      tailwindcss-ruby (~> 4.0)
+    tailwindcss-ruby (4.2.1)
+    tailwindcss-ruby (4.2.1-aarch64-linux-gnu)
+    tailwindcss-ruby (4.2.1-aarch64-linux-musl)
+    tailwindcss-ruby (4.2.1-x86_64-linux-gnu)
+    tailwindcss-ruby (4.2.1-x86_64-linux-musl)
     thor (1.5.0)
     thruster (0.1.19)
     thruster (0.1.19-aarch64-linux)
@@ -454,6 +489,7 @@ DEPENDENCIES
   rails (~> 8.0.4)
   rspec
   rubocop-rails-omakase
+  sass-embedded (~> 1.98)
   selenium-webdriver
   solid_cable
   solid_cache
@@ -462,6 +498,7 @@ DEPENDENCIES
   stimulus-rails
   stripe
   table_print
+  tailwindcss-rails
   thruster
   turbo-rails
   tzinfo-data
@@ -513,6 +550,11 @@ CHECKSUMS
   faker (3.6.1) sha256=c513d23c1d26b426283e913b25e0b714576011d7c1ad368a9ac6ea2113a1ccde
   fugit (1.12.1) sha256=5898f478ede9b415f0804e42b8f3fd53f814bd85eebffceebdbc34e1107aaf68
   globalid (1.3.0) sha256=05c639ad6eb4594522a0b07983022f04aa7254626ab69445a0e493aa3786ff11
+  google-protobuf (4.34.0) sha256=bffaea30fbe2807c80667a78953b15645b3bef62b25c10ca187e4418119be531
+  google-protobuf (4.34.0-aarch64-linux-gnu) sha256=0ab8a8a97976a2265d647e69b3ff1980c89184abdaf06d36091856c5ab37cc55
+  google-protobuf (4.34.0-aarch64-linux-musl) sha256=0632a86df6d320eac3b335bd779499d43ad8ee6d1f8c8494b773ed5d3d5c6ab4
+  google-protobuf (4.34.0-x86_64-linux-gnu) sha256=bbb333fbe79c16f35a2e2154cf29f3ce26f60390dba286b339861206d5435ef9
+  google-protobuf (4.34.0-x86_64-linux-musl) sha256=0b75858a388b17e73aa4176df2e722762dbc92551b7075fdc562d33c1c6de0b0
   i18n (1.14.8) sha256=285778639134865c5e0f6269e0b818256017e8cde89993fdfcbfb64d088824a5
   importmap-rails (2.2.3) sha256=7101be2a4dc97cf1558fb8f573a718404c5f6bcfe94f304bf1f39e444feeb16a
   io-console (0.8.2) sha256=d6e3ae7a7cc7574f4b8893b4fca2162e57a825b223a177b7afa236c5ef9814cc
@@ -593,6 +635,12 @@ CHECKSUMS
   rubocop-rails-omakase (1.1.0) sha256=2af73ac8ee5852de2919abbd2618af9c15c19b512c4cfc1f9a5d3b6ef009109d
   ruby-progressbar (1.13.0) sha256=80fc9c47a9b640d6834e0dc7b3c94c9df37f08cb072b7761e4a71e22cff29b33
   rubyzip (3.2.2) sha256=c0ed99385f0625415c8f05bcae33fe649ed2952894a95ff8b08f26ca57ea5b3c
+  sass-embedded (1.98.0-aarch64-linux-gnu) sha256=019baa4ee850f9d6f3f53125fd4ee56b13ea5191bc8f8f9436825ec3e171b02d
+  sass-embedded (1.98.0-aarch64-linux-musl) sha256=9f4defd3cddf0bbf129f0b6ad8af966bdb90e36ab162f49a5b9f1baaf3339af1
+  sass-embedded (1.98.0-arm-linux-gnueabihf) sha256=763277f4070caccd6fcbcf4c54249539effe78c36850617922834a8eb72177d7
+  sass-embedded (1.98.0-arm-linux-musleabihf) sha256=7e21e46569f5cc47d5d04d77c73e4bdb08547304e2ed0ff6b9a83d608c0d9a2b
+  sass-embedded (1.98.0-x86_64-linux-gnu) sha256=36b72021e00cfdd91ccb9eb490cff6addc376424cf9c2786f01392c8d0f0d4a0
+  sass-embedded (1.98.0-x86_64-linux-musl) sha256=8f66a2db9bb1efd95df340e4157be3803be8b22b5f2f5280d9387553fcb9584a
   securerandom (0.4.1) sha256=cc5193d414a4341b6e225f0cb4446aceca8e50d5e1888743fac16987638ea0b1
   selenium-webdriver (4.41.0) sha256=cdc1173cd55cf186022cea83156cc2d0bec06d337e039b02ad25d94e41bedd22
   solid_cable (3.0.12) sha256=a168a54731a455d5627af48d8441ea3b554b8c1f6e6cd6074109de493e6b0460
@@ -609,6 +657,12 @@ CHECKSUMS
   stringio (3.2.0) sha256=c37cb2e58b4ffbd33fe5cd948c05934af997b36e0b6ca6fdf43afa234cf222e1
   stripe (18.4.2) sha256=fd08a73ab87fc0b0ad938ca71293e1051e593001b70de5e9fcf12d1097133831
   table_print (1.5.7) sha256=436664281f93387b882335795e16cfeeb839ad0c785ff7f9110fc0f17c68b5cb
+  tailwindcss-rails (4.4.0) sha256=efa2961351a52acebe616e645a81a30bb4f27fde46cc06ce7688d1cd1131e916
+  tailwindcss-ruby (4.2.1) sha256=95886a1e24b42d76792c787d34e47098b53cb3b5a6363845bca4486f52b2e66a
+  tailwindcss-ruby (4.2.1-aarch64-linux-gnu) sha256=de457ddfc999c6bbbe1a59fbc11eb2168d619f6e0cb72d8d3334d372b331e36f
+  tailwindcss-ruby (4.2.1-aarch64-linux-musl) sha256=e6ed27704263201f8366316354aa45f9016cc9378ce8fac46fbbe65fafd4da5e
+  tailwindcss-ruby (4.2.1-x86_64-linux-gnu) sha256=201d0e5e5d4aba52cae4ee4bd1acd497d2790c83e7f15da964aab8ec93876831
+  tailwindcss-ruby (4.2.1-x86_64-linux-musl) sha256=79fa48ad51e533545f9fdbb04227e1342a65a42c2bd1314118b95473d5612007
   thor (1.5.0) sha256=e3a9e55fe857e44859ce104a84675ab6e8cd59c650a49106a05f55f136425e73
   thruster (0.1.19) sha256=3246eb6ea6fe699e89d6eecc4edda856452e4ebeb9d5999791f0e88832369527
   thruster (0.1.19-aarch64-linux) sha256=cfabff204f655359675c3f0e3e3940c6d1f110b765d0d48f5281077b8bb65325

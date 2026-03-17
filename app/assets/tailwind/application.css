@@ -1,0 +1,5 @@
+@import "tailwindcss";
+/* Tailwind v4 entry point.
+  tailwindcss-rails reads this file, automatically scans all ERB views
+  to detect used classes, and compiles the result into
+  app/assets/builds/tailwind.css (unused classes are purged). */
