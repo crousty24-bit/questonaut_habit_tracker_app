@@ -84,17 +84,19 @@
   &::before {
     content: '';
     position: absolute;
-    inset: 0;
-    background: linear-gradient(to right, $cyan, $purple);
+    inset: -4px;
+    background: linear-gradient(135deg, $cyan, $purple);
     border-radius: 1.5rem;
     filter: blur(3rem);
     opacity: 0.2;
     animation: pulse-glow 3s ease-in-out infinite;
+    z-index: 0;
   }
 }
 
 .hero-card-inner {
   position: relative;
+  z-index: 1;
   // glass-panel s'applique via la classe ERB
   border-radius: 1.5rem;
   padding: $sp-8;

@@ -1,53 +1,97 @@
 <div class="stars-bg" id="stars"></div>
 
-<nav class="top-nav">
-  <div class="nav-inner">
-    <a class="brand" href="<%= root_path %>">
-      <div class="brand-icon">&#x1F680;</div>
-      <span class="brand-text">Questonaut</span>
-    </a>
-    <div class="nav-actions">
-      <% if user_signed_in? %>
-        <a class="btn btn-ghost" href="<%= dashboard_path %>">Dashboard</a>
-        <%= button_to "Logout", destroy_user_session_path, method: :delete, class: "btn btn-primary" %>
-      <% else %>
-        <a class="btn btn-primary" href="<%= new_user_session_path %>">Start Mission</a>
-      <% end %>
-    </div>
-  </div>
-</nav>
-
+<%# Hero section %>
 <section class="hero">
   <div class="hero-grid">
+
+    <%# Colonne gauche — texte %>
     <div class="hero-content">
+
+      <span class="mission-badge">🌟 New Mission Available</span>
+
       <h1 class="text-5xl md:text-7xl font-bold leading-tight brand-font text-white">
-        Become the <span>Commander</span> of Your Habits
+        Become the
+        <span class="text-gradient">Commander</span>
+        of Your Habits
       </h1>
+
       <p>
-        Questonaut turns your daily routine into a space adventure. Track your habits and earn badges as you progress.
+        Questonaut turns your daily routine into a space adventure.
+        Track your habits and earn badges as you progress.
       </p>
+
       <div class="hero-actions">
-        <a class="btn btn-primary" href="<%= user_signed_in? ? dashboard_path : new_user_session_path %>">
+        <a href="<%= user_signed_in? ? dashboard_path : new_user_session_path %>"
+          class="btn btn-primary btn-xl">
           Launch Mission
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+          </svg>
         </a>
-        <a class="btn btn-secondary" href="<%= user_signed_in? ? dashboard_path : new_user_session_path %>">
+        <a href="<%= user_signed_in? ? dashboard_path : new_user_registration_path %>"
+          class="btn btn-secondary btn-xl">
           Explore
         </a>
       </div>
+
     </div>
 
-    <!-- Optional: illustration card, but remove fake stats -->
+    <%# Colonne droite — carte de preview %>
     <div class="hero-card">
-      <div class="card-glow animate-pulse"></div>
-      <div class="relative glass-panel rounded-3xl p-8 neon-glow">
-        <div class="card-header">
-          <div class="card-icon">&#x1F4CA;</div>
-          <div>
-            <div class="card-title">Mission Dashboard</div>
-            <div class="card-sub">Track your habits & badges</div>
+      <div class="hero-card-inner glass-panel neon-glow">
+
+        <div class="hero-card-header">
+          <div class="flex items-center gap-3">
+            <div class="card-icon-wrap">📊</div>
+            <div>
+              <div class="font-semibold text-white">Mission Dashboard</div>
+              <div class="text-xs text-gray-400">Day 42 of mission</div>
+            </div>
+          </div>
+          <span class="level-badge">LVL 12</span>
+        </div>
+
+        <div class="flex justify-between text-sm mb-2">
+          <span class="text-gray-300">Progress to Level 13</span>
+          <span class="font-semibold" style="color: var(--neon-cyan);">2,450 / 3,000 XP</span>
+        </div>
+        <div class="xp-bar">
+          <div class="xp-fill" style="width: 82%"></div>
+        </div>
+
+        <div class="hero-card-mini-stats">
+          <div class="mini-stat">
+            <span class="mini-stat__icon streak-flame">🔥</span>
+            <span class="mini-stat__label">Streak 15d</span>
+          </div>
+          <div class="mini-stat">
+            <span class="mini-stat__icon">🏆</span>
+            <span class="mini-stat__label">12 Badges</span>
+          </div>
+          <div class="mini-stat">
+            <span class="mini-stat__icon">✅</span>
+            <span class="mini-stat__label">8/8 Today</span>
           </div>
         </div>
+
       </div>
     </div>
+
   </div>
 </section>
+
+<%# Script étoiles %>
+<script>
+  (function() {
+    const container = document.getElementById('stars');
+    for (let i = 0; i < 100; i++) {
+      const star = document.createElement('div');
+      star.className = 'star';
+      star.style.left = Math.random() * 100 + '%';
+      star.style.top  = Math.random() * 100 + '%';
+      star.style.animationDelay = Math.random() * 3 + 's';
+      container.appendChild(star);
+    }
+  })();
+</script>
