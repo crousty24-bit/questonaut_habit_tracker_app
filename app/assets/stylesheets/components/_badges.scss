@@ -15,6 +15,7 @@
 .cat-productivity{ background: rgba(0, 243, 255, 0.15);  color: $cyan;   border: 1px solid rgba(0, 243, 255, 0.35); }
 .cat-learning    { background: rgba(251, 191, 36, 0.15); color: $amber;  border: 1px solid rgba(251, 191, 36, 0.35); }
 .cat-fitness     { background: rgba(255, 165, 2, 0.18);  color: #ffa502; border: 1px solid rgba(255, 165, 2, 0.35); }
+.cat-nutrition   { background: rgba(45, 212, 191, 0.16); color: #2dd4bf; border: 1px solid rgba(45, 212, 191, 0.35); }
 
 // ─── Frequency tags ──────────────────────────────────────────
 .frequency-tag {
@@ -67,4 +68,10 @@
   border-color: rgba(255, 165, 2, 0.5); color: #ffa502;
   &:hover   { background: rgba(255, 165, 2, 0.08); }
   &.selected{ background: #ffa502; border-color: #ffa502; color: $bg-base; box-shadow: 0 0 15px rgba(255, 165, 2, 0.4); }
+}
+
+.tag-nutrition {
+  border-color: rgba(45, 212, 191, 0.5); color: #2dd4bf;
+  &:hover   { background: rgba(45, 212, 191, 0.08); }
+  &.selected{ background: #2dd4bf; border-color: #2dd4bf; color: $bg-base; box-shadow: 0 0 15px rgba(45, 212, 191, 0.35); }
 }

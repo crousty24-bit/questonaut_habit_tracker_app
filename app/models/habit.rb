@@ -1,5 +1,5 @@
 class Habit < ApplicationRecord
-  CATEGORIES = %w[health productivity learning fitness].freeze
+  CATEGORIES = %w[health productivity learning fitness nutrition].freeze
   FREQUENCIES = %w[daily weekly].freeze
 
   attr_accessor :category_name

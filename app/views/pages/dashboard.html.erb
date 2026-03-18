@@ -18,7 +18,8 @@
       "health" => "❤️",
       "productivity" => "⚡",
       "learning" => "📚",
-      "fitness" => "💪"
+      "fitness" => "💪",
+      "nutrition" => "🥗"
     }[category] || "🎯"
   end
 
@@ -127,6 +128,7 @@
         <button type="button" class="filter-btn" data-dashboard-filter="productivity">Productivity</button>
         <button type="button" class="filter-btn" data-dashboard-filter="learning">Learning</button>
         <button type="button" class="filter-btn" data-dashboard-filter="fitness">Fitness</button>
+        <button type="button" class="filter-btn" data-dashboard-filter="nutrition">Nutrition</button>
       </div>
 
       <div class="missions-list">
@@ -323,6 +325,7 @@
           <button type="button" class="selectable-tag tag-productivity <%= 'selected' if selected_category == 'productivity' %>" data-category-option data-value="productivity">⚡ Productivity</button>
           <button type="button" class="selectable-tag tag-learning <%= 'selected' if selected_category == 'learning' %>" data-category-option data-value="learning">📚 Learning</button>
           <button type="button" class="selectable-tag tag-fitness <%= 'selected' if selected_category == 'fitness' %>" data-category-option data-value="fitness">💪 Fitness</button>
+          <button type="button" class="selectable-tag tag-nutrition <%= 'selected' if selected_category == 'nutrition' %>" data-category-option data-value="nutrition">🥗 Nutrition</button>
         </div>
         <%= form.hidden_field :category_name, value: selected_category, data: { category_input: true } %>
       </div>
@@ -393,6 +396,7 @@
           <button type="button" class="selectable-tag tag-productivity <%= 'selected' if editing_category == 'productivity' %>" data-edit-category-option data-value="productivity">⚡ Productivity</button>
           <button type="button" class="selectable-tag tag-learning <%= 'selected' if editing_category == 'learning' %>" data-edit-category-option data-value="learning">📚 Learning</button>
           <button type="button" class="selectable-tag tag-fitness <%= 'selected' if editing_category == 'fitness' %>" data-edit-category-option data-value="fitness">💪 Fitness</button>
+          <button type="button" class="selectable-tag tag-nutrition <%= 'selected' if editing_category == 'nutrition' %>" data-edit-category-option data-value="nutrition">🥗 Nutrition</button>
         </div>
         <%= form.hidden_field :category_name, value: editing_category, id: "editHabitCategory", data: { edit_category_input: true } %>
       </div>

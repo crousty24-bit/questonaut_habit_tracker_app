@@ -6,7 +6,8 @@
       "health" => "❤️",
       "productivity" => "⚡",
       "learning" => "📚",
-      "fitness" => "💪"
+      "fitness" => "💪",
+      "nutrition" => "🥗"
     }[category] || "🎯"
   end
 
@@ -46,6 +47,7 @@
     <button type="button" class="filter-btn" data-habit-filter="productivity">Productivity</button>
     <button type="button" class="filter-btn" data-habit-filter="learning">Learning</button>
     <button type="button" class="filter-btn" data-habit-filter="fitness">Fitness</button>
+    <button type="button" class="filter-btn" data-habit-filter="nutrition">Nutrition</button>
   </div>
 
   <div class="habits-grid" id="allHabitsList">
@@ -141,6 +143,7 @@
           <button type="button" class="selectable-tag tag-productivity <%= 'selected' if selected_category == 'productivity' %>" data-category-option data-value="productivity">⚡ Productivity</button>
           <button type="button" class="selectable-tag tag-learning <%= 'selected' if selected_category == 'learning' %>" data-category-option data-value="learning">📚 Learning</button>
           <button type="button" class="selectable-tag tag-fitness <%= 'selected' if selected_category == 'fitness' %>" data-category-option data-value="fitness">💪 Fitness</button>
+          <button type="button" class="selectable-tag tag-nutrition <%= 'selected' if selected_category == 'nutrition' %>" data-category-option data-value="nutrition">🥗 Nutrition</button>
         </div>
         <%= form.hidden_field :category_name, value: selected_category, data: { category_input: true } %>
       </div>
