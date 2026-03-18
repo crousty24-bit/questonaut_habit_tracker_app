@@ -1,0 +1,30 @@
+@use "base/variables" as *;
+
+// ─── XP Bar ──────────────────────────────────────────────────
+.xp-bar {
+  height: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 5px;
+  overflow: hidden;
+
+  &.thin  { height: 6px; }
+  &.thick { height: 14px; }
+}
+
+.xp-fill {
+  height: 100%;
+  border-radius: 5px;
+  background: linear-gradient(90deg, $cyan, $purple);
+  box-shadow: 0 0 10px rgba(0, 243, 255, 0.4);
+  transition: width 0.5s ease;
+
+  &.green  { background: linear-gradient(90deg, $green, #16a34a); box-shadow: 0 0 10px rgba(74, 222, 128, 0.4); }
+  &.orange { background: linear-gradient(90deg, $orange, $yellow); box-shadow: 0 0 10px rgba(255, 107, 53, 0.4); }
+  &.red    { background: linear-gradient(90deg, $red, #ff006e); box-shadow: 0 0 10px rgba(255, 71, 87, 0.4); }
+}
+
+// ─── Streak flame ────────────────────────────────────────────
+.streak-flame {
+  color: $orange;
+  animation: flicker 1.5s infinite alternate;
+}

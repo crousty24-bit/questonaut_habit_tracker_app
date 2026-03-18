@@ -1,0 +1,124 @@
+@use "sass:color";
+@use "base/variables" as *;
+
+// ─── Wrapper centré ───────────────────────────────────────────
+.auth-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $sp-6;
+  padding-top: 5rem; // espace sous la navbar fixe
+}
+
+// ─── Carte auth ───────────────────────────────────────────────
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+  padding: $sp-8;
+  // glass-panel appliqué en ERB
+}
+
+// ─── En-tête ─────────────────────────────────────────────────
+.auth-header {
+  text-align: center;
+  margin-bottom: $sp-8;
+
+  &__icon {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: $sp-4;
+  }
+
+  &__title {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: white;
+    font-family: 'Space Grotesk', sans-serif;
+    margin-bottom: $sp-2;
+  }
+
+  &__subtitle {
+    font-size: 0.875rem;
+    color: $text-secondary;
+  }
+}
+
+// ─── Formulaire ───────────────────────────────────────────────
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: $sp-5;
+}
+
+// ─── Lien de bas de page (pas de compte ? Inscris-toi) ────────
+.auth-footer {
+  text-align: center;
+  margin-top: $sp-6;
+  font-size: 0.875rem;
+  color: $text-secondary;
+
+  a {
+    color: $cyan;
+    font-weight: 600;
+    transition: $transition-base;
+
+    &:hover { color: color.adjust($cyan, $lightness: 10%); } // use color.adjust instead of lighten cause deprecated
+  }
+}
+
+// ─── Divider "ou continuer avec" ─────────────────────────────
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: $sp-3;
+  color: $text-muted;
+  font-size: 0.75rem;
+
+  &::before,
+  &::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: $border-dim;
+  }
+}
+
+// ─── Messages d'erreur Devise ────────────────────────────────
+.auth-error {
+  background: rgba(255, 71, 87, 0.1);
+  border: 1px solid rgba(255, 71, 87, 0.3);
+  border-radius: $radius-md;
+  padding: $sp-3 $sp-4;
+  font-size: 0.875rem;
+  color: #ff6b81;
+
+  ul { padding-left: $sp-4; }
+  li { margin-top: 2px; }
+}
+
+.auth-notice {
+  background: rgba(0, 243, 255, 0.08);
+  border: 1px solid $border-cyan;
+  border-radius: $radius-md;
+  padding: $sp-3 $sp-4;
+  font-size: 0.875rem;
+  color: $cyan;
+}
+
+// ─── Checkbox (remember me) ──────────────────────────────────
+.auth-checkbox {
+  display: flex;
+  align-items: center;
+  gap: $sp-2;
+  font-size: 0.875rem;
+  color: $text-secondary;
+  cursor: pointer;
+
+  input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: $cyan;
+    cursor: pointer;
+  }
+}

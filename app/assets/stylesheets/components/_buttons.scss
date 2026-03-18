@@ -1,0 +1,91 @@
+@use "base/variables" as *;
+
+// ─── Base ────────────────────────────────────────────────────
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: $sp-2;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+  transition: $transition-base;
+  white-space: nowrap;
+  border-radius: $radius-pill;
+
+  // Sizes
+  &-sm  { font-size: 0.75rem;  padding: $sp-2 $sp-4; }
+  &-md  { font-size: 0.875rem; padding: 10px $sp-5; }
+  &-lg  { font-size: 1rem;     padding: $sp-3 $sp-8; }
+  &-xl  { font-size: 1.125rem; padding: $sp-4 $sp-10; }
+
+  &:disabled { opacity: 0.4; pointer-events: none; cursor: not-allowed; }
+}
+
+// ─── Variants ────────────────────────────────────────────────
+.btn-primary {
+  background: linear-gradient(135deg, $cyan, #0081ff);
+  color: white;
+  box-shadow: $glow-cyan;
+
+  &:hover { transform: translateY(-2px); box-shadow: $glow-cyan-lg; }
+  &:active { transform: translateY(0); }
+}
+
+.btn-secondary {
+  background: rgba(0, 243, 255, 0.08);
+  border: 1px solid $border-cyan;
+  color: $cyan;
+
+  &:hover { background: rgba(0, 243, 255, 0.15); box-shadow: 0 0 15px rgba(0, 243, 255, 0.2); }
+}
+
+.btn-ghost {
+  background: transparent;
+  border: 1px solid $border-soft;
+  color: $text-secondary;
+
+  &:hover { border-color: rgba(255, 255, 255, 0.4); color: white; background: rgba(255, 255, 255, 0.05); }
+}
+
+.btn-danger {
+  background: rgba(255, 71, 87, 0.12);
+  border: 1px solid rgba(255, 71, 87, 0.4);
+  color: $red;
+
+  &:hover { background: $red; color: white; box-shadow: $glow-red; }
+}
+
+// ─── Mission Success Button ───────────────────────────────────
+.mission-success-btn {
+  padding: 9px 18px;
+  border-radius: 22px;
+  border: 2px solid $green;
+  color: $green;
+  background: rgba(74, 222, 128, 0.08);
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: $transition-base;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  letter-spacing: 0.3px;
+
+  &:hover {
+    background: $green;
+    color: $bg-base;
+    box-shadow: $glow-green;
+    transform: translateY(-1px);
+  }
+
+  &.active {
+    background: $green;
+    color: $bg-base;
+    box-shadow: $glow-green;
+    cursor: default;
+  }
+}
