@@ -69,11 +69,13 @@
   &__value {
     font-size: 1.875rem;
     font-weight: 700;
+    font-family: 'Space Grotesk', sans-serif;
   }
 
   &__label {
     font-size: 0.875rem;
     color: $text-secondary;
+    margin-top: 2px;
   }
 }
 
