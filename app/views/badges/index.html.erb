@@ -31,7 +31,7 @@
   end
 %>
 
-<div class="stars-bg"></div>
+<div class="stars-bg" data-controller="stars"></div>
 
 <section class="page-wrapper statistics-page">
   <div class="statistics-header">
@@ -106,34 +106,16 @@
     </div>
   </div>
 
-  <div class="glass-panel statistics-badges">
-    <h2 class="statistics-badges__title">
-      <span>🏆</span>
-      <span>Badge Collection</span>
-      <span class="statistics-badges__count">(<%= @unlocked_badges_count %>/<%= @badges.count %> Unlocked)</span>
-    </h2>
-
-    <% @badge_groups.each do |group_name, badges| %>
-      <% next if badges.empty? %>
-      <section class="statistics-badge-group">
-        <h3 class="statistics-badge-group__title"><%= group_name %></h3>
-        <div class="badge-grid">
-          <% badges.each do |badge| %>
-            <% unlocked = @user_badge_ids.include?(badge.id) %>
-            <div class="badge-item <%= 'locked' unless unlocked %>">
-              <% if badge.icon.attached? %>
-                <%= image_tag badge.icon, class: "pixel-badge #{'locked' unless unlocked}", alt: badge.name %>
-              <% else %>
-                <div class="statistics-badge-fallback <%= 'locked' unless unlocked %>"><%= badge.name.first.upcase %></div>
-              <% end %>
-              <div class="badge-name"><%= badge.name %></div>
-              <div class="badge-desc"><%= unlocked ? (badge.description.presence || "Unlocked") : "???" %></div>
-            </div>
-          <% end %>
-        </div>
-      </section>
-    <% end %>
-  </div>
+  <%= turbo_frame_tag "statistics_badge_collection", src: statistics_badge_collection_path, loading: "lazy" do %>
+    <div class="glass-panel statistics-badges statistics-badges--loading">
+      <h2 class="statistics-badges__title">
+        <span>🏆</span>
+        <span>Badge Collection</span>
+        <span class="statistics-badges__count">(<%= @unlocked_badges_count %>/<%= @total_badges_count %> Unlocked)</span>
+      </h2>
+      <div class="placeholder-chart">Loading badge collection...</div>
+    </div>
+  <% end %>
 
   <div class="glass-panel statistics-analysis">
     <h2 class="statistics-analysis__title">Detailed Analysis</h2>
@@ -163,20 +145,3 @@
     </div>
   </div>
 </section>
-
-<script>
-  (function() {
-    const container = document.querySelector('.stars-bg');
-    if (!container || container.dataset.enhanced === 'true') return;
-    container.dataset.enhanced = 'true';
-
-    for (let i = 0; i < 80; i++) {
-      const star = document.createElement('div');
-      star.className = 'star';
-      star.style.left = Math.random() * 100 + '%';
-      star.style.top = Math.random() * 100 + '%';
-      star.style.animationDelay = Math.random() * 3 + 's';
-      container.appendChild(star);
-    }
-  })();
-</script>

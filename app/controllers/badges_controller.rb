@@ -1,10 +1,8 @@
 class BadgesController < ApplicationController
-  before_action :authenticate_user!, only: %i[index show]
+  before_action :authenticate_user!, only: %i[index show collection]
   before_action :set_badge, only: %i[show edit update destroy]
 
   def index
-    @badges = Badge.includes(icon_attachment: :blob).order(:name)
-    @user_badge_ids = current_user.badge_ids
     @habits = current_user.habits.includes(:tags, :habit_logs).order(created_at: :desc)
     @completed_logs = HabitLog.joins(:habit).where(habits: { user_id: current_user.id }, completed: true)
 
@@ -12,14 +10,23 @@ class BadgesController < ApplicationController
     @mission_days = @completed_logs.select(:date).distinct.count
     @best_streak = @habits.map { |habit| streak_for(habit) }.max || 0
     @unlocked_badges_count = current_user.badges.count
+    @total_badges_count = Badge.count
     @category_distribution = category_distribution
     @detailed_habits = @habits.sort_by { |habit| [-habit_success_rate(habit), -streak_for(habit)] }.first(4)
+  end
+
+  def collection
+    @badges = Badge.includes(icon_attachment: :blob).order(:name)
+    @user_badge_ids = current_user.badge_ids
+    @unlocked_badges_count = current_user.badges.count
     @badge_groups = {
       "Streak Achievements" => @badges.select { |badge| badge.name.start_with?("Streak ") },
       "Mission Milestones" => @badges.select { |badge| mission_badge?(badge) },
       "Level Ranks" => @badges.select { |badge| badge.name.start_with?("Level ") },
       "Category Collection" => @badges.select { |badge| badge.name.start_with?("Tag: ") }
     }
+
+    render partial: "badge_collection"
   end
 
   def show; end

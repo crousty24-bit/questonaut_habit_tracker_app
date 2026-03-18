@@ -9,6 +9,7 @@ Rails.application.routes.draw do
   # Main connected pages
   get "dashboard", to: "pages#dashboard", as: :dashboard
   get "statistics", to: "badges#index", as: :statistics
+  get "statistics/badge_collection", to: "badges#collection", as: :statistics_badge_collection
 
   # HABITS (owned by the currently logged-in user)
   resources :habits, except: [:index, :new, :show, :edit] do

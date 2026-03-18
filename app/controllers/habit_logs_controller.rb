@@ -1,4 +1,6 @@
 class HabitLogsController < ApplicationController
+  include DashboardState
+
   before_action :set_habit_log, only: %i[show edit update destroy]
 
   def index
@@ -22,16 +24,22 @@ class HabitLogsController < ApplicationController
     already_completed = @habit_log.persisted? && @habit_log.completed?
     @habit_log.completed = completed_value
 
-    if @habit_log.save
-      if @habit_log.completed? && !already_completed
-        current_user.add_xp(10) unless @habit_log.previously_new_record?
-        BadgeAwarder.call(current_user, context: :habit_logged, habit: @habit)
-        redirect_to dashboard_path, notice: "Mission successfully validated."
+    respond_to do |format|
+      if @habit_log.save
+        if @habit_log.completed? && !already_completed
+          current_user.add_xp(10) unless @habit_log.previously_new_record?
+          BadgeAwarder.call(current_user, context: :habit_logged, habit: @habit)
+        end
+
+        format.turbo_stream { render_dashboard_update }
+        format.html do
+          redirect_to dashboard_path,
+                      notice: (@habit_log.completed? && !already_completed ? "Mission successfully validated." : "Mission was already validated for today.")
+        end
       else
-        redirect_to dashboard_path, notice: "Mission was already validated for today."
+        format.turbo_stream { render_dashboard_update(status: :unprocessable_entity) }
+        format.html { render :new, status: :unprocessable_entity }
       end
-    else
-      render :new, status: :unprocessable_entity
     end
   end
 
