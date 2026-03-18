@@ -1,70 +1,75 @@
-# Nettoyage
-UserBadge.destroy_all
-Badge.destroy_all
-HabitLog.destroy_all
-Tag.destroy_all
-Habit.destroy_all
-User.destroy_all
-
-puts "Creating users..."
-
-users = []
-
-5.times do |i|
-  users << User.create!(
-    email: "user#{i+1}@mail.com",
-    password: "password",
-    password_confirmation: "password",
-    name: "User #{i+1}",
-    total_xp: rand(0..500),
-    level: rand(1..5)
-  )
+# --------------------
+# BADGES HABIT / USER
+# --------------------
+{
+  "Welcome" => "habit/welcome.png",
+  "First Mission" => "habit/firstmission.png",
+  "Daily Login" => "habit/dailylogin.png", 
+  "Veteran" => "habit/veteran.png"
+}.each do |name, file|
+  badge = Badge.find_or_create_by!(name: name)
+  badge.icon.attach(
+    io: File.open(Rails.root.join("app/assets/images/asset_badge/#{file}")),
+    filename: File.basename(file)
+  ) unless badge.icon.attached?
 end
 
-puts "Creating badges..."
-
-badges = [
-  Badge.create!(name: "First Habit", description: "Complete your first habit", icon: "first.png"),
-  Badge.create!(name: "3 Day Streak", description: "Complete a habit 3 days in a row", icon: "streak3.png"),
-  Badge.create!(name: "10 Habits Done", description: "Complete 10 habits", icon: "10habits.png")
-]
-
-puts "Creating habits for each user..."
-
-users.each do |user|
-  rand(2..4).times do
-    habit = Habit.create!(
-      title: ["Run", "Read", "Meditate", "Workout", "Drink Water"].sample,
-      description: "Daily self improvement habit",
-      user: user
-    )
-
-    Tag.create!(
-      title: ["Health", "Mind", "Fitness", "Learning"].sample,
-      habit: habit
-    )
-
-    puts "Creating habit logs..."
-
-    7.times do |day|
-      HabitLog.create!(
-        habit: habit,
-        date: Date.today - day,
-        completed: [true, false].sample
-      )
-    end
-  end
+# --------------------
+# STREAK BADGES
+# --------------------
+{
+  "Streak 3" => "streak/3days.png",
+  "Streak 7" => "streak/7days.png",
+  "Streak 10" => "streak/10days.png",
+  "Streak 15" => "streak/15days.png",
+  "Streak 30" => "streak/30days.png",
+  "Streak 45" => "streak/45days.png",
+  "Streak 60" => "streak/60days.png",
+  "Streak 90" => "streak/90days.png"
+}.each do |name, file|
+  badge = Badge.find_or_create_by!(name: name)
+  badge.icon.attach(
+    io: File.open(Rails.root.join("app/assets/images/asset_badge/#{file}")),
+    filename: File.basename(file)
+  ) unless badge.icon.attached?
 end
 
-puts "Assigning badges..."
-
-users.each do |user|
-  badges.sample(2).each do |badge|
-    UserBadge.create!(
-      user: user,
-      badge: badge
-    )
-  end
+# --------------------
+# LEVEL BADGES
+# --------------------
+{
+  "Level 1" => "level/lvl1.png",
+  "Level 3" => "level/lvl3.png",
+  "Level 10" => "level/lvl10.png",
+  "Level 15" => "level/lvl15.png",
+  "Level 30" => "level/lvl30.png",
+  "Level 45" => "level/lvl45.png",
+  "Level 50" => "level/lvl50.png",
+  "Level 100" => "level/lvl100.png",
+  "Level 150" => "level/lvl150.png",
+  "Level 200" => "level/lvl200.png",
+  "Level 250" => "level/level250.png"
+}.each do |name, file|
+  badge = Badge.find_or_create_by!(name: name)
+  badge.icon.attach(
+    io: File.open(Rails.root.join("app/assets/images/asset_badge/#{file}")),
+    filename: File.basename(file)
+  ) unless badge.icon.attached?
 end
 
-puts "Seeds created successfully!"
+# --------------------
+# TAG BADGES
+# --------------------
+{
+  "Tag: Fitness" => "tags/fitness.png",
+  "Tag: Learning" => "tags/learning.png",
+  "Tag: Nutrition" => "tags/nutrition.png",
+  "Tag: Productivity" => "tags/productivity.png",
+  "Tag: Health" => "tags/health.png"
+}.each do |name, file|
+  badge = Badge.find_or_create_by!(name: name)
+  badge.icon.attach(
+    io: File.open(Rails.root.join("app/assets/images/asset_badge/#{file}")),
+    filename: File.basename(file)
+  ) unless badge.icon.attached?
+end

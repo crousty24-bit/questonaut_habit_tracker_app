@@ -1,3 +1,4 @@
+# app/services/badge_awarder.rb
 class BadgeAwarder
   def self.call(user, context: nil, habit: nil)
     new(user, context, habit).call
@@ -23,27 +24,21 @@ class BadgeAwarder
 
   private
 
-  # --------------------
-  # GENERIC
-  # --------------------
-
   def award(name)
     badge = Badge.find_by(name: name)
     return unless badge
-
     @user.user_badges.find_or_create_by(badge: badge)
   end
 
   # --------------------
   # USER BADGES
   # --------------------
-
   def award_signup_badge
     award("Welcome")
   end
 
   def award_first_habit_badge
-    award("First Habit") if @user.habits.count == 1
+    award("First Mission") if @user.habits.count == 1
   end
 
   def award_first_log_badge
@@ -55,63 +50,43 @@ class BadgeAwarder
   end
 
   # --------------------
-  # STREAK (PAR HABIT ✅)
+  # STREAK BADGES
   # --------------------
-
   STREAKS = [3, 7, 10, 15, 30, 45, 60, 90, 120]
 
   def award_streak_badges
     return unless @habit
-
     streak = habit_streak(@habit)
-
-    STREAKS.each do |days|
-      award("Streak #{days}") if streak >= days
-    end
+    STREAKS.each { |days| award("Streak #{days}") if streak >= days }
   end
 
   def habit_streak(habit)
     logs = habit.habit_logs.order(date: :desc)
-
     return 0 if logs.empty?
-
     streak = 1
-
     logs.each_cons(2) do |a, b|
-      if a.date == b.date + 1.day
-        streak += 1
-      else
-        break
-      end
+      break unless a.date == b.date + 1.day
+      streak += 1
     end
-
     streak
   end
 
   # --------------------
   # TAG BADGES
   # --------------------
-
   def award_tag_badges
     return unless @habit
-
-    @habit.tags.each do |tag|
-      award("Tag: #{tag.name}")
-    end
+    @habit.tags.each { |tag| award("Tag: #{tag.title}") }
   end
 
   # --------------------
   # LEVEL BADGES
   # --------------------
-
   LEVELS = [1, 5, 10, 15, 20, 25, 30, 50, 100, 150, 200]
 
   def award_level_badges
     level = user_level
-
-    LEVELS.each do |lvl|
-      award("Level #{lvl}") if level >= lvl
-    end
+    LEVELS.each { |lvl| award("Level #{lvl}") if level >= lvl }
   end
 
   def user_level
@@ -119,14 +94,15 @@ class BadgeAwarder
   end
 
   # --------------------
-  # LOYALTY BADGES
+  # LOYALTY & DAILY LOGIN
   # --------------------
-
   def award_loyalty_badges
     days = (Date.today - @user.created_at.to_date).to_i
-
     award("1 Month") if days >= 30
     award("3 Months") if days >= 90
     award("1 Year") if days >= 365
+
+    # Daily Login badge
+    award("Daily Login") if @context == :login && @user.login_streak >= 7
   end
 end
