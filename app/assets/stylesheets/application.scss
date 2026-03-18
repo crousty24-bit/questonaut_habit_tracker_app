@@ -1,0 +1,28 @@
+/* Single entry point for the Sass pipeline.
+# This file writes no styles directly — it imports all partials in the correct order.
+# Logical order: variables first (used everywhere), then layers from most global
+# to most specific.
+# Compiled by: bundle exec sass → app/assets/builds/sass.css
+
+# @use loads a Sass partial. "as *" on variables exposes all variables
+# ($color-accent, $radius-card…) directly in other files without a namespace prefix.*/
+
+@use "base/variables" as *;
+@use "base/globals";            /* global body styles, links, base transitions */
+
+@use "layout/navbar";           /* main navigation bar */
+@use "layout/dashboard";        /* general dashboard layout structure */
+
+@use "components/buttons";      /* reusable buttons (primary, ghost, danger…) */
+@use "components/cards";        /* habit-card, stat-card, badge-card */
+@use "components/forms";        /* inputs, labels, selects, error states */
+@use "components/progress";     /* xp-bar, streak-indicator, progress-ring */
+
+@use "pages/home";              /* styles specific to the landing page */
+@use "pages/auth";              /* login, signup, reset password (Devise) */
+@use "pages/habits";            /* habit list and habit detail views */
+
+@use "themes/space-theme";      /* sci-fi visual identity: glow, gradients, overlays */
+
+@use "utilities/animations";    /* hover, fade-in, pulse, slide-up */
+@use "utilities/effects";       /* lassmorphism, blur, light shadows */

@@ -1,0 +1,4 @@
+web: bin/rails server -p 3000
+css: bundle exec sass app/assets/stylesheets/application.scss:app/assets/builds/sass.css --load-path app/assets/stylesheets --watch
+js:  bin/rails tailwindcss:watch
+
