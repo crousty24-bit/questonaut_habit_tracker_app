@@ -36,23 +36,6 @@
   }
 }
 
-// ─── Badge "New Mission Available" ────────────────────────────
-.mission-badge {
-  display: inline-block;
-  align-self: flex-start; //prevent strech of badge
-  padding: $sp-2 $sp-4;
-  border-radius: $radius-pill;
-  background: linear-gradient(
-    to right,
-    rgba(0, 243, 255, 0.2),
-    rgba(188, 19, 254, 0.2)
-  );
-  border: 1px solid rgba(0, 243, 255, 0.3);
-  color: $cyan;
-  font-size: 0.875rem;
-  font-weight: 600;
-}
-
 // ─── Boutons hero ─────────────────────────────────────────────
 .hero-actions {
   display: flex;
