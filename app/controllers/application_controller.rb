@@ -1,10 +1,10 @@
 class ApplicationController < ActionController::Base
-  allow_browser versions: :modern
   before_action :award_login_badges
+
+  private
 
   def award_login_badges
     return unless user_signed_in?
-
-    BadgeAwarder.call(current_user, context: :login)
+    current_user.award_daily_login
   end
 end
