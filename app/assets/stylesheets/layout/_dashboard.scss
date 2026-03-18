@@ -200,6 +200,16 @@
   gap: $sp-4;
 }
 
+.dashboard-filter-bar {
+  margin-top: -$sp-2;
+}
+
+.dashboard-section-block {
+  display: flex;
+  flex-direction: column;
+  gap: $sp-4;
+}
+
 .missions-section-label {
   margin-top: $sp-2;
   margin-bottom: $sp-1;
@@ -267,11 +277,20 @@
 }
 
 .dashboard-habit__action {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: $sp-3;
   flex-shrink: 0;
 }
 
 .dashboard-habit__action form {
   margin: 0;
+}
+
+.dashboard-habit__controls {
+  display: flex;
+  gap: $sp-2;
 }
 
 .profile-avatar-wrap {
@@ -332,16 +351,6 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: $sp-6;
-}
-
-.missions-section-label {
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: $text-muted;
-  margin-top: $sp-6;
-  margin-bottom: $sp-3;
 }
 
 // ─── Sidebar widgets ──────────────────────────────────────────
@@ -528,10 +537,19 @@
     width: 100%;
   }
 
+  .dashboard-habit__action {
+    align-items: stretch;
+  }
+
   .dashboard-cta,
   .dashboard-habit__action .mission-success-btn,
   .dashboard-habit__action form {
     width: 100%;
+  }
+
+  .dashboard-habit__controls {
+    width: 100%;
+    justify-content: flex-end;
   }
 
   .dashboard-habit__action .mission-success-btn {

@@ -11,7 +11,7 @@ Rails.application.routes.draw do
   get "statistics", to: "badges#index", as: :statistics
 
   # HABITS (owned by the currently logged-in user)
-  resources :habits do
+  resources :habits, except: [:index, :new, :show, :edit] do
     resources :habit_logs, only: [:index, :create, :show, :update, :destroy]
     resources :tags, only: [:index, :create, :update, :destroy]
   end

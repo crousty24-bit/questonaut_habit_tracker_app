@@ -36,6 +36,14 @@
 
   best_streak = @habits.map { |habit| streak_for.call(habit) }.max || 0
   login_streak = current_user.login_streak || 0
+  editing_habit = @editing_habit || current_user.habits.new
+  editing_category = if editing_habit.respond_to?(:category_name) && editing_habit.category_name.present?
+                       editing_habit.category_name
+                     elsif editing_habit.respond_to?(:primary_category) && editing_habit.persisted?
+                       editing_habit.primary_category
+                     else
+                       "health"
+                     end
 %>
 
 <div class="stars-bg"></div>
@@ -114,53 +122,80 @@
         <div class="dashboard-date"><%= @today.strftime("%A, %B %-d, %Y") %></div>
       </div>
 
+      <div class="filter-bar dashboard-filter-bar">
+        <button type="button" class="filter-btn" data-dashboard-filter="health">Health</button>
+        <button type="button" class="filter-btn" data-dashboard-filter="productivity">Productivity</button>
+        <button type="button" class="filter-btn" data-dashboard-filter="learning">Learning</button>
+        <button type="button" class="filter-btn" data-dashboard-filter="fitness">Fitness</button>
+      </div>
+
       <div class="missions-list">
         <% if @habits.any? %>
           <% [["Daily Missions", daily_habits], ["Weekly Missions", weekly_habits]].each do |section_title, habits| %>
             <% next if habits.empty? %>
-            <div class="missions-section-label"><%= section_title %></div>
+            <section class="dashboard-section-block" data-dashboard-section>
+              <div class="missions-section-label"><%= section_title %></div>
 
-            <% habits.each do |habit| %>
-              <% category = habit.primary_category %>
-              <% completed = habit.habit_logs.any? { |log| log.date == @today && log.completed? } %>
-              <% streak = streak_for.call(habit) %>
+              <% habits.each do |habit| %>
+                <% category = habit.primary_category %>
+                <% completed = habit.habit_logs.any? { |log| log.date == @today && log.completed? } %>
+                <% streak = streak_for.call(habit) %>
 
-              <article class="habit-card <%= 'completed' if completed %>">
-                <div class="dashboard-habit">
-                  <div class="dashboard-habit__main">
-                    <div class="cat-icon <%= category %>"><%= category_icon_for.call(category) %></div>
+                <article class="habit-card <%= 'completed' if completed %>" data-dashboard-card data-category="<%= category %>">
+                  <div class="dashboard-habit">
+                    <div class="dashboard-habit__main">
+                      <div class="cat-icon <%= category %>"><%= category_icon_for.call(category) %></div>
 
-                    <div class="dashboard-habit__content">
-                      <div class="dashboard-habit__topline">
-                        <h3 class="dashboard-habit__title <%= 'is-complete' if completed %>"><%= habit.title %></h3>
-                        <span class="category-tag cat-<%= category %>"><%= category %></span>
-                      </div>
+                      <div class="dashboard-habit__content">
+                        <div class="dashboard-habit__topline">
+                          <h3 class="dashboard-habit__title <%= 'is-complete' if completed %>"><%= habit.title %></h3>
+                          <span class="category-tag cat-<%= category %>"><%= category %></span>
+                        </div>
 
-                      <p class="dashboard-habit__description">
-                        <%= habit.description.presence || "Stay consistent and complete this mission to earn XP." %>
-                      </p>
+                        <p class="dashboard-habit__description">
+                          <%= habit.description.presence || "Stay consistent and complete this mission to earn XP." %>
+                        </p>
 
-                      <div class="dashboard-habit__meta">
-                        <span class="streak-flame">🔥 <%= streak %> day<%= "s" if streak != 1 %></span>
-                        <span class="dashboard-habit__xp">+10 XP</span>
+                        <div class="dashboard-habit__meta">
+                          <span class="streak-flame">🔥 <%= streak %> day<%= "s" if streak != 1 %></span>
+                          <span class="dashboard-habit__xp">+10 XP</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  <div class="dashboard-habit__action">
-                    <% if completed %>
-                      <button class="mission-success-btn active" disabled>✓ Completed</button>
-                    <% else %>
-                      <%= button_to "🚀 Mission Success",
-                                    habit_habit_logs_path(habit),
-                                    method: :post,
-                                    params: { habit_log: { date: @today, completed: true, habit_id: habit.id } },
-                                    class: "mission-success-btn" %>
-                    <% end %>
+                    <div class="dashboard-habit__action">
+                      <div class="dashboard-habit__controls">
+                        <button type="button"
+                                class="habit-action-btn"
+                                title="Edit"
+                                data-edit-habit-open
+                                data-habit-id="<%= habit.id %>"
+                                data-habit-title="<%= habit.title %>"
+                                data-habit-description="<%= habit.description.to_s %>"
+                                data-habit-frequency="<%= habit.frequency %>"
+                                data-habit-category="<%= category %>">✏️</button>
+                        <%= button_to "🗑️",
+                                      habit_path(habit),
+                                      method: :delete,
+                                      class: "habit-action-btn delete",
+                                      title: "Delete",
+                                      form: { data: { turbo_confirm: "Delete this mission permanently?" } } %>
+                      </div>
+
+                      <% if completed %>
+                        <button class="mission-success-btn active" disabled>✓ Completed</button>
+                      <% else %>
+                        <%= button_to "🚀 Mission Success",
+                                      habit_habit_logs_path(habit),
+                                      method: :post,
+                                      params: { habit_log: { date: @today, completed: true, habit_id: habit.id } },
+                                      class: "mission-success-btn" %>
+                      <% end %>
+                    </div>
                   </div>
-                </div>
-              </article>
-            <% end %>
+                </article>
+              <% end %>
+            </section>
           <% end %>
         <% else %>
           <div class="glass-panel dashboard-empty">
@@ -236,6 +271,17 @@
     </div>
 
     <%= form_with(model: @habit, url: habits_path, class: "dashboard-modal-form") do |form| %>
+      <% if @habit.errors.any? %>
+        <div class="auth-error">
+          <h2 class="auth-error__title"><%= pluralize(@habit.errors.count, "error") %> prevented this mission from being saved:</h2>
+          <ul>
+            <% @habit.errors.full_messages.each do |message| %>
+              <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
       <div class="form-group">
         <%= form.label :title, "Mission Name", class: "form-label" %>
         <%= form.text_field :title,
@@ -271,8 +317,8 @@
 
       <div class="form-group">
         <label class="form-label">Category (select one)</label>
+        <% selected_category = @habit.category_name.presence || "health" %>
         <div class="dashboard-modal-form__tags">
-          <% selected_category = @habit.category_name.presence || 'health' %>
           <button type="button" class="selectable-tag tag-health <%= 'selected' if selected_category == 'health' %>" data-category-option data-value="health">❤️ Health</button>
           <button type="button" class="selectable-tag tag-productivity <%= 'selected' if selected_category == 'productivity' %>" data-category-option data-value="productivity">⚡ Productivity</button>
           <button type="button" class="selectable-tag tag-learning <%= 'selected' if selected_category == 'learning' %>" data-category-option data-value="learning">📚 Learning</button>
@@ -284,6 +330,76 @@
       <div class="dashboard-modal-form__actions">
         <button type="button" class="btn btn-ghost btn-md dashboard-modal-form__button" data-modal-close="createHabitModal">Cancel</button>
         <%= form.submit "Create Mission", class: "btn btn-primary btn-md dashboard-modal-form__button" %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<div id="editHabitModal" class="modal-overlay dashboard-mission-modal <%= 'active' if @show_edit_habit_modal %>">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 class="modal-title">✏️ Edit Mission</h3>
+      <button type="button" class="modal-close" data-modal-close="editHabitModal">&times;</button>
+    </div>
+
+    <%= form_with(scope: :habit,
+                  url: (@editing_habit&.persisted? ? habit_path(@editing_habit) : "#"),
+                  method: :post,
+                  html: { class: "dashboard-modal-form", id: "editHabitForm" }) do |form| %>
+      <%= hidden_field_tag :_method, "patch", id: "editHabitMethod" %>
+
+      <% if @editing_habit&.errors&.any? %>
+        <div class="auth-error">
+          <h2 class="auth-error__title"><%= pluralize(@editing_habit.errors.count, "error") %> prevented this mission from being updated:</h2>
+          <ul>
+            <% @editing_habit.errors.full_messages.each do |message| %>
+              <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <div class="form-group">
+        <%= form.label :title, "Mission Name", class: "form-label" %>
+        <%= form.text_field :title, class: "input", placeholder: "e.g., Morning Meditation", required: true, id: "editHabitTitle", value: editing_habit.title %>
+      </div>
+
+      <div class="form-group">
+        <%= form.label :description, "Description", class: "form-label" %>
+        <%= form.text_area :description, rows: 3, class: "textarea", placeholder: "Describe your goal...", id: "editHabitDescription" do %><%= editing_habit.description %><% end %>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Frequency</label>
+        <div class="dashboard-modal-form__choices">
+          <button type="button" class="freq-option <%= (editing_habit.frequency || 'daily') == 'daily' ? 'selected' : '' %>" data-edit-frequency-option data-value="daily">
+            <span class="freq-icon">📅</span>
+            <span class="freq-title">Daily</span>
+            <span class="freq-desc">Validate every day</span>
+          </button>
+          <button type="button" class="freq-option <%= editing_habit.frequency == 'weekly' ? 'selected' : '' %>" data-edit-frequency-option data-value="weekly">
+            <span class="freq-icon">📆</span>
+            <span class="freq-title">Weekly</span>
+            <span class="freq-desc">Once per week only</span>
+          </button>
+        </div>
+        <%= form.hidden_field :frequency, value: (editing_habit.frequency || 'daily'), id: "editHabitFrequency", data: { edit_frequency_input: true } %>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Category (select one)</label>
+        <div class="dashboard-modal-form__tags">
+          <button type="button" class="selectable-tag tag-health <%= 'selected' if editing_category == 'health' %>" data-edit-category-option data-value="health">❤️ Health</button>
+          <button type="button" class="selectable-tag tag-productivity <%= 'selected' if editing_category == 'productivity' %>" data-edit-category-option data-value="productivity">⚡ Productivity</button>
+          <button type="button" class="selectable-tag tag-learning <%= 'selected' if editing_category == 'learning' %>" data-edit-category-option data-value="learning">📚 Learning</button>
+          <button type="button" class="selectable-tag tag-fitness <%= 'selected' if editing_category == 'fitness' %>" data-edit-category-option data-value="fitness">💪 Fitness</button>
+        </div>
+        <%= form.hidden_field :category_name, value: editing_category, id: "editHabitCategory", data: { edit_category_input: true } %>
+      </div>
+
+      <div class="dashboard-modal-form__actions">
+        <button type="button" class="btn btn-ghost btn-md dashboard-modal-form__button" data-modal-close="editHabitModal">Cancel</button>
+        <%= form.submit "Update Mission", class: "btn btn-primary btn-md dashboard-modal-form__button" %>
       </div>
     <% end %>
   </div>
@@ -322,20 +438,96 @@
     });
 
     const frequencyInput = modal.querySelector('[data-frequency-input]');
-    const frequencyOptions = modal.querySelectorAll('[data-frequency-option]');
-    frequencyOptions.forEach((option) => {
+    modal.querySelectorAll('[data-frequency-option]').forEach((option) => {
       option.addEventListener('click', () => {
-        frequencyOptions.forEach((node) => node.classList.remove('selected'));
+        modal.querySelectorAll('[data-frequency-option]').forEach((node) => node.classList.remove('selected'));
         option.classList.add('selected');
         if (frequencyInput) frequencyInput.value = option.dataset.value;
       });
     });
 
     const categoryInput = modal.querySelector('[data-category-input]');
-    const categoryOptions = modal.querySelectorAll('[data-category-option]');
-    categoryOptions.forEach((option) => {
+    modal.querySelectorAll('[data-category-option]').forEach((option) => {
       option.addEventListener('click', () => {
-        categoryOptions.forEach((node) => node.classList.remove('selected'));
+        modal.querySelectorAll('[data-category-option]').forEach((node) => node.classList.remove('selected'));
+        option.classList.add('selected');
+        if (categoryInput) categoryInput.value = option.dataset.value;
+      });
+    });
+  })();
+
+  (function() {
+    const buttons = document.querySelectorAll('[data-dashboard-filter]');
+    const cards = document.querySelectorAll('[data-dashboard-card]');
+    const sections = document.querySelectorAll('[data-dashboard-section]');
+    if (!buttons.length || !cards.length) return;
+
+    buttons.forEach((button) => {
+      button.addEventListener('click', () => {
+        const wasActive = button.classList.contains('active');
+        buttons.forEach((node) => node.classList.remove('active'));
+        const filter = wasActive ? null : button.dataset.dashboardFilter;
+        if (!wasActive) button.classList.add('active');
+
+        cards.forEach((card) => {
+          const matches = !filter || card.dataset.category === filter;
+          card.style.display = matches ? '' : 'none';
+        });
+
+        sections.forEach((section) => {
+          const hasVisibleCards = Array.from(section.querySelectorAll('[data-dashboard-card]')).some((card) => card.style.display !== 'none');
+          section.style.display = hasVisibleCards ? '' : 'none';
+        });
+      });
+    });
+  })();
+
+  (function() {
+    const modal = document.getElementById('editHabitModal');
+    const form = document.getElementById('editHabitForm');
+    if (!modal || !form) return;
+
+    document.querySelectorAll('[data-edit-habit-open]').forEach((trigger) => {
+      trigger.addEventListener('click', () => {
+        form.action = `/habits/${trigger.dataset.habitId}`;
+        document.getElementById('editHabitTitle').value = trigger.dataset.habitTitle || '';
+        document.getElementById('editHabitDescription').value = trigger.dataset.habitDescription || '';
+        document.getElementById('editHabitFrequency').value = trigger.dataset.habitFrequency || 'daily';
+        document.getElementById('editHabitCategory').value = trigger.dataset.habitCategory || 'health';
+
+        modal.querySelectorAll('[data-edit-frequency-option]').forEach((option) => {
+          option.classList.toggle('selected', option.dataset.value === (trigger.dataset.habitFrequency || 'daily'));
+        });
+
+        modal.querySelectorAll('[data-edit-category-option]').forEach((option) => {
+          option.classList.toggle('selected', option.dataset.value === (trigger.dataset.habitCategory || 'health'));
+        });
+
+        modal.classList.add('active');
+      });
+    });
+
+    document.querySelectorAll('[data-modal-close="editHabitModal"]').forEach((trigger) => {
+      trigger.addEventListener('click', () => modal.classList.remove('active'));
+    });
+
+    modal.addEventListener('click', (event) => {
+      if (event.target === modal) modal.classList.remove('active');
+    });
+
+    const frequencyInput = modal.querySelector('[data-edit-frequency-input]');
+    modal.querySelectorAll('[data-edit-frequency-option]').forEach((option) => {
+      option.addEventListener('click', () => {
+        modal.querySelectorAll('[data-edit-frequency-option]').forEach((node) => node.classList.remove('selected'));
+        option.classList.add('selected');
+        if (frequencyInput) frequencyInput.value = option.dataset.value;
+      });
+    });
+
+    const categoryInput = modal.querySelector('[data-edit-category-input]');
+    modal.querySelectorAll('[data-edit-category-option]').forEach((option) => {
+      option.addEventListener('click', () => {
+        modal.querySelectorAll('[data-edit-category-option]').forEach((node) => node.classList.remove('selected'));
         option.classList.add('selected');
         if (categoryInput) categoryInput.value = option.dataset.value;
       });
