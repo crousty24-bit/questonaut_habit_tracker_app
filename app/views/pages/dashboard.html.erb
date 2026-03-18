@@ -124,6 +124,7 @@
       </div>
 
       <div class="filter-bar dashboard-filter-bar">
+        <button type="button" class="filter-btn active" data-dashboard-filter="all">All</button>
         <button type="button" class="filter-btn" data-dashboard-filter="health">Health</button>
         <button type="button" class="filter-btn" data-dashboard-filter="productivity">Productivity</button>
         <button type="button" class="filter-btn" data-dashboard-filter="learning">Learning</button>
@@ -176,12 +177,13 @@
                                 data-habit-description="<%= habit.description.to_s %>"
                                 data-habit-frequency="<%= habit.frequency %>"
                                 data-habit-category="<%= category %>">✏️</button>
-                        <%= button_to "🗑️",
-                                      habit_path(habit),
+                        <%= button_to habit_path(habit),
                                       method: :delete,
                                       class: "habit-action-btn delete",
                                       title: "Delete",
-                                      form: { data: { turbo_confirm: "Delete this mission permanently?" } } %>
+                                      form: { data: { turbo_confirm: "Delete this mission permanently?" } } do %>
+                          &times;
+                        <% end %>
                       </div>
 
                       <% if completed %>
@@ -215,9 +217,9 @@
       <div class="glass-panel streak-card">
         <div class="streak-card__glow"></div>
         <div class="streak-flame dashboard-sidebar-icon">🔥</div>
-        <div class="streak-card__days"><%= login_streak %> Days</div>
+        <div class="streak-card__days"><%= login_streak %> Day<%= "s" if login_streak != 1 %></div>
         <div class="streak-card__label">Current Login Streak</div>
-        <div class="streak-card__best">Best mission streak: <%= best_streak %> days</div>
+        <div class="streak-card__best">Best mission streak: <%= best_streak %> day<%= "s" if best_streak != 1 %></div>
       </div>
 
       <div class="glass-panel dashboard-widget">
@@ -468,13 +470,12 @@
 
     buttons.forEach((button) => {
       button.addEventListener('click', () => {
-        const wasActive = button.classList.contains('active');
         buttons.forEach((node) => node.classList.remove('active'));
-        const filter = wasActive ? null : button.dataset.dashboardFilter;
-        if (!wasActive) button.classList.add('active');
+        const filter = button.dataset.dashboardFilter;
+        button.classList.add('active');
 
         cards.forEach((card) => {
-          const matches = !filter || card.dataset.category === filter;
+          const matches = filter === 'all' || card.dataset.category === filter;
           card.style.display = matches ? '' : 'none';
         });
 

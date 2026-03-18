@@ -5,7 +5,7 @@
   background: $bg-panel;
   border: 1px solid $border-dim;
   border-radius: $radius-lg;
-  padding: $sp-4;
+  padding: $sp-3;
   transition: $transition-base;
   backdrop-filter: blur(8px);
 
@@ -61,10 +61,10 @@
   flex-shrink: 0;
 
   &.health      { background: rgba(255, 71, 87, 0.15); }
-  &.productivity{ background: rgba(0, 243, 255, 0.15); }
-  &.learning    { background: rgba(251, 191, 36, 0.15); }
+  &.productivity{ background: rgba(59, 130, 246, 0.16); }
+  &.learning    { background: rgba(167, 139, 250, 0.16); }
   &.fitness     { background: rgba(255, 165, 2, 0.15); }
-  &.nutrition   { background: rgba(45, 212, 191, 0.15); }
+  &.nutrition   { background: rgba(74, 222, 128, 0.16); }
 }
 
 // ─── Pixel badges ────────────────────────────────────────────
@@ -74,6 +74,7 @@
   image-rendering: pixelated;
   border-radius: $radius-sm;
   display: block;
+  margin: 0 auto;
   transition: $transition-base;
 
   &:hover { transform: scale(1.1); filter: brightness(1.2); }
@@ -88,6 +89,9 @@
 }
 
 .badge-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
 
   .badge-name { font-size: 11px; margin-top: $sp-2; color: $text-primary; font-weight: 500; }
