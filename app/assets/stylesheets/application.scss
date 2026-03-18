@@ -17,6 +17,9 @@
 @use "components/cards";        /* habit-card, stat-card, badge-card */
 @use "components/forms";        /* inputs, labels, selects, error states */
 @use "components/progress";     /* xp-bar, streak-indicator, progress-ring */
+@use "components/badges";
+@use "components/alerts";
+@use "components/modals";
 
 @use "pages/home";              /* styles specific to the landing page */
 @use "pages/auth";              /* login, signup, reset password (Devise) */

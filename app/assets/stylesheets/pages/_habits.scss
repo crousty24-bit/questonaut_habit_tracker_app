@@ -1,0 +1,75 @@
+@use "base/variables" as *;
+
+// ─── Header de page ──────────────────────────────────────────
+.habits-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+// ─── Grille de la liste des habitudes ────────────────────────
+.habits-grid {
+  display: grid;
+  gap: $sp-4;
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+// ─── Habit card (vue management — plus riche que le dashboard) 
+.habit-card-management {
+  display: flex;
+  flex-direction: column;
+  gap: $sp-3;
+
+  &__top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+
+  &__info {
+    display: flex;
+    align-items: center;
+    gap: $sp-3;
+  }
+
+  &__tags {
+    display: flex;
+    gap: $sp-2;
+    margin-top: $sp-1;
+    flex-wrap: wrap;
+  }
+
+  &__actions {
+    display: flex;
+    gap: $sp-2;
+
+    button {
+      padding: $sp-2;
+      border-radius: $radius-sm;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      transition: $transition-base;
+      font-size: 1rem;
+
+      &:hover { background: rgba(255, 255, 255, 0.1); }
+
+      &.delete:hover { background: rgba(255, 71, 87, 0.2); }
+    }
+  }
+
+  &__desc {
+    font-size: 0.875rem;
+    color: $text-secondary;
+  }
+
+  &__footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.75rem;
+  }
+}

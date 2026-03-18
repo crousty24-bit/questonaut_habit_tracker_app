@@ -1,0 +1,70 @@
+@use "base/variables" as *;
+
+// ─── Category tags ───────────────────────────────────────────
+.category-tag {
+  display: inline-block;
+  padding: 3px $sp-3;
+  border-radius: $radius-md;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.cat-health      { background: rgba(255, 71, 87, 0.18);  color: #ff6b81; border: 1px solid rgba(255, 71, 87, 0.35); }
+.cat-productivity{ background: rgba(0, 243, 255, 0.15);  color: $cyan;   border: 1px solid rgba(0, 243, 255, 0.35); }
+.cat-learning    { background: rgba(251, 191, 36, 0.15); color: $amber;  border: 1px solid rgba(251, 191, 36, 0.35); }
+.cat-fitness     { background: rgba(255, 165, 2, 0.18);  color: #ffa502; border: 1px solid rgba(255, 165, 2, 0.35); }
+
+// ─── Frequency tags ──────────────────────────────────────────
+.frequency-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px $sp-3;
+  border-radius: $radius-sm;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.freq-daily  { background: rgba(0, 243, 255, 0.1);  color: $cyan;  border: 1px solid rgba(0, 243, 255, 0.3); }
+.freq-weekly { background: rgba(251, 191, 36, 0.1); color: $amber; border: 1px solid rgba(251, 191, 36, 0.3); }
+
+// ─── Selectable pills (form category picker) ─────────────────
+.selectable-tag {
+  padding: 10px $sp-5;
+  border: 2px solid;
+  border-radius: $radius-pill;
+  cursor: pointer;
+  transition: $transition-base;
+  font-size: 0.9rem;
+  font-weight: 500;
+  background: transparent;
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+.tag-health {
+  border-color: rgba(255, 71, 87, 0.5); color: #ff6b81;
+  &:hover   { background: rgba(255, 71, 87, 0.08); }
+  &.selected{ background: #ff4757; border-color: #ff4757; color: white; box-shadow: 0 0 15px rgba(255, 71, 87, 0.4); }
+}
+
+.tag-productivity {
+  border-color: rgba(0, 243, 255, 0.5); color: $cyan;
+  &:hover   { background: rgba(0, 243, 255, 0.08); }
+  &.selected{ background: $cyan; border-color: $cyan; color: $bg-base; box-shadow: 0 0 15px rgba(0, 243, 255, 0.4); }
+}
+
+.tag-learning {
+  border-color: rgba(251, 191, 36, 0.5); color: $amber;
+  &:hover   { background: rgba(251, 191, 36, 0.08); }
+  &.selected{ background: $amber; border-color: $amber; color: $bg-base; box-shadow: 0 0 15px rgba(251, 191, 36, 0.4); }
+}
+
+.tag-fitness {
+  border-color: rgba(255, 165, 2, 0.5); color: #ffa502;
+  &:hover   { background: rgba(255, 165, 2, 0.08); }
+  &.selected{ background: #ffa502; border-color: #ffa502; color: $bg-base; box-shadow: 0 0 15px rgba(255, 165, 2, 0.4); }
+}
