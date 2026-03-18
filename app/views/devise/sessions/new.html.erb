@@ -1,26 +1,68 @@
-<h2>Log in</h2>
+<section class="auth-wrapper">
+  <div class="auth-shell">
+    <div class="auth-hero glass-panel">
+      <div class="auth-hero__eyebrow">Mission Access</div>
+      <h1 class="auth-hero__title brand-font">
+        Return to your
+        <span class="text-gradient">mission control</span>
+      </h1>
+      <p class="auth-hero__copy">
+        Log in to track your habits, validate your daily missions, and keep your Questonaut streak alive.
+      </p>
 
-<%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
-  <div class="field">
-    <p><%= f.label :email %></p>
-    <p><%= f.email_field :email, autofocus: true, autocomplete: "email" %></p>
-  </div>
-
-  <div class="field">
-    <p><%= f.label :password %></p>
-    <p><%= f.password_field :password, autocomplete: "current-password" %></p>
-  </div>
-
-  <% if devise_mapping.rememberable? %>
-    <div class="field">
-      <p><%= f.check_box :remember_me %></p>
-      <p><%= f.label :remember_me %></p>
+      <div class="auth-hero__stats">
+        <div class="auth-stat">
+          <strong>+10 XP</strong>
+          <span>per validation</span>
+        </div>
+        <div class="auth-stat">
+          <strong>7 days</strong>
+          <span>for daily login badge</span>
+        </div>
+        <div class="auth-stat">
+          <strong>Levels</strong>
+          <span>unlock as you progress</span>
+        </div>
+      </div>
     </div>
-  <% end %>
 
-  <div class="actions">
-    <%= f.submit "Log in" %>
+    <div class="auth-card glass-panel neon-glow">
+      <div class="auth-header">
+        <span class="auth-header__icon">🚀</span>
+        <div class="auth-header__eyebrow">Commander Access</div>
+        <h2 class="auth-header__title">Log In</h2>
+        <p class="auth-header__subtitle">Continue your exploration and launch today's missions.</p>
+      </div>
+
+      <%= form_for(resource, as: resource_name, url: session_path(resource_name), html: { class: "auth-form" }) do |f| %>
+        <%= render "devise/shared/error_messages", resource: resource %>
+
+        <div class="form-group">
+          <%= f.label :email, class: "form-label" %>
+          <%= f.email_field :email, autofocus: true, autocomplete: "email", placeholder: "commander@questonaut.space", class: "input" %>
+        </div>
+
+        <div class="form-group">
+          <div class="auth-row">
+            <%= f.label :password, class: "form-label" %>
+            <% if devise_mapping.recoverable? %>
+              <%= link_to "Forgot password?", new_password_path(resource_name), class: "auth-inline-link" %>
+            <% end %>
+          </div>
+          <%= f.password_field :password, autocomplete: "current-password", placeholder: "Enter your password", class: "input" %>
+        </div>
+
+        <% if devise_mapping.rememberable? %>
+          <label class="auth-checkbox">
+            <%= f.check_box :remember_me %>
+            <span>Keep me signed in</span>
+          </label>
+        <% end %>
+
+        <%= f.submit "Launch Mission", class: "btn btn-primary btn-lg auth-submit" %>
+      <% end %>
+
+      <%= render "devise/shared/links" %>
+    </div>
   </div>
-<% end %>
-
-<%= render "devise/shared/links" %>
+</section>

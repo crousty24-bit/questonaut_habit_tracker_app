@@ -29,8 +29,8 @@
     <div class="nav-actions">
       <% if user_signed_in? %>
         <div class="hidden sm:block text-right">
-          <div class="text-sm font-semibold text-white"><%= current_user.username %></div>
-          <div class="text-xs" style="color: var(--neon-cyan);">Level <%= current_user.level %></div>
+          <div class="text-sm font-semibold text-white"><%= current_user.name.presence || current_user.email %></div>
+          <div class="text-xs" style="color: var(--neon-cyan);">Level <%= current_user.level || 1 %></div>
         </div>
         <div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500
                     flex items-center justify-center text-xl border-2 border-cyan-500/30">
