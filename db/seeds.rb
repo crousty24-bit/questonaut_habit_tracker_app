@@ -73,3 +73,20 @@ end
     filename: File.basename(file)
   ) unless badge.icon.attached?
 end
+
+# --------------------
+# TEST USERS
+# --------------------
+[
+  { name: "Test User 1", email: "testuser1@questonaut.test" },
+  { name: "Test User 2", email: "testuser2@questonaut.test" },
+  { name: "Test User 3", email: "testuser3@questonaut.test" },
+  { name: "Test User 4", email: "testuser4@questonaut.test" },
+  { name: "Test User 5", email: "testuser5@questonaut.test" }
+].each do |attributes|
+  user = User.find_or_initialize_by(email: attributes[:email])
+  user.name = attributes[:name]
+  user.password = "password123" if user.new_record?
+  user.password_confirmation = "password123" if user.new_record?
+  user.save!
+end
