@@ -1,0 +1,36 @@
+<%= turbo_frame_tag "statistics_badge_collection" do %>
+  <div class="glass-panel statistics-badges">
+    <h2 class="statistics-badges__title">
+      <span>🏆</span>
+      <span>Badge Collection</span>
+      <span class="statistics-badges__count">(<%= @unlocked_badges_count %>/<%= @badges.count %> Unlocked)</span>
+    </h2>
+
+    <% @badge_groups.each do |group_name, badges| %>
+      <% next if badges.empty? %>
+      <section class="statistics-badge-group">
+        <h3 class="statistics-badge-group__title"><%= group_name %></h3>
+        <div class="badge-grid">
+          <% badges.each do |badge| %>
+            <% unlocked = @user_badge_ids.include?(badge.id) %>
+            <div class="badge-item <%= 'locked' unless unlocked %>">
+              <% if badge.icon.attached? %>
+                <%= image_tag badge.icon,
+                              class: "pixel-badge #{'locked' unless unlocked}",
+                              alt: badge.name,
+                              width: 64,
+                              height: 64,
+                              loading: "lazy",
+                              decoding: "async" %>
+              <% else %>
+                <div class="statistics-badge-fallback <%= 'locked' unless unlocked %>"><%= badge.name.first.upcase %></div>
+              <% end %>
+              <div class="badge-name"><%= badge.name %></div>
+              <div class="badge-desc"><%= unlocked ? (badge.description.presence || "Unlocked") : "???" %></div>
+            </div>
+          <% end %>
+        </div>
+      </section>
+    <% end %>
+  </div>
+<% end %>

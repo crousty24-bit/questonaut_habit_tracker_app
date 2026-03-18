@@ -1,42 +1,54 @@
 class HabitsController < ApplicationController
+  include DashboardState
+
   before_action :set_habit, only: %i[show edit update destroy]
-
-  def index
-    @habits = current_user.habits
-  end
-
-  def show; end
-
-  def new
-    @habit = current_user.habits.new
-  end
-
-  def edit; end
 
   def create
     @habit = current_user.habits.new(habit_params)
-    if @habit.save
-      # --- GAMIFICATION ---
-      current_user.add_xp(20)
-      BadgeAwarder.call(current_user, context: :habit_created, habit: @habit)
-      # -------------------
-      redirect_to @habit, notice: "Habit was successfully created."
-    else
-      render :new, status: :unprocessable_entity
+    respond_to do |format|
+      if @habit.save
+        current_user.add_xp(20)
+        BadgeAwarder.call(current_user, context: :habit_created, habit: @habit)
+
+        format.turbo_stream { render_dashboard_update }
+        format.html { redirect_to dashboard_path }
+      else
+        @show_create_habit_modal = true
+
+        format.turbo_stream { render_dashboard_update(status: :unprocessable_entity) }
+        format.html do
+          load_dashboard_state
+          render "pages/dashboard", status: :unprocessable_entity
+        end
+      end
     end
   end
 
   def update
-    if @habit.update(habit_params)
-      redirect_to @habit, notice: "Habit was successfully updated.", status: :see_other
-    else
-      render :edit, status: :unprocessable_entity
+    respond_to do |format|
+      if @habit.update(habit_params)
+        format.turbo_stream { render_dashboard_update }
+        format.html { redirect_to dashboard_path }
+      else
+        @editing_habit = @habit
+        @show_edit_habit_modal = true
+
+        format.turbo_stream { render_dashboard_update(status: :unprocessable_entity) }
+        format.html do
+          load_dashboard_state
+          render "pages/dashboard", status: :unprocessable_entity
+        end
+      end
     end
   end
 
   def destroy
     @habit.destroy!
-    redirect_to habits_path, notice: "Habit was successfully destroyed.", status: :see_other
+
+    respond_to do |format|
+      format.turbo_stream { render_dashboard_update }
+      format.html { redirect_to dashboard_path }
+    end
   end
 
   private
@@ -46,6 +58,6 @@ class HabitsController < ApplicationController
   end
 
   def habit_params
-    params.require(:habit).permit(:title, :description)
+    params.require(:habit).permit(:title, :description, :frequency, :category_name)
   end
 end

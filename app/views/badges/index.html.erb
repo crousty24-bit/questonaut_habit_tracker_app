@@ -1,16 +1,147 @@
-<p style="color: green"><%= notice %></p>
+<% content_for :title, "Statistics" %>
 
-<% content_for :title, "Badges" %>
+<%
+  category_icon_for = lambda do |category|
+    {
+      "health" => "❤️",
+      "productivity" => "⚡",
+      "learning" => "📚",
+      "fitness" => "💪",
+      "nutrition" => "🥗"
+    }[category] || "🎯"
+  end
 
-<h1>Badges</h1>
+  streak_for = lambda do |habit|
+    dates = habit.habit_logs.select(&:completed?).map(&:date).compact.sort.reverse
+    next 0 if dates.empty?
 
-<div id="badges">
-  <% @badges.each do |badge| %>
-    <%= render badge %>
-    <p>
-      <%= link_to "Show this badge", badge %>
+    streak = 1
+    dates.each_cons(2) do |current_date, previous_date|
+      break unless current_date == previous_date + 1.day
+      streak += 1
+    end
+    streak
+  end
+
+  habit_success_rate = lambda do |habit|
+    total_logs = habit.habit_logs.count
+    next 0 if total_logs.zero?
+
+    ((habit.habit_logs.count(&:completed?) / total_logs.to_f) * 100).round
+  end
+%>
+
+<div class="stars-bg" data-controller="stars"></div>
+
+<section class="page-wrapper statistics-page">
+  <div class="statistics-header">
+    <h1 class="statistics-title brand-font">📊 Mission Report</h1>
+    <p class="statistics-subtitle">
+      Track your consistency, review your unlocked badges, and see how each mission contributes to your long-term progress.
     </p>
-  <% end %>
-</div>
+  </div>
 
-<%= link_to "New badge", new_badge_path %>
+  <div class="statistics-grid">
+    <div class="stat-card glass-panel">
+      <div class="stat-value"><%= @success_rate %>%</div>
+      <div class="stat-label">Success Rate</div>
+    </div>
+    <div class="stat-card glass-panel">
+      <div class="stat-value"><%= @mission_days %></div>
+      <div class="stat-label">Mission Days</div>
+    </div>
+    <div class="stat-card glass-panel">
+      <div class="stat-value"><%= @best_streak %></div>
+      <div class="stat-label">Best Streak</div>
+    </div>
+    <div class="stat-card glass-panel">
+      <div class="stat-value"><%= @unlocked_badges_count %></div>
+      <div class="stat-label">Badges Unlocked</div>
+    </div>
+  </div>
+
+  <div class="statistics-panels">
+    <div class="glass-panel statistics-panel">
+      <h2 class="statistics-panel__title">Weekly Progress</h2>
+      <div class="statistics-progress-list">
+        <% if @detailed_habits.any? %>
+          <% @detailed_habits.each do |habit| %>
+            <% rate = habit_success_rate.call(habit) %>
+            <div class="statistics-progress-item">
+              <div class="statistics-progress-item__top">
+                <span><%= habit.title %></span>
+                <strong><%= rate %>%</strong>
+              </div>
+              <div class="xp-bar thin">
+                <div class="xp-fill" style="width: <%= rate %>%"></div>
+              </div>
+            </div>
+          <% end %>
+        <% else %>
+          <div class="placeholder-chart">Start completing missions to unlock progress data.</div>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="glass-panel statistics-panel">
+      <h2 class="statistics-panel__title">Category Distribution</h2>
+      <% if @category_distribution.any? %>
+        <div class="statistics-category-list">
+          <% @category_distribution.each do |category, count| %>
+            <% percentage = ((count.to_f / @habits.count) * 100).round %>
+            <div class="statistics-category-item">
+              <div class="statistics-category-item__top">
+                <span><%= category_icon_for.call(category) %> <%= category.capitalize %></span>
+                <strong><%= count %> mission<%= "s" if count != 1 %></strong>
+              </div>
+              <div class="xp-bar thin">
+                <div class="xp-fill orange" style="width: <%= percentage %>%"></div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="placeholder-chart">Create a few missions to reveal your category spread.</div>
+      <% end %>
+    </div>
+  </div>
+
+  <%= turbo_frame_tag "statistics_badge_collection", src: statistics_badge_collection_path, loading: "lazy" do %>
+    <div class="glass-panel statistics-badges statistics-badges--loading">
+      <h2 class="statistics-badges__title">
+        <span>🏆</span>
+        <span>Badge Collection</span>
+        <span class="statistics-badges__count">(<%= @unlocked_badges_count %>/<%= @total_badges_count %> Unlocked)</span>
+      </h2>
+      <div class="placeholder-chart">Loading badge collection...</div>
+    </div>
+  <% end %>
+
+  <div class="glass-panel statistics-analysis">
+    <h2 class="statistics-analysis__title">Detailed Analysis</h2>
+    <div class="statistics-analysis__list">
+      <% if @detailed_habits.any? %>
+        <% @detailed_habits.each do |habit| %>
+          <% category = habit.primary_category %>
+          <% rate = habit_success_rate.call(habit) %>
+          <% streak = streak_for.call(habit) %>
+          <div class="statistics-analysis__item">
+            <div class="statistics-analysis__habit">
+              <div class="cat-icon <%= category %>"><%= category_icon_for.call(category) %></div>
+              <div>
+                <div class="statistics-analysis__habit-title"><%= habit.title %></div>
+                <div class="statistics-analysis__habit-category"><%= category.capitalize %></div>
+              </div>
+            </div>
+            <div class="statistics-analysis__metrics">
+              <div class="statistics-analysis__success"><%= rate %>% success</div>
+              <div class="statistics-analysis__streak">Current streak: <%= streak %>d</div>
+            </div>
+          </div>
+        <% end %>
+      <% else %>
+        <div class="placeholder-chart">No mission analysis yet. Validate a few habits to generate insights.</div>
+      <% end %>
+    </div>
+  </div>
+</section>

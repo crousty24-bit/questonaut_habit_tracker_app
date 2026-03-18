@@ -26,6 +26,53 @@
   position: relative;
 }
 
+.dashboard-mission-modal .modal-box {
+  max-width: 560px;
+}
+
+.dashboard-modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: $sp-5;
+}
+
+.dashboard-modal-form__choices {
+  display: flex;
+  gap: $sp-4;
+}
+
+.dashboard-modal-form .freq-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: $sp-2;
+}
+
+.dashboard-modal-form__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $sp-2;
+}
+
+.dashboard-modal-form__actions {
+  display: flex;
+  gap: $sp-3;
+  padding-top: $sp-2;
+}
+
+.dashboard-modal-form__button {
+  flex: 1;
+  justify-content: center;
+}
+
+@media (max-width: 640px) {
+  .dashboard-modal-form__choices,
+  .dashboard-modal-form__actions {
+    flex-direction: column;
+  }
+}
+
 .modal-header {
   display: flex;
   justify-content: space-between;

@@ -1,8 +1,10 @@
 class HabitLogsController < ApplicationController
+  include DashboardState
+
   before_action :set_habit_log, only: %i[show edit update destroy]
 
   def index
-    @habit_logs = HabitLog.all
+    @habit_logs = HabitLog.joins(:habit).where(habits: { user_id: current_user.id })
   end
 
   def show; end
@@ -14,15 +16,30 @@ class HabitLogsController < ApplicationController
   def edit; end
 
   def create
-    @habit_log = HabitLog.new(habit_log_params)
-    if @habit_log.save
-      # --- GAMIFICATION ---
-      current_user.add_xp(10)
-      BadgeAwarder.call(current_user, context: :habit_logged, habit: @habit_log.habit)
-      # -------------------
-      redirect_to @habit_log, notice: "Habit log was successfully created."
-    else
-      render :new, status: :unprocessable_entity
+    @habit = current_user.habits.find(params[:habit_id])
+    log_date = habit_log_params[:date].presence || Date.current
+    completed_value = ActiveModel::Type::Boolean.new.cast(habit_log_params[:completed])
+
+    @habit_log = @habit.habit_logs.find_or_initialize_by(date: log_date)
+    already_completed = @habit_log.persisted? && @habit_log.completed?
+    @habit_log.completed = completed_value
+
+    respond_to do |format|
+      if @habit_log.save
+        if @habit_log.completed? && !already_completed
+          current_user.add_xp(10) unless @habit_log.previously_new_record?
+          BadgeAwarder.call(current_user, context: :habit_logged, habit: @habit)
+        end
+
+        format.turbo_stream { render_dashboard_update }
+        format.html do
+          redirect_to dashboard_path,
+                      notice: (@habit_log.completed? && !already_completed ? "Mission successfully validated." : "Mission was already validated for today.")
+        end
+      else
+        format.turbo_stream { render_dashboard_update(status: :unprocessable_entity) }
+        format.html { render :new, status: :unprocessable_entity }
+      end
     end
   end
 
@@ -42,7 +59,7 @@ class HabitLogsController < ApplicationController
   private
 
   def set_habit_log
-    @habit_log = HabitLog.find(params[:id])
+    @habit_log = HabitLog.joins(:habit).where(habits: { user_id: current_user.id }).find(params[:id])
   end
 
   def habit_log_params
