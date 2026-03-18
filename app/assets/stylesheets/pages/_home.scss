@@ -36,22 +36,6 @@
   }
 }
 
-// ─── Badge "New Mission Available" ────────────────────────────
-.mission-badge {
-  display: inline-block;
-  padding: $sp-2 $sp-4;
-  border-radius: $radius-pill;
-  background: linear-gradient(
-    to right,
-    rgba(0, 243, 255, 0.2),
-    rgba(188, 19, 254, 0.2)
-  );
-  border: 1px solid rgba(0, 243, 255, 0.3);
-  color: $cyan;
-  font-size: 0.875rem;
-  font-weight: 600;
-}
-
 // ─── Boutons hero ─────────────────────────────────────────────
 .hero-actions {
   display: flex;
@@ -68,11 +52,13 @@
   &__value {
     font-size: 1.875rem;
     font-weight: 700;
+    font-family: 'Space Grotesk', sans-serif;
   }
 
   &__label {
     font-size: 0.875rem;
     color: $text-secondary;
+    margin-top: 2px;
   }
 }
 
@@ -84,17 +70,19 @@
   &::before {
     content: '';
     position: absolute;
-    inset: 0;
-    background: linear-gradient(to right, $cyan, $purple);
+    inset: -4px;
+    background: linear-gradient(135deg, $cyan, $purple);
     border-radius: 1.5rem;
     filter: blur(3rem);
     opacity: 0.2;
-    animation: pulse-glow 3s ease-in-out infinite;
+    animation: pulse-glow 2s ease-in-out infinite;
+    z-index: 0;
   }
 }
 
 .hero-card-inner {
   position: relative;
+  z-index: 1;
   // glass-panel s'applique via la classe ERB
   border-radius: 1.5rem;
   padding: $sp-8;

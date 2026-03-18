@@ -9,8 +9,8 @@
 }
 
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 20px rgba(0, 243, 255, 0.3); }
-  50%       { box-shadow: 0 0 40px rgba(0, 243, 255, 0.4); }
+  0%, 100% { opacity: 0.15 rgba(0, 243, 255, 0.3); filter: blur(3rem); }
+  50%       { opacity: 0.35 rgba(0, 243, 255, 0.4); filter: blur(4rem); }
 }
 
 @keyframes slide-up {
