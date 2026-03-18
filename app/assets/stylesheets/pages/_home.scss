@@ -39,6 +39,7 @@
 // ─── Badge "New Mission Available" ────────────────────────────
 .mission-badge {
   display: inline-block;
+  align-self: flex-start; //prevent strech of badge
   padding: $sp-2 $sp-4;
   border-radius: $radius-pill;
   background: linear-gradient(
