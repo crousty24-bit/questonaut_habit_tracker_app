@@ -24,6 +24,7 @@
 @use "pages/home";              /* styles specific to the landing page */
 @use "pages/auth";              /* login, signup, reset password (Devise) */
 @use "pages/habits";            /* habit list and habit detail views */
+@use "pages/statistics";        /* mission report and badge collection */
 
 @use "themes/space-theme";      /* sci-fi visual identity: glow, gradients, overlays */
 

@@ -1,16 +1,229 @@
-<p style="color: green"><%= notice %></p>
-
 <% content_for :title, "Habits" %>
 
-<h1>Habits</h1>
+<%
+  category_icon_for = lambda do |category|
+    {
+      "health" => "❤️",
+      "productivity" => "⚡",
+      "learning" => "📚",
+      "fitness" => "💪"
+    }[category] || "🎯"
+  end
 
-<div id="habits">
-  <% @habits.each do |habit| %>
-    <%= render habit %>
-    <p>
-      <%= link_to "Show this habit", habit %>
-    </p>
-  <% end %>
+  streak_for = lambda do |habit|
+    dates = habit.habit_logs.select(&:completed?).map(&:date).compact.sort.reverse
+    next 0 if dates.empty?
+
+    streak = 1
+    dates.each_cons(2) do |current_date, previous_date|
+      break unless current_date == previous_date + 1.day
+      streak += 1
+    end
+    streak
+  end
+%>
+
+<div class="stars-bg"></div>
+
+<section class="page-wrapper habits-page">
+  <div class="habits-header">
+    <div>
+      <h1 class="habits-title brand-font">Mission Control Center</h1>
+      <p class="habits-subtitle">Manage your missions, update their brief, and keep your progress on course.</p>
+    </div>
+
+    <button type="button" class="btn btn-primary btn-md habits-header__cta" data-modal-open="createHabitModal">
+      <span>+</span>
+      <span>New Mission</span>
+    </button>
+  </div>
+
+  <div class="filter-bar habits-filter-bar">
+    <button type="button" class="filter-btn active" data-habit-filter="all">All</button>
+    <button type="button" class="filter-btn" data-habit-filter="daily">Daily</button>
+    <button type="button" class="filter-btn" data-habit-filter="weekly">Weekly</button>
+    <button type="button" class="filter-btn" data-habit-filter="health">Health</button>
+    <button type="button" class="filter-btn" data-habit-filter="productivity">Productivity</button>
+    <button type="button" class="filter-btn" data-habit-filter="learning">Learning</button>
+    <button type="button" class="filter-btn" data-habit-filter="fitness">Fitness</button>
+  </div>
+
+  <div class="habits-grid" id="allHabitsList">
+    <% @habits.each do |habit| %>
+      <% category = habit.primary_category %>
+      <% streak = streak_for.call(habit) %>
+      <% completed_today = habit.habit_logs.any? { |log| log.date == @today && log.completed? } %>
+
+      <article class="glass-panel habit-card-management"
+               data-habit-card
+               data-frequency="<%= habit.frequency %>"
+               data-category="<%= category %>">
+        <div class="habit-card-management__top">
+          <div class="habit-card-management__info">
+            <div class="cat-icon <%= category %>"><%= category_icon_for.call(category) %></div>
+            <div>
+              <h3 class="habit-card-management__title"><%= habit.title %></h3>
+              <div class="habit-card-management__tags">
+                <span class="category-tag cat-<%= category %>"><%= category %></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="habit-card-management__actions">
+            <%= link_to "✏️", edit_habit_path(habit), class: "habit-action-btn", title: "Edit" %>
+            <%= link_to "👁️", habit_path(habit), class: "habit-action-btn", title: "Open" %>
+            <%= button_to "🗑️", habit_path(habit), method: :delete, class: "habit-action-btn delete", title: "Delete", form: { data: { turbo_confirm: "Delete this habit permanently?" } } %>
+          </div>
+        </div>
+
+        <p class="habit-card-management__desc">
+          <%= habit.description.presence || "This mission has no description yet." %>
+        </p>
+
+        <div class="habit-card-management__footer">
+          <span class="streak-flame">🔥 <%= streak %> day<%= "s" if streak != 1 %> streak</span>
+          <span class="habit-card-management__footer-right">
+            <span class="habit-card-management__xp">+10 XP per validation</span>
+            <% if completed_today %>
+              <span class="habit-card-management__status">Completed today</span>
+            <% else %>
+              <span class="habit-card-management__status is-muted"><%= habit.frequency.capitalize %> mission</span>
+            <% end %>
+          </span>
+        </div>
+      </article>
+    <% end %>
+  </div>
+</section>
+
+<div id="createHabitModal" class="modal-overlay dashboard-mission-modal <%= 'active' if @show_create_habit_modal %>">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 class="modal-title">🚀 New Mission</h3>
+      <button type="button" class="modal-close" data-modal-close="createHabitModal">&times;</button>
+    </div>
+
+    <%= form_with(model: @habit, url: habits_path, class: "dashboard-modal-form") do |form| %>
+      <%= hidden_field_tag :return_to, habits_path %>
+
+      <div class="form-group">
+        <%= form.label :title, "Mission Name", class: "form-label" %>
+        <%= form.text_field :title, class: "input", placeholder: "e.g., Morning Meditation", required: true %>
+      </div>
+
+      <div class="form-group">
+        <%= form.label :description, "Description", class: "form-label" %>
+        <%= form.text_area :description, rows: 3, class: "textarea", placeholder: "Describe your goal..." %>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Frequency</label>
+        <div class="dashboard-modal-form__choices">
+          <button type="button" class="freq-option <%= (@habit.frequency || 'daily') == 'daily' ? 'selected' : '' %>" data-frequency-option data-value="daily">
+            <span class="freq-icon">📅</span>
+            <span class="freq-title">Daily</span>
+            <span class="freq-desc">Validate every day</span>
+          </button>
+          <button type="button" class="freq-option <%= @habit.frequency == 'weekly' ? 'selected' : '' %>" data-frequency-option data-value="weekly">
+            <span class="freq-icon">📆</span>
+            <span class="freq-title">Weekly</span>
+            <span class="freq-desc">Once per week only</span>
+          </button>
+        </div>
+        <%= form.hidden_field :frequency, value: (@habit.frequency || 'daily'), data: { frequency_input: true } %>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Category (select one)</label>
+        <% selected_category = @habit.category_name.presence || 'health' %>
+        <div class="dashboard-modal-form__tags">
+          <button type="button" class="selectable-tag tag-health <%= 'selected' if selected_category == 'health' %>" data-category-option data-value="health">❤️ Health</button>
+          <button type="button" class="selectable-tag tag-productivity <%= 'selected' if selected_category == 'productivity' %>" data-category-option data-value="productivity">⚡ Productivity</button>
+          <button type="button" class="selectable-tag tag-learning <%= 'selected' if selected_category == 'learning' %>" data-category-option data-value="learning">📚 Learning</button>
+          <button type="button" class="selectable-tag tag-fitness <%= 'selected' if selected_category == 'fitness' %>" data-category-option data-value="fitness">💪 Fitness</button>
+        </div>
+        <%= form.hidden_field :category_name, value: selected_category, data: { category_input: true } %>
+      </div>
+
+      <div class="dashboard-modal-form__actions">
+        <button type="button" class="btn btn-ghost btn-md dashboard-modal-form__button" data-modal-close="createHabitModal">Cancel</button>
+        <%= form.submit "Create Mission", class: "btn btn-primary btn-md dashboard-modal-form__button" %>
+      </div>
+    <% end %>
+  </div>
 </div>
 
-<%= link_to "New habit", new_habit_path %>
+<script>
+  (function() {
+    const container = document.querySelector('.stars-bg');
+    if (!container || container.dataset.enhanced === 'true') return;
+    container.dataset.enhanced = 'true';
+
+    for (let i = 0; i < 80; i++) {
+      const star = document.createElement('div');
+      star.className = 'star';
+      star.style.left = Math.random() * 100 + '%';
+      star.style.top = Math.random() * 100 + '%';
+      star.style.animationDelay = Math.random() * 3 + 's';
+      container.appendChild(star);
+    }
+  })();
+
+  (function() {
+    const modal = document.getElementById('createHabitModal');
+    if (!modal) return;
+
+    document.querySelectorAll('[data-modal-open="createHabitModal"]').forEach((trigger) => {
+      trigger.addEventListener('click', () => modal.classList.add('active'));
+    });
+
+    document.querySelectorAll('[data-modal-close="createHabitModal"]').forEach((trigger) => {
+      trigger.addEventListener('click', () => modal.classList.remove('active'));
+    });
+
+    modal.addEventListener('click', (event) => {
+      if (event.target === modal) modal.classList.remove('active');
+    });
+
+    const frequencyInput = modal.querySelector('[data-frequency-input]');
+    const frequencyOptions = modal.querySelectorAll('[data-frequency-option]');
+    frequencyOptions.forEach((option) => {
+      option.addEventListener('click', () => {
+        frequencyOptions.forEach((node) => node.classList.remove('selected'));
+        option.classList.add('selected');
+        if (frequencyInput) frequencyInput.value = option.dataset.value;
+      });
+    });
+
+    const categoryInput = modal.querySelector('[data-category-input]');
+    const categoryOptions = modal.querySelectorAll('[data-category-option]');
+    categoryOptions.forEach((option) => {
+      option.addEventListener('click', () => {
+        categoryOptions.forEach((node) => node.classList.remove('selected'));
+        option.classList.add('selected');
+        if (categoryInput) categoryInput.value = option.dataset.value;
+      });
+    });
+  })();
+
+  (function() {
+    const buttons = document.querySelectorAll('[data-habit-filter]');
+    const cards = document.querySelectorAll('[data-habit-card]');
+    if (!buttons.length || !cards.length) return;
+
+    buttons.forEach((button) => {
+      button.addEventListener('click', () => {
+        buttons.forEach((node) => node.classList.remove('active'));
+        button.classList.add('active');
+
+        const filter = button.dataset.habitFilter;
+        cards.forEach((card) => {
+          const matches = filter === 'all' ||
+            card.dataset.frequency === filter ||
+            card.dataset.category === filter;
+          card.style.display = matches ? '' : 'none';
+        });
+      });
+    });
+  })();
+</script>

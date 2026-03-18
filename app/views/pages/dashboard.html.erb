@@ -1,0 +1,344 @@
+<% content_for :title, "Dashboard" %>
+
+<%
+  total_xp = current_user.total_xp || 0
+  level = current_user.level || 1
+  next_level_xp = [level * 100, 100].max
+  progress_percent = [[current_user.xp_progress_percentage, 0].max, 100].min
+  active_habits = @habits.count
+  daily_habits = @habits.select { |habit| habit.frequency == "daily" }
+  weekly_habits = @habits.select { |habit| habit.frequency == "weekly" }
+  completed_today = @habits.count { |habit| habit.habit_logs.any? { |log| log.date == @today && log.completed? } }
+  weekly_completed = @weekly_completed_logs.count
+  weekly_completion_rate = active_habits.positive? ? [(weekly_completed.to_f / (active_habits * 7) * 100).round, 100].min : 0
+  xp_this_week = weekly_completed * 10
+
+  category_icon_for = lambda do |category|
+    {
+      "health" => "❤️",
+      "productivity" => "⚡",
+      "learning" => "📚",
+      "fitness" => "💪"
+    }[category] || "🎯"
+  end
+
+  streak_for = lambda do |habit|
+    dates = habit.habit_logs.select(&:completed?).map(&:date).compact.sort.reverse
+    next 0 if dates.empty?
+
+    streak = 1
+    dates.each_cons(2) do |current_date, previous_date|
+      break unless current_date == previous_date + 1.day
+      streak += 1
+    end
+    streak
+  end
+
+  best_streak = @habits.map { |habit| streak_for.call(habit) }.max || 0
+  login_streak = current_user.login_streak || 0
+%>
+
+<div class="stars-bg"></div>
+
+<section class="page-wrapper dashboard-page">
+  <div class="glass-panel neon-glow dashboard-hero">
+    <div class="dashboard-hero__halo dashboard-hero__halo--cyan"></div>
+    <div class="dashboard-hero__halo dashboard-hero__halo--purple"></div>
+
+    <div class="dashboard-hero__top">
+      <div class="dashboard-hero__main">
+        <div class="profile-avatar-wrap">
+          <div class="avatar">👨‍🚀</div>
+          <div class="avatar-badge">✓</div>
+        </div>
+
+        <div class="dashboard-hero__copy">
+          <h1 class="dashboard-title brand-font">Welcome Back, Commander</h1>
+          <p class="dashboard-subtitle">
+            Day <%= [login_streak, 1].max %> of your exploration mission
+          </p>
+          <div class="dashboard-meta">
+            <span class="level-badge">LEVEL <%= level %></span>
+            <span class="dashboard-meta__xp"><%= total_xp %> XP</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="dashboard-hero__action">
+        <button type="button" class="btn btn-primary btn-md dashboard-cta" data-modal-open="createHabitModal">
+          <span>+</span>
+          <span>New Mission</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="xp-panel">
+      <div class="dashboard-progress">
+        <span class="xp-panel__label">Progress to Level <%= level + 1 %></span>
+        <span class="xp-panel__value"><%= total_xp %> / <%= next_level_xp %> XP</span>
+      </div>
+      <div class="xp-bar">
+        <div class="xp-fill" style="width: <%= progress_percent %>%"></div>
+      </div>
+    </div>
+
+    <div class="dashboard-overview">
+      <div class="dashboard-overview__card">
+        <span class="dashboard-overview__icon streak-flame">🔥</span>
+        <span class="dashboard-overview__value"><%= login_streak %>d</span>
+        <span class="dashboard-overview__label">Login Streak</span>
+      </div>
+      <div class="dashboard-overview__card">
+        <span class="dashboard-overview__icon">🏆</span>
+        <span class="dashboard-overview__value"><%= current_user.badges.count %></span>
+        <span class="dashboard-overview__label">Badges Unlocked</span>
+      </div>
+      <div class="dashboard-overview__card">
+        <span class="dashboard-overview__icon">✅</span>
+        <span class="dashboard-overview__value"><%= completed_today %>/<%= active_habits %></span>
+        <span class="dashboard-overview__label">Completed Today</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="dashboard-grid">
+    <div class="dashboard-main">
+      <div class="missions-header">
+        <div>
+          <h2 class="dashboard-section-title">Missions</h2>
+          <p class="dashboard-section-subtitle">
+            <span class="dashboard-accent"><%= completed_today %>/<%= active_habits %> completed</span>
+            today
+          </p>
+        </div>
+        <div class="dashboard-date"><%= @today.strftime("%A, %B %-d, %Y") %></div>
+      </div>
+
+      <div class="missions-list">
+        <% if @habits.any? %>
+          <% [["Daily Missions", daily_habits], ["Weekly Missions", weekly_habits]].each do |section_title, habits| %>
+            <% next if habits.empty? %>
+            <div class="missions-section-label"><%= section_title %></div>
+
+            <% habits.each do |habit| %>
+              <% category = habit.primary_category %>
+              <% completed = habit.habit_logs.any? { |log| log.date == @today && log.completed? } %>
+              <% streak = streak_for.call(habit) %>
+
+              <article class="habit-card <%= 'completed' if completed %>">
+                <div class="dashboard-habit">
+                  <div class="dashboard-habit__main">
+                    <div class="cat-icon <%= category %>"><%= category_icon_for.call(category) %></div>
+
+                    <div class="dashboard-habit__content">
+                      <div class="dashboard-habit__topline">
+                        <h3 class="dashboard-habit__title <%= 'is-complete' if completed %>"><%= habit.title %></h3>
+                        <span class="category-tag cat-<%= category %>"><%= category %></span>
+                      </div>
+
+                      <p class="dashboard-habit__description">
+                        <%= habit.description.presence || "Stay consistent and complete this mission to earn XP." %>
+                      </p>
+
+                      <div class="dashboard-habit__meta">
+                        <span class="streak-flame">🔥 <%= streak %> day<%= "s" if streak != 1 %></span>
+                        <span class="dashboard-habit__xp">+10 XP</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="dashboard-habit__action">
+                    <% if completed %>
+                      <button class="mission-success-btn active" disabled>✓ Completed</button>
+                    <% else %>
+                      <%= button_to "🚀 Mission Success",
+                                    habit_habit_logs_path(habit),
+                                    method: :post,
+                                    params: { habit_log: { date: @today, completed: true, habit_id: habit.id } },
+                                    class: "mission-success-btn" %>
+                    <% end %>
+                  </div>
+                </div>
+              </article>
+            <% end %>
+          <% end %>
+        <% else %>
+          <div class="glass-panel dashboard-empty">
+            <h3 class="dashboard-empty__title">No missions yet</h3>
+            <p class="dashboard-empty__copy">
+              Create your first habit to start earning XP, building streaks, and unlocking badges.
+            </p>
+            <button type="button" class="btn btn-primary btn-md" data-modal-open="createHabitModal">Create First Mission</button>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <aside class="sidebar">
+      <div class="glass-panel streak-card">
+        <div class="streak-card__glow"></div>
+        <div class="streak-flame dashboard-sidebar-icon">🔥</div>
+        <div class="streak-card__days"><%= login_streak %> Days</div>
+        <div class="streak-card__label">Current Login Streak</div>
+        <div class="streak-card__best">Best mission streak: <%= best_streak %> days</div>
+      </div>
+
+      <div class="glass-panel dashboard-widget">
+        <h3 class="dashboard-widget__title">🏅 Recent Badges</h3>
+        <div class="dashboard-badges">
+          <% if @recent_badges.any? %>
+            <% @recent_badges.each do |badge| %>
+              <div class="badge-item">
+                <% if badge.icon.attached? %>
+                  <%= image_tag badge.icon, class: "pixel-badge", alt: badge.name %>
+                <% else %>
+                  <div class="dashboard-badge-fallback"><%= badge.name.first.upcase %></div>
+                <% end %>
+                <div class="badge-name"><%= badge.name %></div>
+              </div>
+            <% end %>
+          <% else %>
+            <p class="dashboard-widget__empty">Your first badges will appear here.</p>
+          <% end %>
+        </div>
+        <%= link_to "View all badges →", statistics_path, class: "dashboard-widget__link" %>
+      </div>
+
+      <div class="glass-panel dashboard-widget">
+        <h3 class="dashboard-widget__title">📊 This Week</h3>
+        <div class="dashboard-stats">
+          <div class="dashboard-stat-row">
+            <span>Completion Rate</span>
+            <strong><%= weekly_completion_rate %>%</strong>
+          </div>
+          <div class="xp-bar thin">
+            <div class="xp-fill green" style="width: <%= weekly_completion_rate %>%"></div>
+          </div>
+          <div class="dashboard-stat-row">
+            <span>Active Habits</span>
+            <strong><%= active_habits %></strong>
+          </div>
+          <div class="dashboard-stat-row">
+            <span>XP Earned</span>
+            <strong class="dashboard-accent">+<%= xp_this_week %> XP</strong>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<div id="createHabitModal" class="modal-overlay dashboard-mission-modal <%= 'active' if @show_create_habit_modal %>">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 class="modal-title">🚀 New Mission</h3>
+      <button type="button" class="modal-close" data-modal-close="createHabitModal">&times;</button>
+    </div>
+
+    <%= form_with(model: @habit, url: habits_path, class: "dashboard-modal-form") do |form| %>
+      <div class="form-group">
+        <%= form.label :title, "Mission Name", class: "form-label" %>
+        <%= form.text_field :title,
+                            class: "input",
+                            placeholder: "e.g., Morning Meditation",
+                            required: true %>
+      </div>
+
+      <div class="form-group">
+        <%= form.label :description, "Description", class: "form-label" %>
+        <%= form.text_area :description,
+                           rows: 3,
+                           class: "textarea",
+                           placeholder: "Describe your goal..." %>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Frequency</label>
+        <div class="dashboard-modal-form__choices">
+          <button type="button" class="freq-option <%= (@habit.frequency || 'daily') == 'daily' ? 'selected' : '' %>" data-frequency-option data-value="daily">
+            <span class="freq-icon">📅</span>
+            <span class="freq-title">Daily</span>
+            <span class="freq-desc">Validate every day</span>
+          </button>
+          <button type="button" class="freq-option <%= @habit.frequency == 'weekly' ? 'selected' : '' %>" data-frequency-option data-value="weekly">
+            <span class="freq-icon">📆</span>
+            <span class="freq-title">Weekly</span>
+            <span class="freq-desc">Once per week only</span>
+          </button>
+        </div>
+        <%= form.hidden_field :frequency, value: (@habit.frequency || 'daily'), data: { frequency_input: true } %>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Category (select one)</label>
+        <div class="dashboard-modal-form__tags">
+          <% selected_category = @habit.category_name.presence || 'health' %>
+          <button type="button" class="selectable-tag tag-health <%= 'selected' if selected_category == 'health' %>" data-category-option data-value="health">❤️ Health</button>
+          <button type="button" class="selectable-tag tag-productivity <%= 'selected' if selected_category == 'productivity' %>" data-category-option data-value="productivity">⚡ Productivity</button>
+          <button type="button" class="selectable-tag tag-learning <%= 'selected' if selected_category == 'learning' %>" data-category-option data-value="learning">📚 Learning</button>
+          <button type="button" class="selectable-tag tag-fitness <%= 'selected' if selected_category == 'fitness' %>" data-category-option data-value="fitness">💪 Fitness</button>
+        </div>
+        <%= form.hidden_field :category_name, value: selected_category, data: { category_input: true } %>
+      </div>
+
+      <div class="dashboard-modal-form__actions">
+        <button type="button" class="btn btn-ghost btn-md dashboard-modal-form__button" data-modal-close="createHabitModal">Cancel</button>
+        <%= form.submit "Create Mission", class: "btn btn-primary btn-md dashboard-modal-form__button" %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<script>
+  (function() {
+    const container = document.querySelector('.stars-bg');
+    if (!container || container.dataset.enhanced === 'true') return;
+    container.dataset.enhanced = 'true';
+
+    for (let i = 0; i < 80; i++) {
+      const star = document.createElement('div');
+      star.className = 'star';
+      star.style.left = Math.random() * 100 + '%';
+      star.style.top = Math.random() * 100 + '%';
+      star.style.animationDelay = Math.random() * 3 + 's';
+      container.appendChild(star);
+    }
+  })();
+
+  (function() {
+    const modal = document.getElementById('createHabitModal');
+    if (!modal) return;
+
+    document.querySelectorAll('[data-modal-open="createHabitModal"]').forEach((trigger) => {
+      trigger.addEventListener('click', () => modal.classList.add('active'));
+    });
+
+    document.querySelectorAll('[data-modal-close="createHabitModal"]').forEach((trigger) => {
+      trigger.addEventListener('click', () => modal.classList.remove('active'));
+    });
+
+    modal.addEventListener('click', (event) => {
+      if (event.target === modal) modal.classList.remove('active');
+    });
+
+    const frequencyInput = modal.querySelector('[data-frequency-input]');
+    const frequencyOptions = modal.querySelectorAll('[data-frequency-option]');
+    frequencyOptions.forEach((option) => {
+      option.addEventListener('click', () => {
+        frequencyOptions.forEach((node) => node.classList.remove('selected'));
+        option.classList.add('selected');
+        if (frequencyInput) frequencyInput.value = option.dataset.value;
+      });
+    });
+
+    const categoryInput = modal.querySelector('[data-category-input]');
+    const categoryOptions = modal.querySelectorAll('[data-category-option]');
+    categoryOptions.forEach((option) => {
+      option.addEventListener('click', () => {
+        categoryOptions.forEach((node) => node.classList.remove('selected'));
+        option.classList.add('selected');
+        if (categoryInput) categoryInput.value = option.dataset.value;
+      });
+    });
+  })();
+</script>
