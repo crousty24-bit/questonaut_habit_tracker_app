@@ -21,8 +21,10 @@ class HabitsController < ApplicationController
   # POST /habits or /habits.json
   def create
     @habit = current_user.habits.new(habit_params)
-
-    respond_to do |format|
+    if @habit.save
+      BadgeAwarder.call(current_user, context: :habit_created)
+    end
+      respond_to do |format|
       if @habit.save
         format.html { redirect_to @habit, notice: "Habit was successfully created." }
         format.json { render :show, status: :created, location: @habit }
