@@ -10,6 +10,7 @@
   weekly_completed = @weekly_completed_logs.count
   weekly_completion_rate = active_habits.positive? ? [(weekly_completed.to_f / (active_habits * 7) * 100).round, 100].min : 0
   xp_this_week = weekly_completed * 10
+  active_category = @current_category.presence || "all"
 
   category_icon_for = lambda do |category|
     {
@@ -122,12 +123,12 @@
       </div>
 
       <div class="filter-bar dashboard-filter-bar">
-        <button type="button" class="filter-btn active" data-dashboard-target="filterButton" data-dashboard-filter="all" data-action="dashboard#filter">All</button>
-        <button type="button" class="filter-btn" data-dashboard-target="filterButton" data-dashboard-filter="health" data-action="dashboard#filter">Health</button>
-        <button type="button" class="filter-btn" data-dashboard-target="filterButton" data-dashboard-filter="productivity" data-action="dashboard#filter">Productivity</button>
-        <button type="button" class="filter-btn" data-dashboard-target="filterButton" data-dashboard-filter="learning" data-action="dashboard#filter">Learning</button>
-        <button type="button" class="filter-btn" data-dashboard-target="filterButton" data-dashboard-filter="fitness" data-action="dashboard#filter">Fitness</button>
-        <button type="button" class="filter-btn" data-dashboard-target="filterButton" data-dashboard-filter="nutrition" data-action="dashboard#filter">Nutrition</button>
+        <%= link_to "All", dashboard_path, class: "filter-btn #{'active' if active_category == 'all'}", data: { dashboard_target: "filterButton", dashboard_filter: "all", action: "dashboard#filter" } %>
+        <%= link_to "Health", dashboard_path(category: "health"), class: "filter-btn #{'active' if active_category == 'health'}", data: { dashboard_target: "filterButton", dashboard_filter: "health", action: "dashboard#filter" } %>
+        <%= link_to "Productivity", dashboard_path(category: "productivity"), class: "filter-btn #{'active' if active_category == 'productivity'}", data: { dashboard_target: "filterButton", dashboard_filter: "productivity", action: "dashboard#filter" } %>
+        <%= link_to "Learning", dashboard_path(category: "learning"), class: "filter-btn #{'active' if active_category == 'learning'}", data: { dashboard_target: "filterButton", dashboard_filter: "learning", action: "dashboard#filter" } %>
+        <%= link_to "Fitness", dashboard_path(category: "fitness"), class: "filter-btn #{'active' if active_category == 'fitness'}", data: { dashboard_target: "filterButton", dashboard_filter: "fitness", action: "dashboard#filter" } %>
+        <%= link_to "Nutrition", dashboard_path(category: "nutrition"), class: "filter-btn #{'active' if active_category == 'nutrition'}", data: { dashboard_target: "filterButton", dashboard_filter: "nutrition", action: "dashboard#filter" } %>
       </div>
 
       <div class="missions-list">
