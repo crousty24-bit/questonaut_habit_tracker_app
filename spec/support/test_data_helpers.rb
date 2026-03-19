@@ -15,7 +15,8 @@ module TestDataHelpers
   end
 
   def create_habit(user:, title: "Morning Run", description: "Run 5 km", category_name: "health", frequency: "daily")
-    user.habits.create!(
+    Habit.create!(
+      user: user.reload,
       title: title,
       description: description,
       frequency: frequency,

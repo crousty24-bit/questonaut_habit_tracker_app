@@ -8,6 +8,8 @@ module DashboardState
     @habit ||= current_user.habits.new
     @habit.category_name ||= "health"
     @current_category = selected_category
+    @deleting_habit = habit_pending_deletion
+    @show_delete_habit_modal = @deleting_habit.present?
 
     if defined?(@editing_habit) && @editing_habit.present?
       @editing_habit.category_name ||= @editing_habit.primary_category
@@ -37,5 +39,12 @@ module DashboardState
     category = params[:category].to_s.downcase
     return if category.blank? || category == "all"
     return category if Habit::CATEGORIES.include?(category)
+  end
+
+  def habit_pending_deletion
+    habit_id = params[:delete_mission_id].presence
+    return unless habit_id
+
+    current_user.habits.find_by(id: habit_id)
   end
 end

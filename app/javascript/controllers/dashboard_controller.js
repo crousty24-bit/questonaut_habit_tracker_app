@@ -4,6 +4,7 @@ export default class extends Controller {
   static targets = [
     "createModal",
     "editModal",
+    "deleteModal",
     "createFrequencyInput",
     "editFrequencyInput",
     "createCategoryInput",
@@ -13,7 +14,9 @@ export default class extends Controller {
     "filterButton",
     "editForm",
     "editTitle",
-    "editDescription"
+    "editDescription",
+    "deleteForm",
+    "deleteMissionName"
   ]
 
   openCreateModal() {
@@ -53,6 +56,28 @@ export default class extends Controller {
 
   maybeCloseEditModal(event) {
     if (event.target === this.editModalTarget) this.closeEditModal()
+  }
+
+  openDeleteModal(event) {
+    if (!this.hasDeleteModalTarget) return
+
+    event.preventDefault()
+
+    const trigger = event.currentTarget
+
+    if (this.hasDeleteFormTarget) this.deleteFormTarget.action = trigger.dataset.habitDeletePath || "#"
+    if (this.hasDeleteMissionNameTarget) this.deleteMissionNameTarget.textContent = trigger.dataset.habitTitle || ""
+
+    this.deleteModalTarget.classList.add("active")
+  }
+
+  closeDeleteModal(event) {
+    if (event) event.preventDefault()
+    if (this.hasDeleteModalTarget) this.deleteModalTarget.classList.remove("active")
+  }
+
+  maybeCloseDeleteModal(event) {
+    if (event.target === this.deleteModalTarget) this.closeDeleteModal(event)
   }
 
   selectCreateFrequency(event) {
