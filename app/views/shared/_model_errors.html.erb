@@ -1,0 +1,18 @@
+<% if record&.errors&.any? %>
+  <% field_messages = record.errors.attribute_names.filter_map do |attribute|
+       next if attribute == :base
+
+       record.errors.full_messages_for(attribute)
+     end.flatten.uniq %>
+  <% messages = field_messages.presence || record.errors.full_messages %>
+
+  <% if messages.any? %>
+    <div class="auth-error" data-turbo-temporary>
+      <ul>
+        <% messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+<% end %>

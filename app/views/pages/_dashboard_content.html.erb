@@ -285,32 +285,27 @@
         <button type="button" class="modal-close" data-action="dashboard#closeCreateModal">&times;</button>
       </div>
 
-      <%= form_with(model: @habit, url: habits_path, class: "dashboard-modal-form") do |form| %>
-        <% if @habit.errors.any? %>
-          <div class="auth-error">
-            <h2 class="auth-error__title"><%= pluralize(@habit.errors.count, "error") %> prevented this mission from being saved:</h2>
-            <ul>
-              <% @habit.errors.full_messages.each do |message| %>
-                <li><%= message %></li>
-              <% end %>
-            </ul>
-          </div>
-        <% end %>
+      <% create_habit_feedback = validation_feedback_data(@habit) %>
+      <%= form_with(model: @habit, url: habits_path, class: "dashboard-modal-form", data: create_habit_feedback) do |form| %>
+        <%= render "shared/model_errors", record: @habit %>
+        <%= render "shared/validation_toast", message: create_habit_feedback[:validation_feedback_notification_message_value] %>
 
         <div class="form-group">
           <%= form.label :title, "Mission Name", class: "form-label" %>
           <%= form.text_field :title,
-                              class: "input",
+                              class: validation_field_classes(@habit, :title, "input"),
                               placeholder: "e.g., Morning Meditation",
-                              required: true %>
+                              required: true,
+                              data: validation_field_data(:title) %>
         </div>
 
         <div class="form-group">
           <%= form.label :description, "Description", class: "form-label" %>
           <%= form.text_area :description,
                              rows: 3,
-                             class: "textarea",
-                             placeholder: "Describe your goal..." %>
+                             class: validation_field_classes(@habit, :description, "textarea"),
+                             placeholder: "Describe your goal...",
+                             data: validation_field_data(:description) %>
         </div>
 
         <div class="form-group">
@@ -373,42 +368,40 @@
         <button type="button" class="modal-close" data-action="dashboard#closeEditModal">&times;</button>
       </div>
 
+      <% edit_habit_feedback = validation_feedback_data(editing_habit) %>
       <%= form_with(scope: :habit,
                     url: (@editing_habit&.persisted? ? habit_path(@editing_habit) : "#"),
                     method: :post,
-                    html: { class: "dashboard-modal-form", id: "editHabitForm", data: { dashboard_target: "editForm" } }) do |form| %>
+                    html: {
+                      class: "dashboard-modal-form",
+                      id: "editHabitForm",
+                      data: edit_habit_feedback.merge(dashboard_target: "editForm")
+                    }) do |form| %>
         <%= hidden_field_tag :_method, "patch", id: "editHabitMethod" %>
 
-        <% if @editing_habit&.errors&.any? %>
-          <div class="auth-error">
-            <h2 class="auth-error__title"><%= pluralize(@editing_habit.errors.count, "error") %> prevented this mission from being updated:</h2>
-            <ul>
-              <% @editing_habit.errors.full_messages.each do |message| %>
-                <li><%= message %></li>
-              <% end %>
-            </ul>
-          </div>
-        <% end %>
+        <%= render "shared/model_errors", record: @editing_habit %>
+
+        <%= render "shared/validation_toast", message: edit_habit_feedback[:validation_feedback_notification_message_value] %>
 
         <div class="form-group">
           <%= form.label :title, "Mission Name", class: "form-label" %>
           <%= form.text_field :title,
-                              class: "input",
+                              class: validation_field_classes(editing_habit, :title, "input"),
                               placeholder: "e.g., Morning Meditation",
                               required: true,
                               id: "editHabitTitle",
                               value: editing_habit.title,
-                              data: { dashboard_target: "editTitle" } %>
+                              data: validation_field_data(:title).merge(dashboard_target: "editTitle") %>
         </div>
 
         <div class="form-group">
           <%= form.label :description, "Description", class: "form-label" %>
           <%= form.text_area :description,
                              rows: 3,
-                             class: "textarea",
+                             class: validation_field_classes(editing_habit, :description, "textarea"),
                              placeholder: "Describe your goal...",
                              id: "editHabitDescription",
-                             data: { dashboard_target: "editDescription" } do %><%= editing_habit.description %><% end %>
+                             data: validation_field_data(:description).merge(dashboard_target: "editDescription") do %><%= editing_habit.description %><% end %>
         </div>
 
         <div class="form-group">

@@ -9,7 +9,16 @@ class Habit < ApplicationRecord
   has_many :habit_logs, dependent: :destroy
   has_many :tags, dependent: :destroy
 
-  validates :title, presence: true
+  validates :title,
+    presence: true,
+    length: { minimum: 3, maximum: 50 },
+    content: true
+
+  validates :description,
+    length: { maximum: 200 },
+    content: true,
+    allow_blank: true
+
   validates :frequency, inclusion: { in: FREQUENCIES }
 
   after_save :sync_primary_category

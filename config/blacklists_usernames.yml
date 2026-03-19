@@ -1,0 +1,90 @@
+default: &default
+  banned_words:
+    # reserved roles / handles
+    - admin
+    - root
+    - system
+    - support
+    - staff
+    - owner
+    - moderator
+    - mod
+    - official
+    - questonaut
+
+    # explicit sexual content
+    - sex
+    - porn
+    - porno
+    - hentai
+    - nude
+    - nsfw
+    - xxx
+
+    # severe crimes / abuse
+    - rape
+    - rapist
+    - pedo
+    - pedophile
+    - incest
+
+    # drugs
+    - drug
+    - drugs
+    - cocaine
+    - heroin
+    - meth
+    - lsd
+    - mdma
+
+    # hacking / cheating
+    - hack
+    - hacker
+    - hacking
+    - exploit
+    - cheat
+    - aimbot
+
+    # scams
+    - scam
+    - fraud
+    - phishing
+
+    # violence / extremism
+    - kill
+    - murder
+    - terrorist
+    - terrorism
+    - nazi
+    - hitler
+
+    # insults
+    - fuck
+    - shit
+    - bitch
+    - asshole
+
+    # sql / technical bait
+    - select
+    - insert
+    - update
+    - delete
+    - drop
+    - union
+
+    # links / domains
+    - http
+    - https
+    - www
+    - .com
+    - .net
+    - .org
+
+development:
+  <<: *default
+
+test:
+  <<: *default
+
+production:
+  <<: *default

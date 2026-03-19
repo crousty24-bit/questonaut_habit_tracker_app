@@ -1,3 +1,5 @@
+<% signup_feedback = validation_feedback_data(resource) %>
+
 <section class="auth-wrapper">
   <div class="auth-shell">
     <div class="auth-hero glass-panel">
@@ -35,26 +37,43 @@
         <p class="auth-header__subtitle">Start your first mission and build a routine that lasts.</p>
       </div>
 
-      <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { class: "auth-form" }) do |f| %>
+      <%= form_for(resource,
+                   as: resource_name,
+                   url: registration_path(resource_name),
+                   html: { class: "auth-form", data: signup_feedback }) do |f| %>
         <%= render "devise/shared/error_messages", resource: resource %>
+        <%= render "shared/validation_toast", message: signup_feedback[:validation_feedback_notification_message_value] %>
 
         <div class="form-group">
           <%= f.label :name, class: "form-label" do %>
             Commander Name <span class="required">*</span>
           <% end %>
-          <%= f.text_field :name, autofocus: true, autocomplete: "name", placeholder: "Captain Nova", class: "input" %>
+          <%= f.text_field :name,
+                           autofocus: true,
+                           autocomplete: "name",
+                           placeholder: "Captain Nova",
+                           class: validation_field_classes(resource, :name, "input"),
+                           data: validation_field_data(:name) %>
         </div>
 
         <div class="form-group">
           <%= f.label :email, class: "form-label" %>
-          <%= f.email_field :email, autocomplete: "email", placeholder: "commander@questonaut.space", class: "input" %>
+          <%= f.email_field :email,
+                            autocomplete: "email",
+                            placeholder: "commander@questonaut.space",
+                            class: validation_field_classes(resource, :email, "input"),
+                            data: validation_field_data(:email) %>
         </div>
 
         <div class="form-group">
           <%= f.label :password, class: "form-label" do %>
             Password <span class="required">*</span>
           <% end %>
-          <%= f.password_field :password, autocomplete: "new-password", placeholder: "Create a secure password", class: "input" %>
+          <%= f.password_field :password,
+                               autocomplete: "new-password",
+                               placeholder: "Create a secure password",
+                               class: validation_field_classes(resource, :password, "input"),
+                               data: validation_field_data(:password) %>
           <% if @minimum_password_length %>
             <div class="form-hint"><%= @minimum_password_length %> characters minimum.</div>
           <% end %>
@@ -64,7 +83,11 @@
           <%= f.label :password_confirmation, class: "form-label" do %>
             Confirm Password <span class="required">*</span>
           <% end %>
-          <%= f.password_field :password_confirmation, autocomplete: "new-password", placeholder: "Repeat your password", class: "input" %>
+          <%= f.password_field :password_confirmation,
+                               autocomplete: "new-password",
+                               placeholder: "Repeat your password",
+                               class: validation_field_classes(resource, :password_confirmation, "input"),
+                               data: validation_field_data(:password_confirmation) %>
         </div>
 
         <%= f.submit "Start Mission", class: "btn btn-primary btn-lg auth-submit" %>
