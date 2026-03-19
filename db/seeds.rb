@@ -4,14 +4,11 @@
 {
   "Welcome" => "habit/welcome.png",
   "First Mission" => "habit/firstmission.png",
-  "Daily Login" => "habit/dailylogin.png", 
+  "Daily Login" => "habit/dailylogin.png",
   "Veteran" => "habit/veteran.png"
 }.each do |name, file|
   badge = Badge.find_or_create_by!(name: name)
-  badge.icon.attach(
-    io: File.open(Rails.root.join("app/assets/images/asset_badge/#{file}")),
-    filename: File.basename(file)
-  ) unless badge.icon.attached?
+  badge.update!(image_key: File.basename(file))
 end
 
 # --------------------
@@ -28,10 +25,7 @@ end
   "Streak 90" => "streak/90days.png"
 }.each do |name, file|
   badge = Badge.find_or_create_by!(name: name)
-  badge.icon.attach(
-    io: File.open(Rails.root.join("app/assets/images/asset_badge/#{file}")),
-    filename: File.basename(file)
-  ) unless badge.icon.attached?
+  badge.update!(image_key: File.basename(file))
 end
 
 # --------------------
@@ -51,10 +45,7 @@ end
   "Level 250" => "level/level250.png"
 }.each do |name, file|
   badge = Badge.find_or_create_by!(name: name)
-  badge.icon.attach(
-    io: File.open(Rails.root.join("app/assets/images/asset_badge/#{file}")),
-    filename: File.basename(file)
-  ) unless badge.icon.attached?
+  badge.update!(image_key: File.basename(file))
 end
 
 # --------------------
@@ -68,10 +59,7 @@ end
   "Tag: Health" => "tags/health.png"
 }.each do |name, file|
   badge = Badge.find_or_create_by!(name: name)
-  badge.icon.attach(
-    io: File.open(Rails.root.join("app/assets/images/asset_badge/#{file}")),
-    filename: File.basename(file)
-  ) unless badge.icon.attached?
+  badge.update!(image_key: File.basename(file))
 end
 
 # --------------------

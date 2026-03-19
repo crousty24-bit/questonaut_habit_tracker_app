@@ -14,7 +14,7 @@ module DashboardState
 
     @habits = current_user.habits.includes(:tags, :habit_logs).order(created_at: :desc)
     @recent_badges = current_user.user_badges
-                                 .includes(badge: { icon_attachment: :blob })
+                                 .includes(:badge)
                                  .order(created_at: :desc)
                                  .limit(3)
                                  .map(&:badge)
