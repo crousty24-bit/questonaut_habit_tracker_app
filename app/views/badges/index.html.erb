@@ -11,18 +11,6 @@
     }[category] || "🎯"
   end
 
-  streak_for = lambda do |habit|
-    dates = habit.habit_logs.select(&:completed?).map(&:date).compact.sort.reverse
-    next 0 if dates.empty?
-
-    streak = 1
-    dates.each_cons(2) do |current_date, previous_date|
-      break unless current_date == previous_date + 1.day
-      streak += 1
-    end
-    streak
-  end
-
   habit_success_rate = lambda do |habit|
     total_logs = habit.habit_logs.count
     next 0 if total_logs.zero?
@@ -124,7 +112,7 @@
         <% @detailed_habits.each do |habit| %>
           <% category = habit.primary_category %>
           <% rate = habit_success_rate.call(habit) %>
-          <% streak = streak_for.call(habit) %>
+          <% streak = habit.current_streak(as_of: Date.current) %>
           <div class="statistics-analysis__item">
             <div class="statistics-analysis__habit">
               <div class="cat-icon <%= category %>"><%= category_icon_for.call(category) %></div>

@@ -5,6 +5,7 @@ module DashboardState
 
   def load_dashboard_state
     @today = Date.current
+    @now = Time.current
     @habit ||= current_user.habits.new
     @habit.category_name ||= "health"
     @current_category = selected_category
@@ -15,7 +16,9 @@ module DashboardState
       @editing_habit.category_name ||= @editing_habit.primary_category
     end
 
-    @habits = current_user.habits.includes(:tags, :habit_logs).order(created_at: :desc)
+    all_habits = current_user.habits.includes(:tags, :habit_logs).order(created_at: :desc)
+    @streak_reset_habits = all_habits.select { |habit| habit.streak_reset_alert?(as_of: @today) }
+    @habits = all_habits
     @habits = @habits.select { |habit| habit.primary_category == @current_category } if @current_category.present?
     @recent_badges = current_user.user_badges
                                  .includes(:badge)
