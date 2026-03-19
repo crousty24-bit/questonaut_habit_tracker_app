@@ -105,17 +105,27 @@
       <button type="button" class="modal-close" data-modal-close="createHabitModal">&times;</button>
     </div>
 
-    <%= form_with(model: @habit, url: habits_path, class: "dashboard-modal-form") do |form| %>
+    <% create_habit_feedback = validation_feedback_data(@habit) %>
+    <%= form_with(model: @habit, url: habits_path, class: "dashboard-modal-form", data: create_habit_feedback) do |form| %>
       <%= hidden_field_tag :return_to, habits_path %>
+      <%= render "shared/validation_toast", message: create_habit_feedback[:validation_feedback_notification_message_value] %>
 
       <div class="form-group">
         <%= form.label :title, "Mission Name", class: "form-label" %>
-        <%= form.text_field :title, class: "input", placeholder: "e.g., Morning Meditation", required: true %>
+        <%= form.text_field :title,
+                            class: validation_field_classes(@habit, :title, "input"),
+                            placeholder: "e.g., Morning Meditation",
+                            required: true,
+                            data: validation_field_data(:title) %>
       </div>
 
       <div class="form-group">
         <%= form.label :description, "Description", class: "form-label" %>
-        <%= form.text_area :description, rows: 3, class: "textarea", placeholder: "Describe your goal..." %>
+        <%= form.text_area :description,
+                           rows: 3,
+                           class: validation_field_classes(@habit, :description, "textarea"),
+                           placeholder: "Describe your goal...",
+                           data: validation_field_data(:description) %>
       </div>
 
       <div class="form-group">

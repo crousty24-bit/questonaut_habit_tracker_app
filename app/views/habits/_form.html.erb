@@ -1,4 +1,6 @@
-<%= form_with(model: habit) do |form| %>
+<% habit_feedback = validation_feedback_data(habit) %>
+
+<%= form_with(model: habit, data: habit_feedback) do |form| %>
   <% if habit.errors.any? %>
     <div style="color: red">
       <h2><%= pluralize(habit.errors.count, "error") %> prohibited this habit from being saved:</h2>
@@ -10,14 +12,20 @@
     </div>
   <% end %>
 
+  <%= render "shared/validation_toast", message: habit_feedback[:validation_feedback_notification_message_value] %>
+
   <div>
     <%= form.label :title, style: "display: block" %>
-    <%= form.textarea :title %>
+    <%= form.textarea :title,
+                      class: validation_field_classes(habit, :title, "textarea"),
+                      data: validation_field_data(:title) %>
   </div>
 
   <div>
     <%= form.label :description, style: "display: block" %>
-    <%= form.textarea :description %>
+    <%= form.textarea :description,
+                      class: validation_field_classes(habit, :description, "textarea"),
+                      data: validation_field_data(:description) %>
   </div>
 
   <div>
