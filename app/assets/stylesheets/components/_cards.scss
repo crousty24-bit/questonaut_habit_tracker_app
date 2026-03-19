@@ -1,0 +1,115 @@
+@use "base/variables" as *;
+
+// ─── Habit card ──────────────────────────────────────────────
+.habit-card {
+  background: $bg-panel;
+  border: 1px solid $border-dim;
+  border-radius: $radius-lg;
+  padding: $sp-3;
+  transition: $transition-base;
+  backdrop-filter: blur(8px);
+
+  &:hover {
+    transform: translateY(-2px);
+    border-color: $border-cyan;
+    box-shadow: 0 10px 30px rgba(0, 243, 255, 0.1);
+  }
+
+  &.completed {
+    border-color: rgba(74, 222, 128, 0.25);
+    background: rgba(74, 222, 128, 0.03);
+  }
+}
+
+// ─── Stat card ───────────────────────────────────────────────
+.stat-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid $border-soft;
+  border-radius: $radius-lg;
+  padding: $sp-6;
+  text-align: center;
+  transition: $transition-base;
+
+  &:hover { border-color: $border-cyan; box-shadow: 0 0 20px rgba(0, 243, 255, 0.08); }
+}
+
+.stat-value {
+  font-size: 2.5rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, $cyan, $purple);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  line-height: 1.1;
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: $text-secondary;
+  margin-top: $sp-2;
+}
+
+// ─── Category icon circle ────────────────────────────────────
+.cat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+
+  &.health      { background: rgba(255, 71, 87, 0.15); }
+  &.productivity{ background: rgba(59, 130, 246, 0.16); }
+  &.learning    { background: rgba(167, 139, 250, 0.16); }
+  &.fitness     { background: rgba(255, 165, 2, 0.15); }
+  &.nutrition   { background: rgba(74, 222, 128, 0.16); }
+}
+
+// ─── Pixel badges ────────────────────────────────────────────
+.pixel-badge {
+  width: 64px;
+  height: 64px;
+  image-rendering: pixelated;
+  border-radius: $radius-sm;
+  display: block;
+  margin: 0 auto;
+  transition: $transition-base;
+
+  &:hover { transform: scale(1.1); filter: brightness(1.2); }
+
+  &.locked { filter: grayscale(100%) brightness(0.25); opacity: 0.5; }
+}
+
+.badge-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: $sp-4;
+}
+
+.badge-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+
+  .badge-name { font-size: 11px; margin-top: $sp-2; color: $text-primary; font-weight: 500; }
+  .badge-desc { font-size: 9px; color: $text-muted; margin-top: 2px; }
+
+  &.locked {
+    .badge-name, .badge-desc { color: $text-muted; }
+  }
+}
+
+// ─── Placeholder chart ───────────────────────────────────────
+.placeholder-chart {
+  height: 200px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px dashed rgba(255, 255, 255, 0.2);
+  border-radius: $radius-sm;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.4);
+}

@@ -1,0 +1,95 @@
+<div class="stars-bg" data-controller="stars"></div>
+
+<%# Hero section %>
+<section class="hero">
+  <div class="hero-grid">
+
+    <%# Colonne gauche — texte %>
+    <div class="hero-content">
+
+      <h1 class="text-5xl md:text-7xl font-bold leading-tight brand-font text-white">
+        Become the
+        <span class="text-gradient">Commander</span>
+        of Your Habits
+      </h1>
+
+      <p>
+        Questonaut turns your daily routine into a space adventure.
+        Track your habits and earn badges as you progress.
+      </p>
+
+      <div class="hero-actions">
+        <a href="<%= user_signed_in? ? dashboard_path : new_user_session_path %>"
+          class="btn btn-primary btn-xl">
+          Launch Mission
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+          </svg>
+        </a>
+        <a href="<%= user_signed_in? ? dashboard_path : new_user_registration_path %>"
+          class="btn btn-secondary btn-xl">
+          Explore
+        </a>
+      </div>
+
+      <div class="hero-stats">
+        <div>
+          <div class="hero-stats__value" style="color: var(--neon-cyan);">10k+</div>
+          <div class="hero-stats__label">Active Astronauts</div>
+        </div>
+        <div>
+          <div class="hero-stats__value" style="color: #a78bfa;">500k+</div>
+          <div class="hero-stats__label">Missions Completed</div>
+        </div>
+        <div>
+          <div class="hero-stats__value" style="color: var(--neon-green);">98%</div>
+          <div class="hero-stats__label">Success Rate</div>
+        </div>
+      </div>
+
+    </div>
+
+    <%# Card preview %>
+    <div class="hero-card">
+      <div class="hero-card-inner glass-panel neon-glow">
+
+        <div class="hero-card-header">
+          <div class="flex items-center gap-3">
+            <div class="card-icon-wrap">📊</div>
+            <div>
+              <div class="font-semibold text-white">Mission Dashboard</div>
+              <div class="text-xs text-gray-400">Day 42 of mission</div>
+            </div>
+          </div>
+          <span class="level-badge">LVL 12</span>
+        </div>
+
+        <div class="flex justify-between text-sm mb-2">
+          <span class="text-gray-300">Progress to Level 13</span>
+          <span class="font-semibold" style="color: var(--neon-cyan);">2,450 / 3,000 XP</span>
+        </div>
+        <div class="xp-bar">
+          <div class="xp-fill" style="width: 82%"></div>
+        </div>
+
+        <div class="hero-card-mini-stats">
+          <div class="mini-stat">
+            <span class="mini-stat__icon streak-flame">🔥</span>
+            <span class="mini-stat__label">Streak 15d</span>
+          </div>
+          <div class="mini-stat">
+            <span class="mini-stat__icon">🏆</span>
+            <span class="mini-stat__label">12 Badges</span>
+          </div>
+          <div class="mini-stat">
+            <span class="mini-stat__icon">✅</span>
+            <span class="mini-stat__label">8/8 Today</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</section>

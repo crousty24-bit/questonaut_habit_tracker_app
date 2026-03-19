@@ -1,0 +1,28 @@
+@use "base/variables" as *;
+
+.toast {
+  position: fixed;
+  bottom: $sp-6;
+  right: $sp-6;
+  background: $bg-panel;
+  backdrop-filter: blur(12px);
+  border: 1px solid $cyan;
+  padding: $sp-4 $sp-6;
+  border-radius: $radius-md;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), $glow-cyan;
+  transform: translateX(400px);
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  z-index: $z-toast;
+  max-width: 320px;
+
+  &.show { transform: translateX(0); }
+
+  &.toast-success { border-color: $green; }
+  &.toast-error   { border-color: $red; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), $glow-red; }
+  &.toast-warning { border-color: $yellow; }
+}
+
+.toast-content { display: flex; align-items: center; gap: $sp-3; }
+.toast-icon    { font-size: 24px; flex-shrink: 0; }
+.toast-title   { font-weight: 600; color: white; font-size: 0.875rem; }
+.toast-message { font-size: 0.75rem; color: $text-secondary; }

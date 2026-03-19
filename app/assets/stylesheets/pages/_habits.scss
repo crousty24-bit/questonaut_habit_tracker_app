@@ -1,0 +1,175 @@
+@use "base/variables" as *;
+
+.habits-page {
+  display: flex;
+  flex-direction: column;
+  gap: $sp-8;
+}
+
+// ─── Header de page ──────────────────────────────────────────
+.habits-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: $sp-6;
+}
+
+.habits-title {
+  color: white;
+  font-size: clamp(2rem, 4vw, 3rem);
+}
+
+.habits-subtitle {
+  margin-top: 6px;
+  color: $text-secondary;
+  max-width: 680px;
+}
+
+.habits-header__cta {
+  flex-shrink: 0;
+  min-width: 170px;
+  justify-content: center;
+}
+
+.habits-filter-bar {
+  align-items: center;
+}
+
+// ─── Grille de la liste des habitudes ────────────────────────
+.habits-grid {
+  display: grid;
+  gap: $sp-4;
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+// ─── Habit card (vue management — plus riche que le dashboard) 
+.habit-card-management {
+  display: flex;
+  flex-direction: column;
+  gap: $sp-3;
+  padding: $sp-4;
+  min-height: 208px;
+
+  &__top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: $sp-4;
+  }
+
+  &__info {
+    display: flex;
+    align-items: center;
+    gap: $sp-3;
+    flex: 1;
+  }
+
+  &__tags {
+    display: flex;
+    gap: $sp-2;
+    margin-top: $sp-1;
+    flex-wrap: wrap;
+  }
+
+  &__title {
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  &__actions {
+    display: flex;
+    gap: $sp-2;
+  }
+
+  &__desc {
+    font-size: 0.875rem;
+    color: $text-secondary;
+    flex: 1;
+  }
+
+  &__footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: $sp-4;
+    font-size: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  &__footer-right {
+    display: flex;
+    align-items: center;
+    gap: $sp-3;
+    flex-wrap: wrap;
+  }
+
+  &__xp {
+    color: $cyan;
+  }
+
+  &__status {
+    color: white;
+    font-weight: 600;
+
+    &.is-muted {
+      color: $text-secondary;
+      font-weight: 500;
+    }
+  }
+}
+
+.habit-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-radius: $radius-sm;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid $border-dim;
+  color: $text-secondary;
+  cursor: pointer;
+  text-decoration: none;
+  transition: $transition-base;
+  font-size: 0.85rem;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: white;
+  }
+
+  &.delete:hover {
+    background: rgba(255, 71, 87, 0.14);
+    border-color: rgba(255, 71, 87, 0.35);
+    color: #ff7b8e;
+  }
+
+  &.delete {
+    color: $red;
+    background: rgba(255, 71, 87, 0.08);
+    border-color: rgba(255, 71, 87, 0.22);
+    font-size: 1rem;
+    line-height: 1;
+  }
+}
+
+.habit-card-management form {
+  margin: 0;
+}
+
+@media (max-width: 900px) {
+  .habits-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .habits-header__cta {
+    width: 100%;
+  }
+}

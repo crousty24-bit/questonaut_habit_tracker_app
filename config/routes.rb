@@ -1,14 +1,23 @@
 Rails.application.routes.draw do
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
+  get "pages/home"
+  # Devise routes for authentication (sign up, login, logout, etc.)
+  devise_for :users
 
-  # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
-  # Can be used by load balancers and uptime monitors to verify that the app is live.
-  get "up" => "rails/health#show", as: :rails_health_check
+  # Root (landing page)
+  root to: 'pages#home'
 
-  # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
-  # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
-  # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
+  # Main connected pages
+  get "dashboard", to: "pages#dashboard", as: :dashboard
+  get "statistics", to: "badges#index", as: :statistics
+  get "statistics/badge_collection", to: "badges#collection", as: :statistics_badge_collection
 
-  # Defines the root path route ("/")
-  # root "posts#index"
+  # HABITS (owned by the currently logged-in user)
+  resources :habits, except: [:index, :new, :show, :edit] do
+    resources :habit_logs, only: [:index, :create, :show, :update, :destroy]
+    resources :tags, only: [:index, :create, :update, :destroy]
+  end
+
+  # BADGES (global resource)
+  resources :badges, only: [:index, :show]
+  resources :user_badges, only: [:create, :destroy]
 end

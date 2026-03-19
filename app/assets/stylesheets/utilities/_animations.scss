@@ -1,0 +1,28 @@
+@keyframes twinkle {
+  0%, 100% { opacity: 0.3; }
+  50%       { opacity: 1; }
+}
+
+@keyframes flicker {
+  0%   { opacity: 1; transform: scale(1); }
+  100% { opacity: 0.8; transform: scale(1.05); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.15 rgba(0, 243, 255, 0.3); filter: blur(3rem); }
+  50%       { opacity: 0.35 rgba(0, 243, 255, 0.4); filter: blur(4rem); }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.animate-slide-up { animation: slide-up 0.4s ease forwards; }
+.animate-fade-in  { animation: fade-in 0.3s ease forwards; }
+.pulse-glow       { animation: pulse-glow 2.5s ease-in-out infinite; }

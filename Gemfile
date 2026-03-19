@@ -61,3 +61,22 @@ group :test do
   gem "capybara"
   gem "selenium-webdriver"
 end
+gem 'faker'
+
+
+gem 'devise'
+gem 'pry'
+gem 'administrate'
+gem 'stripe'
+gem 'dotenv-rails'
+gem 'rspec'
+gem 'table_print'
+
+gem 'sass-embedded', '~> 1.98'
+gem 'tailwindcss-rails'
+
+group :development do   
+  gem "better_errors"   
+  gem "binding_of_caller" 
+end
+

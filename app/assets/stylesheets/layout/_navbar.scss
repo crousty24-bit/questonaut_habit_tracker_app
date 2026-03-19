@@ -1,0 +1,161 @@
+@use "base/variables" as *;
+
+// ─── Navbar principale ────────────────────────────────────────
+.top-nav {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background: $bg-panel;
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid $border-cyan;
+  box-shadow: $glow-cyan;
+  z-index: $z-navbar;
+  padding: $sp-4 $sp-6;
+}
+
+.nav-inner {
+  max-width: 80rem;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: $sp-4;
+}
+
+// ─── Brand ────────────────────────────────────────────────────
+.brand {
+  display: flex;
+  align-items: center;
+  gap: $sp-3;
+  text-decoration: none;
+
+  &-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, $cyan, #7c3aed);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    box-shadow: $glow-cyan;
+  }
+
+  &-text {
+    font-size: 1.5rem;
+    font-weight: 700;
+    font-family: 'Space Grotesk', sans-serif;
+    color: white;
+    letter-spacing: 0.05em;
+  }
+}
+
+// ─── Actions droite ───────────────────────────────────────────
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: $sp-4;
+}
+
+.nav-user-meta {
+  text-align: right;
+}
+
+.nav-user-meta__name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: white;
+}
+
+.nav-user-meta__level {
+  font-size: 0.75rem;
+  color: $cyan;
+}
+
+.nav-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #7c3aed, #ec4899);
+  border: 2px solid rgba(0, 243, 255, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+}
+
+.nav-logout {
+  margin: 0;
+}
+
+.nav-actions form {
+  margin: 0;
+}
+
+// ─── Liens de navigation (pages connectées) ───────────────────
+.nav-links {
+  display: flex;
+  gap: $sp-2;
+}
+
+.nav-item {
+  position: relative;
+  padding: $sp-2 $sp-4;
+  font-size: 0.875rem;
+  color: $text-secondary;
+  cursor: pointer;
+  transition: color 0.2s;
+  border-radius: $radius-sm;
+  font-weight: 500;
+  text-decoration: none;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: $cyan;
+    transition: $transition-base;
+    transform: translateX(-50%);
+  }
+
+  &:hover { color: white; }
+
+  &.active {
+    color: $cyan;
+    &::after { width: 100%; }
+  }
+}
+
+@media (max-width: 900px) {
+  .nav-inner {
+    flex-wrap: wrap;
+  }
+
+  .nav-links {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .nav-user-meta {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .top-nav {
+    padding: $sp-3 $sp-4;
+  }
+
+  .brand-text {
+    font-size: 1.2rem;
+  }
+
+  .nav-actions {
+    gap: $sp-2;
+  }
+}

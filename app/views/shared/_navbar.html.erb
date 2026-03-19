@@ -1,0 +1,45 @@
+<nav class="top-nav" id="navbar">
+  <div class="nav-inner">
+
+    <%# Brand %>
+    <a href="<%= root_path %>" class="brand">
+      <div class="brand-icon">🚀</div>
+      <span class="brand-text">Questonaut</span>
+    </a>
+
+    <%# Nav links %>
+    <% if user_signed_in? %>
+      <div class="nav-links">
+        <a href="<%= dashboard_path %>"
+          class="nav-item <%= 'active' if current_page?(dashboard_path) %>">
+          Dashboard
+        </a>
+        <a href="<%= statistics_path %>"
+          class="nav-item <%= 'active' if current_page?(statistics_path) %>">
+          Statistics
+        </a>
+      </div>
+    <% end %>
+
+    <%# Right side : guest ou user %>
+    <div class="nav-actions">
+      <% if user_signed_in? %>
+        <div class="nav-user-meta">
+          <div class="nav-user-meta__name"><%= current_user.name.presence || current_user.email %></div>
+          <div class="nav-user-meta__level">Level <%= current_user.level || 1 %></div>
+        </div>
+        <div class="nav-avatar">
+          👨‍🚀
+        </div>
+        <%= button_to "Logout", destroy_user_session_path,
+            method: :delete,
+            class: "btn btn-ghost btn-md nav-logout" %>
+      <% else %>
+        <a href="<%= new_user_session_path %>" class="btn btn-primary btn-md">
+          Start Mission
+        </a>
+      <% end %>
+    </div>
+
+  </div>
+</nav>
