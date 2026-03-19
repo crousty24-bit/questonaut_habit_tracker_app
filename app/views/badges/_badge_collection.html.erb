@@ -14,17 +14,19 @@
           <% badges.each do |badge| %>
             <% unlocked = @user_badge_ids.include?(badge.id) %>
             <div class="badge-item <%= 'locked' unless unlocked %>">
-              <% if badge.image_key.present? %>
-                <%= image_tag badge_image(badge, unlocked: unlocked),
-                              class: "pixel-badge #{'locked' unless unlocked}",
-                              alt: badge.name,
-                              width: 64,
-                              height: 64,
-                              loading: "lazy",
-                              decoding: "async" %>
-              <% else %>
-                <div class="statistics-badge-fallback <%= 'locked' unless unlocked %>"><%= badge.name.first.upcase %></div>
-              <% end %>
+              <div class="badge-asset">
+                <% if badge.image_key.present? %>
+                  <%= image_tag badge_image(badge, unlocked: unlocked),
+                                class: "pixel-badge #{'locked' unless unlocked}",
+                                alt: badge.name,
+                                width: 64,
+                                height: 64,
+                                loading: "lazy",
+                                decoding: "async" %>
+                <% else %>
+                  <div class="statistics-badge-fallback <%= 'locked' unless unlocked %>"><%= badge.name.first.upcase %></div>
+                <% end %>
+              </div>
               <div class="badge-name"><%= badge.name %></div>
               <div class="badge-desc"><%= unlocked ? (badge.description.presence || "Unlocked") : "???" %></div>
             </div>
