@@ -84,6 +84,10 @@ RSpec.configure do |config|
     Capybara.current_driver = :rack_test
   end
 
+  config.before(type: :request) do
+    clear_cookies
+  end
+
   config.before(type: :system, js: true) do
     skip "JavaScript browser driver is unavailable in this environment." unless js_system_tests_available
 
