@@ -72,6 +72,7 @@ export default class extends Controller {
   }
 
   filter(event) {
+    event.preventDefault()
     const filter = event.currentTarget.dataset.dashboardFilter
 
     this.filterButtonTargets.forEach((button) => {
