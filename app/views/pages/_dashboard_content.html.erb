@@ -12,8 +12,10 @@
   xp_this_week = weekly_completed * 10
   active_category = @current_category.presence || "all"
   dashboard_base_path = dashboard_path({ category: @current_category.presence }.compact)
-  timer_deadline = habit_timer_deadline(now: @now)
-  timer_seconds_remaining = habit_timer_seconds_remaining(now: @now)
+  daily_timer_deadline = habit_timer_deadline(now: @now)
+  daily_timer_seconds_remaining = habit_timer_seconds_remaining(now: @now)
+  weekly_timer_deadline = habit_timer_deadline(period: :weekly, now: @now)
+  weekly_timer_seconds_remaining = habit_timer_seconds_remaining(period: :weekly, now: @now)
 
   category_icon_for = lambda do |category|
     {
@@ -150,11 +152,18 @@
               <div class="missions-section-header">
                 <div class="missions-section-label"><%= section_title %></div>
                 <% if section_title == "Daily Missions" %>
-                  <div class="habit-timer missions-section-timer"
+                  <div class="habit-timer habit-timer--daily missions-section-timer"
                        data-controller="habit-timer"
-                       data-habit-timer-expiry-value="<%= timer_deadline.iso8601 %>">
+                       data-habit-timer-expiry-value="<%= daily_timer_deadline.iso8601 %>">
                     <span class="habit-timer__label" data-habit-timer-target="label">available in</span>
-                    <strong class="habit-timer__value" data-habit-timer-target="value"><%= format_habit_timer(timer_seconds_remaining) %></strong>
+                    <strong class="habit-timer__value" data-habit-timer-target="value"><%= format_habit_timer(daily_timer_seconds_remaining) %></strong>
+                  </div>
+                <% elsif section_title == "Weekly Missions" %>
+                  <div class="habit-timer habit-timer--weekly missions-section-timer"
+                       data-controller="habit-timer"
+                       data-habit-timer-expiry-value="<%= weekly_timer_deadline.iso8601 %>">
+                    <span class="habit-timer__label" data-habit-timer-target="label">available in</span>
+                    <strong class="habit-timer__value" data-habit-timer-target="value"><%= format_habit_timer(weekly_timer_seconds_remaining) %></strong>
                   </div>
                 <% end %>
               </div>

@@ -21,6 +21,22 @@ RSpec.describe "Habit timer and missed streak alerts" do
     end
   end
 
+  it "shows an orange countdown next to the weekly missions section" do
+    travel_to(Time.zone.parse("2026-03-19 10:15:00")) do
+      user = create_user(email: "weekly-timer@example.com")
+      create_habit(user: user, title: "Weekly Review", frequency: "weekly")
+
+      sign_in_via_ui(user)
+      visit dashboard_path
+
+      within(".missions-section-header", text: "Weekly Missions") do
+        expect(page).to have_text("available in")
+        expect(page).to have_css(".habit-timer--weekly")
+        expect(page).to have_text("85:44:59")
+      end
+    end
+  end
+
   it "keeps the daily missions timer visible after a mission is validated" do
     travel_to(Time.zone.parse("2026-03-19 10:15:00")) do
       user = create_user(email: "timer-completed@example.com")

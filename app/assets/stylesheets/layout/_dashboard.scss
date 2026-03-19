@@ -334,11 +334,20 @@
   gap: $sp-2;
   padding: 4px 8px;
   border-radius: $radius-pill;
+  font-size: 0.75rem;
+  line-height: 1.1;
+}
+
+.habit-timer--daily {
   background: rgba(0, 243, 255, 0.08);
   border: 1px solid rgba(0, 243, 255, 0.22);
   color: $cyan;
-  font-size: 0.75rem;
-  line-height: 1.1;
+}
+
+.habit-timer--weekly {
+  background: rgba(255, 107, 53, 0.08);
+  border: 1px solid rgba(255, 107, 53, 0.22);
+  color: $orange;
 }
 
 .missions-section-timer {
@@ -346,16 +355,24 @@
 }
 
 .habit-timer__label {
-  color: $cyan;
   font-size: 0.75rem;
   font-weight: 500;
 }
 
 .habit-timer__value {
-  color: $cyan;
   font-size: 0.75rem;
   font-weight: 600;
   letter-spacing: 0.02em;
+}
+
+.habit-timer--daily .habit-timer__label,
+.habit-timer--daily .habit-timer__value {
+  color: $cyan;
+}
+
+.habit-timer--weekly .habit-timer__label,
+.habit-timer--weekly .habit-timer__value {
+  color: $orange;
 }
 
 .dashboard-habit__action {

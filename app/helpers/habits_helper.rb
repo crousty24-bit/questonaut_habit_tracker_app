@@ -1,10 +1,15 @@
 module HabitsHelper
-  def habit_timer_deadline(now: Time.current)
-    now.end_of_day
+  def habit_timer_deadline(period: :daily, now: Time.current)
+    case period.to_sym
+    when :weekly
+      now.end_of_week
+    else
+      now.end_of_day
+    end
   end
 
-  def habit_timer_seconds_remaining(now: Time.current)
-    [(habit_timer_deadline(now: now) - now).to_i, 0].max
+  def habit_timer_seconds_remaining(period: :daily, now: Time.current)
+    [(habit_timer_deadline(period: period, now: now) - now).to_i, 0].max
   end
 
   def habit_timer_prefix(habit, today: Date.current)
