@@ -6,8 +6,8 @@ module DashboardState
   def load_dashboard_state
     @today = Date.current
     @now = Time.current
-    @habit ||= current_user.habits.new
-    @habit.category_name ||= "health"
+    @new_habit = dashboard_new_habit
+    @new_habit.category_name ||= "health"
     @current_category = selected_category
     @deleting_habit = habit_pending_deletion
     @show_delete_habit_modal = @deleting_habit.present?
@@ -49,5 +49,12 @@ module DashboardState
     return unless habit_id
 
     current_user.habits.find_by(id: habit_id)
+  end
+
+  def dashboard_new_habit
+    candidate = defined?(@habit) ? @habit : nil
+    return candidate if candidate.is_a?(Habit) && candidate.new_record?
+
+    current_user.habits.new
   end
 end

@@ -29,6 +29,7 @@
 
   best_streak = @habits.map { |habit| habit.current_streak(as_of: @today) }.max || 0
   login_streak = current_user.login_streak || 0
+  new_habit = @new_habit || current_user.habits.new(category_name: "health")
   editing_habit = @editing_habit || current_user.habits.new
   deleting_habit = @deleting_habit
   editing_category = if editing_habit.respond_to?(:category_name) && editing_habit.category_name.present?
@@ -313,15 +314,15 @@
         <button type="button" class="modal-close" data-action="dashboard#closeCreateModal">&times;</button>
       </div>
 
-      <% create_habit_feedback = validation_feedback_data(@habit) %>
-      <%= form_with(model: @habit, url: habits_path, class: "dashboard-modal-form", data: create_habit_feedback) do |form| %>
-        <%= render "shared/model_errors", record: @habit %>
+      <% create_habit_feedback = validation_feedback_data(new_habit) %>
+      <%= form_with(model: new_habit, url: habits_path, class: "dashboard-modal-form", data: create_habit_feedback) do |form| %>
+        <%= render "shared/model_errors", record: new_habit %>
         <%= render "shared/validation_toast", message: create_habit_feedback[:validation_feedback_notification_message_value] %>
 
         <div class="form-group">
           <%= form.label :title, "Mission Name", class: "form-label" %>
           <%= form.text_field :title,
-                              class: validation_field_classes(@habit, :title, "input"),
+                              class: validation_field_classes(new_habit, :title, "input"),
                               placeholder: "e.g., Morning Meditation",
                               required: true,
                               data: validation_field_data(:title) %>
@@ -331,7 +332,7 @@
           <%= form.label :description, "Description", class: "form-label" %>
           <%= form.text_area :description,
                              rows: 3,
-                             class: validation_field_classes(@habit, :description, "textarea"),
+                             class: validation_field_classes(new_habit, :description, "textarea"),
                              placeholder: "Describe your goal...",
                              data: validation_field_data(:description) %>
         </div>
@@ -340,7 +341,7 @@
           <label class="form-label">Frequency</label>
           <div class="dashboard-modal-form__choices">
             <button type="button"
-                    class="freq-option <%= (@habit.frequency || 'daily') == 'daily' ? 'selected' : '' %>"
+                    class="freq-option <%= (new_habit.frequency || 'daily') == 'daily' ? 'selected' : '' %>"
                     data-action="dashboard#selectCreateFrequency"
                     data-frequency-option
                     data-value="daily">
@@ -349,7 +350,7 @@
               <span class="freq-desc">Validate every day</span>
             </button>
             <button type="button"
-                    class="freq-option <%= @habit.frequency == 'weekly' ? 'selected' : '' %>"
+                    class="freq-option <%= new_habit.frequency == 'weekly' ? 'selected' : '' %>"
                     data-action="dashboard#selectCreateFrequency"
                     data-frequency-option
                     data-value="weekly">
@@ -359,13 +360,13 @@
             </button>
           </div>
           <%= form.hidden_field :frequency,
-                                value: (@habit.frequency || "daily"),
+                                value: (new_habit.frequency || "daily"),
                                 data: { dashboard_target: "createFrequencyInput" } %>
         </div>
 
         <div class="form-group">
           <label class="form-label">Category (select one)</label>
-          <% selected_category = @habit.category_name.presence || "health" %>
+          <% selected_category = new_habit.category_name.presence || "health" %>
           <div class="dashboard-modal-form__tags">
             <button type="button" class="selectable-tag tag-health <%= 'selected' if selected_category == 'health' %>" data-action="dashboard#selectCreateCategory" data-category-option data-value="health">❤️ Health</button>
             <button type="button" class="selectable-tag tag-productivity <%= 'selected' if selected_category == 'productivity' %>" data-action="dashboard#selectCreateCategory" data-category-option data-value="productivity">⚡ Productivity</button>
