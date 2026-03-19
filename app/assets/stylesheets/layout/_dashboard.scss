@@ -172,6 +172,49 @@
   gap: $sp-5;
 }
 
+.dashboard-alert {
+  display: flex;
+  gap: $sp-4;
+  padding: $sp-5;
+  border-radius: $radius-lg;
+  border: 1px solid rgba(255, 215, 0, 0.32);
+  background: rgba(251, 191, 36, 0.08);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+}
+
+.dashboard-alert--warning {
+  border-color: rgba(255, 215, 0, 0.4);
+}
+
+.dashboard-alert__icon {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.dashboard-alert__content {
+  display: flex;
+  flex-direction: column;
+  gap: $sp-2;
+}
+
+.dashboard-alert__title {
+  color: white;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.dashboard-alert__message {
+  color: $text-secondary;
+  font-size: 0.875rem;
+}
+
+.dashboard-alert__list {
+  margin: 0;
+  padding-left: 1rem;
+  color: $amber;
+  font-size: 0.8rem;
+}
+
 .dashboard-section-title {
   font-size: 1.5rem;
   font-weight: 700;
@@ -208,6 +251,14 @@
   display: flex;
   flex-direction: column;
   gap: $sp-4;
+}
+
+.missions-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $sp-3;
+  flex-wrap: wrap;
 }
 
 .missions-section-label {
@@ -270,10 +321,58 @@
   gap: $sp-4;
   margin-top: $sp-2;
   font-size: 0.75rem;
+  flex-wrap: wrap;
 }
 
 .dashboard-habit__xp {
   color: $cyan;
+}
+
+.habit-timer {
+  display: inline-flex;
+  align-items: center;
+  gap: $sp-2;
+  padding: 4px 8px;
+  border-radius: $radius-pill;
+  font-size: 0.75rem;
+  line-height: 1.1;
+}
+
+.habit-timer--daily {
+  background: rgba(0, 243, 255, 0.08);
+  border: 1px solid rgba(0, 243, 255, 0.22);
+  color: $cyan;
+}
+
+.habit-timer--weekly {
+  background: rgba(255, 107, 53, 0.08);
+  border: 1px solid rgba(255, 107, 53, 0.22);
+  color: $orange;
+}
+
+.missions-section-timer {
+  margin-top: $sp-1;
+}
+
+.habit-timer__label {
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.habit-timer__value {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.habit-timer--daily .habit-timer__label,
+.habit-timer--daily .habit-timer__value {
+  color: $cyan;
+}
+
+.habit-timer--weekly .habit-timer__label,
+.habit-timer--weekly .habit-timer__value {
+  color: $orange;
 }
 
 .dashboard-habit__action {
@@ -527,7 +626,9 @@
   .dashboard-hero__top,
   .dashboard-habit,
   .dashboard-habit__main,
-  .missions-header {
+  .missions-header,
+  .missions-section-header,
+  .dashboard-alert {
     flex-direction: column;
     align-items: flex-start;
   }
