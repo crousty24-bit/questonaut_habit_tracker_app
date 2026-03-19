@@ -30,6 +30,15 @@ RSpec.describe "Access control" do
     expect(last_response.body).to include("Mission Report")
   end
 
+  it "redirects a successful login to the dashboard" do
+    user = create_user(email: "redirect-login@example.com")
+
+    post user_session_path, user: { email: user.email, password: "password123" }
+
+    expect(last_response.status).to eq(303)
+    expect(last_response["Location"]).to end_with(dashboard_path)
+  end
+
   it "renders category filter hooks on the dashboard for mission sorting" do
     user = create_user(email: "filters@example.com")
     create_habit(user: user, title: "Meal Prep", category_name: "nutrition")
