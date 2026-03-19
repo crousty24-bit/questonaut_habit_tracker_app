@@ -104,28 +104,47 @@
   font-size: 0.875rem;
   color: $text-secondary;
   cursor: pointer;
-  transition: color 0.2s;
+  transition: color 0.25s ease, transform 0.25s ease;
   border-radius: $radius-sm;
-  font-weight: 500;
+  font-weight: 700;
   text-decoration: none;
+  overflow: hidden;
 
   &::after {
     content: '';
     position: absolute;
-    bottom: 0;
-    left: 50%;
-    width: 0;
+    bottom: 2px;
+    left: $sp-4;
+    right: $sp-4;
     height: 2px;
-    background: $cyan;
-    transition: $transition-base;
-    transform: translateX(-50%);
+    border-radius: 999px;
+    background: linear-gradient(90deg, rgba(0, 243, 255, 0.15) 0%, $cyan 50%, rgba(0, 243, 255, 0.15) 100%);
+    box-shadow: 0 0 14px rgba(0, 243, 255, 0.45);
+    opacity: 0;
+    transform: scaleX(0.2);
+    transform-origin: center;
+    transition: transform 0.28s ease, opacity 0.28s ease, box-shadow 0.28s ease;
   }
 
-  &:hover { color: white; }
+  &:hover,
+  &:focus-visible {
+    color: white;
+    transform: translateY(-1px);
+
+    &::after {
+      opacity: 1;
+      transform: scaleX(1);
+      box-shadow: 0 0 18px rgba(0, 243, 255, 0.7);
+    }
+  }
 
   &.active {
     color: $cyan;
-    &::after { width: 100%; }
+
+    &::after {
+      opacity: 1;
+      transform: scaleX(1);
+    }
   }
 }
 
