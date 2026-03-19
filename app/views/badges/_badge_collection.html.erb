@@ -14,8 +14,8 @@
           <% badges.each do |badge| %>
             <% unlocked = @user_badge_ids.include?(badge.id) %>
             <div class="badge-item <%= 'locked' unless unlocked %>">
-              <% if badge.icon.attached? %>
-                <%= image_tag badge.icon,
+              <% if badge.image_key.present? %>
+                <%= image_tag badge_image(badge, unlocked: unlocked),
                               class: "pixel-badge #{'locked' unless unlocked}",
                               alt: badge.name,
                               width: 64,

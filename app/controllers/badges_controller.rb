@@ -16,7 +16,7 @@ class BadgesController < ApplicationController
   end
 
   def collection
-    @badges = Badge.includes(icon_attachment: :blob).order(:name)
+    @badges = Badge.order(:name)
     @user_badge_ids = current_user.badge_ids
     @unlocked_badges_count = current_user.badges.count
     @badge_groups = {
@@ -66,7 +66,7 @@ class BadgesController < ApplicationController
   end
 
   def badge_params
-    params.require(:badge).permit(:name, :description, :icon)
+    params.require(:badge).permit(:name, :description, :image_key)
   end
 
   def success_rate

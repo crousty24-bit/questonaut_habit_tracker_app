@@ -15,7 +15,7 @@ class BadgesTest < ApplicationSystemTestCase
     click_on "New badge"
 
     fill_in "Description", with: @badge.description
-    fill_in "Icon", with: @badge.icon
+    fill_in "Image key", with: @badge.image_key
     fill_in "Name", with: @badge.name
     click_on "Create Badge"
 
@@ -28,7 +28,7 @@ class BadgesTest < ApplicationSystemTestCase
     click_on "Edit this badge", match: :first
 
     fill_in "Description", with: @badge.description
-    fill_in "Icon", with: @badge.icon
+    fill_in "Image key", with: @badge.image_key
     fill_in "Name", with: @badge.name
     click_on "Update Badge"
 
