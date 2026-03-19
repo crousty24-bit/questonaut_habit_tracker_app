@@ -77,15 +77,7 @@ class BadgesController < ApplicationController
   end
 
   def streak_for(habit)
-    dates = habit.habit_logs.select(&:completed?).map(&:date).compact.sort.reverse
-    return 0 if dates.empty?
-
-    streak = 1
-    dates.each_cons(2) do |current_date, previous_date|
-      break unless current_date == previous_date + 1.day
-      streak += 1
-    end
-    streak
+    habit.current_streak(as_of: Date.current)
   end
 
   def habit_success_rate(habit)

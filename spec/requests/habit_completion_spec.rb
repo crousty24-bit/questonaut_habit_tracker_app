@@ -68,4 +68,24 @@ RSpec.describe "Habit completion" do
     expect(user.reload.total_xp).to eq(10)
     expect(habit.habit_logs.count).to eq(1)
   end
+
+  it "allows an existing incomplete log to be validated once and awards xp only once" do
+    user = create_user(email: "existing-log@example.com")
+    habit = create_habit(user: user, title: "Study")
+    HabitLog.create!(habit: habit, date: Date.current, completed: false)
+
+    login_as(user)
+    follow_redirect!
+
+    post habit_habit_logs_path(habit), habit_log: {
+      date: Date.current,
+      completed: true,
+      habit_id: habit.id
+    }
+
+    expect(last_response.status).to eq(302)
+    expect(habit.habit_logs.count).to eq(1)
+    expect(habit.habit_logs.first.completed).to be(true)
+    expect(user.reload.total_xp).to eq(10)
+  end
 end
