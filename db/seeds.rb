@@ -2,8 +2,8 @@
 # BADGES HABIT / USER
 # --------------------
 {
-  "Welcome" => "habit/welcome.png",
-  "First Mission" => "habit/firstmission.png",
+  "Welcome" => "habit/welcomeV2.png",
+  "First Mission" => "habit/firstmissionV2.png",
   "Daily Login" => "habit/dailylogin.png",
   "Veteran" => "habit/veteran.png"
 }.each do |name, file|
@@ -31,35 +31,43 @@ end
 # --------------------
 # LEVEL BADGES
 # --------------------
-{
-  "Level 1" => "level/lvl1.png",
-  "Level 3" => "level/lvl3.png",
-  "Level 10" => "level/lvl10.png",
-  "Level 15" => "level/lvl15.png",
-  "Level 30" => "level/lvl30.png",
-  "Level 45" => "level/lvl45.png",
-  "Level 50" => "level/lvl50.png",
-  "Level 100" => "level/lvl100.png",
-  "Level 150" => "level/lvl150.png",
-  "Level 200" => "level/lvl200.png",
-  "Level 250" => "level/level250.png"
-}.each do |name, file|
-  badge = Badge.find_or_create_by!(name: name)
-  badge.update!(image_key: File.basename(file))
+Badge::LEVEL_IMAGE_KEYS.each do |level, image_key|
+  badge = Badge.find_or_create_by!(name: "Level #{level}")
+  badge.update!(image_key: image_key, description: "Level #{level}")
 end
+
+legacy_level_five_badge = Badge.find_by(name: "Level 3")
+level_five_badge = Badge.find_by(name: "Level 5")
+
+if legacy_level_five_badge && level_five_badge && legacy_level_five_badge.id != level_five_badge.id
+  legacy_level_five_badge.user_badges.find_each do |user_badge|
+    duplicate = UserBadge.exists?(user_id: user_badge.user_id, badge_id: level_five_badge.id)
+
+    if duplicate
+      user_badge.destroy!
+    else
+      user_badge.update!(badge: level_five_badge)
+    end
+  end
+
+  legacy_level_five_badge.destroy!
+end
+
+Badge.where(name: "Level 45").delete_all
 
 # --------------------
 # TAG BADGES
 # --------------------
 {
-  "Tag: Fitness" => "tags/fitness.png",
-  "Tag: Learning" => "tags/learning.png",
-  "Tag: Nutrition" => "tags/nutrition.png",
-  "Tag: Productivity" => "tags/productivity.png",
-  "Tag: Health" => "tags/health.png"
-}.each do |name, file|
+  "Tag: Fitness" => { file: "tags/fitness.png", description: "Fitness" },
+  "Tag: Learning" => { file: "tags/learning.png", description: "Learning" },
+  "Tag: Nutrition" => { file: "tags/nutrition.png", description: "Nutrition" },
+  "Tag: Productivity" => { file: "tags/productivity.png", description: "Productivity" },
+  "Tag: Health" => { file: "tags/health.png", description: "Health" }
+}.each do |name, config|
+  file = config[:file]
   badge = Badge.find_or_create_by!(name: name)
-  badge.update!(image_key: File.basename(file))
+  badge.update!(image_key: File.basename(file), description: config[:description])
 end
 
 # --------------------

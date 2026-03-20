@@ -16,14 +16,14 @@ class BadgesController < ApplicationController
   end
 
   def collection
-    @badges = Badge.order(:name)
+    @badges = Badge.all
     @user_badge_ids = current_user.badge_ids
     @unlocked_badges_count = current_user.badges.count
     @badge_groups = {
-      "Streak Achievements" => @badges.select { |badge| badge.name.start_with?("Streak ") },
-      "Mission Milestones" => @badges.select { |badge| mission_badge?(badge) },
-      "Level Ranks" => @badges.select { |badge| badge.name.start_with?("Level ") },
-      "Category Collection" => @badges.select { |badge| badge.name.start_with?("Tag: ") }
+      "Streak Achievements" => badges_for_collection(:streak),
+      "Mission Milestones" => badges_for_collection(:mission),
+      "Level Ranks" => badges_for_collection(:level),
+      "Category Collection" => badges_for_collection(:category)
     }
 
     render partial: "badge_collection"
@@ -95,7 +95,8 @@ class BadgesController < ApplicationController
     counts.sort_by { |_, value| -value }.to_h
   end
 
-  def mission_badge?(badge)
-    !(badge.name.start_with?("Streak ") || badge.name.start_with?("Level ") || badge.name.start_with?("Tag: "))
+  def badges_for_collection(group)
+    @badges.select { |badge| badge.collection_group == group }
+           .sort_by(&:collection_sort_key)
   end
 end
