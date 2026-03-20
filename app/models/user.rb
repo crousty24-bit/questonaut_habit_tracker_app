@@ -1,7 +1,7 @@
 # app/models/user.rb
 class User < ApplicationRecord
   before_validation :normalize_username
-
+  after_create :welcome_send
   after_create do
     BadgeAwarder.call(self, context: :user_created)
   end
@@ -26,6 +26,10 @@ class User < ApplicationRecord
 
   def username=(value)
     self[:name] = value
+  end
+
+  def welcome_send
+    UserMailer.welcome_email(self).deliver_now
   end
 
   # --------------------

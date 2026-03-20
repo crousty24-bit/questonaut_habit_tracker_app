@@ -1,7 +1,10 @@
 class UserMailer < ApplicationMailer
+  default from: Rails.application.credentials.dig(:GMAIL_LOGIN)
   def welcome_email(user)
     @user = user
 
-    mail(to: @user.email, subject: "Bienvenue sur Questonaut")
+    @url = new_user_session_url
+
+    mail(to: @user.email, subject: "Welcome to Questonaut")
   end
 end
