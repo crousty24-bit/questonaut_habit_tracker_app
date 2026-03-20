@@ -18,7 +18,7 @@ class BadgeAwarder
     award_streak_badges if @context == :habit_logged
     award_tag_badges if @context == :habit_logged
 
-    award_level_badges if @context == :habit_logged
+    award_level_badges if level_award_context?
     award_loyalty_badges if @context == :login
   end
 
@@ -90,7 +90,11 @@ class BadgeAwarder
   end
 
   def user_level
-    (user_logs.count / 10) + 1
+    @user.level.presence || 1
+  end
+
+  def level_award_context?
+    %i[user_created habit_created habit_logged login].include?(@context)
   end
 
   # --------------------

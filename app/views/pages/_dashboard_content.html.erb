@@ -257,21 +257,21 @@
         <div class="dashboard-badges">
           <% if @recent_badges.any? %>
             <% @recent_badges.each do |badge| %>
-              <div class="badge-item">
-                <div class="badge-asset">
-                  <% if badge.image_key.present? %>
+              <div class="badge-item badge-item--recent">
+                <div class="badge-asset badge-asset--sm">
+                  <% if badge.image_path.present? %>
                     <%= image_tag badge_image(badge),
                                   class: "pixel-badge",
-                                  alt: badge.name,
-                                  width: 64,
-                                  height: 64,
+                                  alt: badge.display_name,
+                                  width: 56,
+                                  height: 56,
                                   loading: "lazy",
                                   decoding: "async" %>
                   <% else %>
-                    <div class="dashboard-badge-fallback"><%= badge.name.first.upcase %></div>
+                    <div class="dashboard-badge-fallback"><%= badge.display_name.first.upcase %></div>
                   <% end %>
                 </div>
-                <div class="badge-name"><%= badge.name %></div>
+                <div class="badge-name"><%= badge.display_name %></div>
               </div>
             <% end %>
           <% else %>

@@ -78,6 +78,16 @@
   flex-shrink: 0;
 }
 
+.badge-asset--sm {
+  width: 56px;
+  height: 56px;
+}
+
+.badge-asset--md {
+  width: 72px;
+  height: 72px;
+}
+
 .pixel-badge {
   width: 100%;
   height: 100%;
@@ -90,13 +100,16 @@
 
   &:hover { transform: scale(1.1); filter: brightness(1.2); }
 
-  &.locked { filter: grayscale(100%) brightness(0.25); opacity: 0.5; }
+  &.is-locked {
+    filter: grayscale(100%) brightness(0.42) saturate(0.7);
+    opacity: 0.72;
+  }
 }
 
 .badge-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-  gap: $sp-4;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: $sp-5;
 }
 
 .badge-item {
@@ -106,12 +119,32 @@
   text-align: center;
   gap: $sp-2;
 
-  .badge-name { font-size: 11px; color: $text-primary; font-weight: 500; }
-  .badge-desc { font-size: 9px; color: $text-muted; margin-top: 2px; }
+  .badge-name {
+    font-size: 0.75rem;
+    line-height: 1.3;
+    color: $text-primary;
+    font-weight: 600;
+  }
+
+  .badge-desc {
+    font-size: 0.625rem;
+    line-height: 1.4;
+    color: $text-muted;
+    margin-top: 2px;
+  }
 
   &.locked {
     .badge-name, .badge-desc { color: $text-muted; }
   }
+}
+
+.badge-item--collection {
+  min-height: 7.75rem;
+}
+
+.badge-item--recent {
+  width: 84px;
+  gap: $sp-3;
 }
 
 // ─── Placeholder chart ───────────────────────────────────────
