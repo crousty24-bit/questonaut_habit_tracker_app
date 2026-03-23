@@ -12,18 +12,19 @@ class BadgesController < ApplicationController
     @unlocked_badges_count = current_user.badges.count
     @total_badges_count = Badge.count
     @category_distribution = category_distribution
+    @weekly_progress = weekly_progress
     @detailed_habits = @habits.sort_by { |habit| [-habit_success_rate(habit), -streak_for(habit)] }.first(4)
   end
 
   def collection
-    @badges = Badge.order(:name)
+    @badges = Badge.all
     @user_badge_ids = current_user.badge_ids
     @unlocked_badges_count = current_user.badges.count
     @badge_groups = {
-      "Streak Achievements" => @badges.select { |badge| badge.name.start_with?("Streak ") },
-      "Mission Milestones" => @badges.select { |badge| mission_badge?(badge) },
-      "Level Ranks" => @badges.select { |badge| badge.name.start_with?("Level ") },
-      "Category Collection" => @badges.select { |badge| badge.name.start_with?("Tag: ") }
+      "Streak Achievements" => badges_for_collection(:streak),
+      "Mission Milestones" => badges_for_collection(:mission),
+      "Level Ranks" => badges_for_collection(:level),
+      "Category Collection" => badges_for_collection(:category)
     }
 
     render partial: "badge_collection"
@@ -77,15 +78,7 @@ class BadgesController < ApplicationController
   end
 
   def streak_for(habit)
-    dates = habit.habit_logs.select(&:completed?).map(&:date).compact.sort.reverse
-    return 0 if dates.empty?
-
-    streak = 1
-    dates.each_cons(2) do |current_date, previous_date|
-      break unless current_date == previous_date + 1.day
-      streak += 1
-    end
-    streak
+    habit.current_streak(as_of: Date.current)
   end
 
   def habit_success_rate(habit)
@@ -103,7 +96,25 @@ class BadgesController < ApplicationController
     counts.sort_by { |_, value| -value }.to_h
   end
 
-  def mission_badge?(badge)
-    !(badge.name.start_with?("Streak ") || badge.name.start_with?("Level ") || badge.name.start_with?("Tag: "))
+  def weekly_progress
+    week_start = Date.current.beginning_of_week(:monday)
+    week_dates = (week_start..week_start.end_of_week(:monday)).to_a
+    completed_counts = @completed_logs.where(date: week_dates).group(:date).count
+    french_day_labels = %w[Lundi Mardi Mercredi Jeudi Vendredi Samedi Dimanche]
+
+    week_dates.each_with_index.map do |date, index|
+      completed_value = completed_counts[date].to_i * 10
+
+      {
+        label: french_day_labels[index],
+        value: completed_value,
+        height_percent: [(completed_value * 100.0 / 50).round, 100].min
+      }
+    end
+  end
+
+  def badges_for_collection(group)
+    @badges.select { |badge| badge.collection_group == group }
+           .sort_by(&:collection_sort_key)
   end
 end

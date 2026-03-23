@@ -1,8 +1,26 @@
-<p>Bonjour <%= @user.name %>,</p>
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+  </head>
+  <body>
+    <h1>Hello <%= @user.name %>,</h1>
 
-<p>Bienvenue sur <strong>Questonaut</strong> !</p>
+    <p>Welcome to <strong>Questonaut</strong> !</p>
 
-<p>Nous sommes ravis de te compter parmi les nouveaux explorateurs.</p>
+    <p>
+      Your registration as been completed with the following email : <%= @user.email %>.
+    </p>
 
-<p>À très vite,<br>
-L’équipe Questonaut</p>
+    <p>
+      To acces your dashboard, please connect to : <%= @url %>.
+    </p>
+
+    <p>
+      We are glad to count you as a new explorer. Let the journey begin!
+    </p>
+
+    <p>See you soon,<br>
+    The Questonaut Team.</p>
+  </body>
+</html>

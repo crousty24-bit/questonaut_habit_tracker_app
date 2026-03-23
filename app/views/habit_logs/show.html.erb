@@ -3,8 +3,9 @@
 <%= render @habit_log %>
 
 <div>
-  <%= link_to "Edit this habit log", edit_habit_log_path(@habit_log) %> |
-  <%= link_to "Back to habit logs", habit_logs_path %>
+  <%= link_to "Back to habit logs", habit_habit_logs_path(@habit_log.habit) %>
 
-  <%= button_to "Destroy this habit log", @habit_log, method: :delete %>
+  <%= button_to "Destroy this habit log",
+                habit_habit_log_path(@habit_log.habit, @habit_log),
+                method: :delete %>
 </div>

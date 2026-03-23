@@ -1,5 +1,20 @@
 #!/usr/bin/env sh
 
+PIDFILE="tmp/pids/server.pid"
+if [ -f "$PIDFILE" ]; then
+  PID="$(cat "$PIDFILE" 2>/dev/null | tr -d '[:space:]')"
+  if [ -z "$PID" ]; then
+    rm -f "$PIDFILE"
+  elif ! kill -0 "$PID" 2>/dev/null; then
+    echo "Removing stale PID file ($PIDFILE: $PID)"
+    rm -f "$PIDFILE"
+  else
+    echo "A server is already running (pid: $PID, file: $PIDFILE)."
+    echo "Stop it first or remove $PIDFILE if you're sure it's stale."
+    exit 1
+  fi
+fi
+
 if ! gem list foreman -i --silent; then
   echo "Installing foreman..."
   gem install foreman

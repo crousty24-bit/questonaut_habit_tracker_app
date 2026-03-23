@@ -1,6 +1,7 @@
 class HabitLogsController < ApplicationController
   include DashboardState
 
+  before_action :authenticate_user!
   before_action :set_habit_log, only: %i[show edit update destroy]
 
   def index
@@ -17,7 +18,7 @@ class HabitLogsController < ApplicationController
 
   def create
     @habit = current_user.habits.find(params[:habit_id])
-    log_date = habit_log_params[:date].presence || Date.current
+    log_date = habit_log_params[:date].present? ? Date.parse(habit_log_params[:date].to_s) : Date.current
     completed_value = ActiveModel::Type::Boolean.new.cast(habit_log_params[:completed])
 
     @habit_log = @habit.habit_logs.find_or_initialize_by(date: log_date)
@@ -28,7 +29,7 @@ class HabitLogsController < ApplicationController
       if @habit_log.save
         if @habit_log.completed? && !already_completed
           current_user.add_xp(10) unless @habit_log.previously_new_record?
-          BadgeAwarder.call(current_user, context: :habit_logged, habit: @habit)
+          BadgeAwarder.call(current_user, context: :habit_logged, habit: @habit, awarded_on: @habit_log.date)
         end
 
         format.turbo_stream { render_dashboard_update }

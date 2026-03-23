@@ -31,7 +31,10 @@
     box-shadow: 0 0 0 3px rgba(0, 243, 255, 0.1);
   }
 
-  &.error   { border-color: $red; }
+  &.error   {
+    border-color: rgba($red, 0.72);
+    box-shadow: 0 0 0 3px rgba($red, 0.14);
+  }
   &.success { border-color: $green; }
 }
 

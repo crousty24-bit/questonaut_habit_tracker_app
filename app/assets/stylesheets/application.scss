@@ -12,6 +12,8 @@
 
 @use "layout/navbar";           /* main navigation bar */
 @use "layout/dashboard";        /* general dashboard layout structure */
+@use "layout/footer";
+@use "layout/cookie_banner";
 
 @use "components/buttons";      /* reusable buttons (primary, ghost, danger…) */
 @use "components/cards";        /* habit-card, stat-card, badge-card */
@@ -25,6 +27,7 @@
 @use "pages/auth";              /* login, signup, reset password (Devise) */
 @use "pages/habits";            /* habit list and habit detail views */
 @use "pages/statistics";        /* mission report and badge collection */
+@use "pages/legal";
 
 @use "themes/space-theme";      /* sci-fi visual identity: glow, gradients, overlays */
 

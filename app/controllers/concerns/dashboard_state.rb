@@ -5,15 +5,20 @@ module DashboardState
 
   def load_dashboard_state
     @today = Date.current
-    @habit ||= current_user.habits.new
-    @habit.category_name ||= "health"
+    @now = Time.current
+    @new_habit = dashboard_new_habit
+    @new_habit.category_name ||= "health"
     @current_category = selected_category
+    @deleting_habit = habit_pending_deletion
+    @show_delete_habit_modal = @deleting_habit.present?
 
     if defined?(@editing_habit) && @editing_habit.present?
       @editing_habit.category_name ||= @editing_habit.primary_category
     end
 
-    @habits = current_user.habits.includes(:tags, :habit_logs).order(created_at: :desc)
+    all_habits = current_user.habits.includes(:tags, :habit_logs).order(created_at: :desc)
+    @streak_reset_habits = all_habits.select { |habit| habit.streak_reset_alert?(as_of: @today) }
+    @habits = all_habits
     @habits = @habits.select { |habit| habit.primary_category == @current_category } if @current_category.present?
     @recent_badges = current_user.user_badges
                                  .includes(:badge)
@@ -37,5 +42,19 @@ module DashboardState
     category = params[:category].to_s.downcase
     return if category.blank? || category == "all"
     return category if Habit::CATEGORIES.include?(category)
+  end
+
+  def habit_pending_deletion
+    habit_id = params[:delete_mission_id].presence
+    return unless habit_id
+
+    current_user.habits.find_by(id: habit_id)
+  end
+
+  def dashboard_new_habit
+    candidate = defined?(@habit) ? @habit : nil
+    return candidate if candidate.is_a?(Habit) && candidate.new_record?
+
+    current_user.habits.new
   end
 end

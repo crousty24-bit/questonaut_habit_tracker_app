@@ -13,20 +13,27 @@
         <div class="badge-grid">
           <% badges.each do |badge| %>
             <% unlocked = @user_badge_ids.include?(badge.id) %>
-            <div class="badge-item <%= 'locked' unless unlocked %>">
-              <% if badge.image_key.present? %>
-                <%= image_tag badge_image(badge, unlocked: unlocked),
-                              class: "pixel-badge #{'locked' unless unlocked}",
-                              alt: badge.name,
-                              width: 64,
-                              height: 64,
-                              loading: "lazy",
-                              decoding: "async" %>
-              <% else %>
-                <div class="statistics-badge-fallback <%= 'locked' unless unlocked %>"><%= badge.name.first.upcase %></div>
+            <% badge_name = badge.collection_group == :category ? badge.name.delete_prefix("Tag: ").strip : badge.display_name %>
+            <% badge_subtitle = badge.collection_subtitle if unlocked %>
+            <% badge_subtitle = nil if badge_subtitle == badge_name %>
+            <div class="badge-item badge-item--collection <%= 'locked' unless unlocked %>">
+              <div class="badge-asset badge-asset--md">
+                <% if badge.image_path.present? %>
+                  <%= image_tag badge_image(badge, unlocked: unlocked),
+                                class: "pixel-badge #{'is-locked' unless unlocked}",
+                                alt: badge.display_name,
+                                width: 72,
+                                height: 72,
+                                loading: "lazy",
+                                decoding: "async" %>
+                <% else %>
+                  <div class="statistics-badge-fallback <%= 'locked' unless unlocked %>"><%= badge.display_name.first.upcase %></div>
+                <% end %>
+              </div>
+              <div class="badge-name"><%= badge_name %></div>
+              <% if badge_subtitle.present? %>
+                <div class="badge-desc"><%= badge_subtitle %></div>
               <% end %>
-              <div class="badge-name"><%= badge.name %></div>
-              <div class="badge-desc"><%= unlocked ? (badge.description.presence || "Unlocked") : "???" %></div>
             </div>
           <% end %>
         </div>

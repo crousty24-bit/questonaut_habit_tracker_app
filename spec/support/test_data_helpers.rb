@@ -1,25 +1,27 @@
 module TestDataHelpers
   DEFAULT_PASSWORD = "password123".freeze
 
-  def create_user(name: "Test Commander", email: "commander@example.com", password: DEFAULT_PASSWORD, **attributes)
-    User.create!(
-      {
-        name: name,
-        email: email,
-        password: password,
-        password_confirmation: password,
-        total_xp: 0,
-        level: 1
-      }.merge(attributes)
-    )
+  def user_attributes(**attributes)
+    {
+      password: DEFAULT_PASSWORD,
+      password_confirmation: DEFAULT_PASSWORD,
+      terms_accepted: "1"
+    }.merge(attributes)
   end
 
-  def create_habit(user:, title: "Morning Run", description: "Run 5 km", category_name: "health", frequency: "daily")
-    user.habits.create!(
-      title: title,
-      description: description,
-      frequency: frequency,
-      category_name: category_name
-    )
+  def create_user(**attributes)
+    FactoryBot.create(:user, **user_attributes(**attributes))
+  end
+
+  def build_user(**attributes)
+    FactoryBot.build(:user, **user_attributes(**attributes))
+  end
+
+  def create_habit(user: nil, **attributes)
+    FactoryBot.create(:habit, user: user || create_user, **attributes)
+  end
+
+  def build_habit(user: nil, **attributes)
+    FactoryBot.build(:habit, user: user || build_user, **attributes)
   end
 end

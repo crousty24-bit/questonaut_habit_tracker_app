@@ -66,6 +66,12 @@
   justify-content: center;
 }
 
+.delete-modal-cancel:hover {
+  background: rgba(255, 71, 87, 0.15);
+  border-color: rgba(255, 71, 87, 0.45);
+  color: $red;
+}
+
 @media (max-width: 640px) {
   .dashboard-modal-form__choices,
   .dashboard-modal-form__actions {
