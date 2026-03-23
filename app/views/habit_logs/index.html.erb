@@ -8,9 +8,9 @@
   <% @habit_logs.each do |habit_log| %>
     <%= render habit_log %>
     <p>
-      <%= link_to "Show this habit log", habit_log %>
+      <%= link_to "Show this habit log", habit_habit_log_path(habit_log.habit, habit_log) %>
     </p>
   <% end %>
 </div>
 
-<%= link_to "New habit log", new_habit_log_path %>
+<%= link_to "Back to dashboard", dashboard_path %>

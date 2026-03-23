@@ -4,6 +4,7 @@ require File.expand_path("../config/environment", __dir__)
 abort("The Rails environment is running in production mode!") if Rails.env.production?
 
 require "spec_helper"
+require "rspec/rails"
 require "capybara/rspec"
 require "selenium-webdriver"
 require "rack/test"
@@ -53,14 +54,17 @@ end
 RSpec.configure do |config|
   config.include ActiveSupport::Testing::TimeHelpers
   config.include Capybara::DSL, type: :system
+  config.include Capybara::DSL, type: :feature
   config.include FactoryBot::Syntax::Methods
   config.include Rails.application.routes.url_helpers
   config.include RequestSpecHelpers, type: :request
   config.include SystemAuthHelpers, type: :system
+  config.include SystemAuthHelpers, type: :feature
   config.include TestDataHelpers
+  config.include ViewSpecHelpers, type: :view
 
   config.define_derived_metadata(file_path: %r{/spec/system/}) do |metadata|
-    metadata[:type] = :system
+    metadata[:type] = :feature
   end
 
   config.define_derived_metadata(file_path: %r{/spec/requests/}) do |metadata|
@@ -71,8 +75,13 @@ RSpec.configure do |config|
     metadata[:type] = :model
   end
 
+  config.define_derived_metadata(file_path: %r{/spec/views/}) do |metadata|
+    metadata[:type] = :view
+  end
+
   config.include Shoulda::Matchers::ActiveModel, type: :model
   config.include Shoulda::Matchers::ActiveRecord, type: :model
+  config.infer_spec_type_from_file_location!
 
   config.before(:suite) do
     Faker::UniqueGenerator.clear
@@ -95,8 +104,9 @@ RSpec.configure do |config|
     Capybara.current_driver = :rack_test
   end
 
-  config.before(type: :request) do
-    clear_cookies
+  config.before(type: :feature) do
+    Capybara.reset_sessions!
+    Capybara.current_driver = :rack_test
   end
 
   config.before(type: :system, js: true) do
@@ -106,6 +116,11 @@ RSpec.configure do |config|
   end
 
   config.after(type: :system) do
+    Capybara.use_default_driver
+    Capybara.reset_sessions!
+  end
+
+  config.after(type: :feature) do
     Capybara.use_default_driver
     Capybara.reset_sessions!
   end

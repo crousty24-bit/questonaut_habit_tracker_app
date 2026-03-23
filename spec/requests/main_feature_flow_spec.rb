@@ -26,45 +26,47 @@ RSpec.describe "Main feature user flow" do
     login_as(user)
     follow_redirect!
 
-    expect(last_response.status).to eq(200)
-    expect(last_response.body).to include("Welcome Back, Commander")
+    expect(response).to have_http_status(:ok)
+    expect(response.body).to include("Welcome Back, Commander")
 
     expect do
-      post habits_path, habit: habit_attributes
+      post habits_path, params: { habit: habit_attributes }
     end.to change(Habit, :count).by(1)
       .and change(Tag, :count).by(1)
 
     habit = user.habits.order(:created_at).last
 
-    expect(last_response.status).to eq(302)
-    expect(last_response["Location"]).to end_with(dashboard_path)
+    expect(response).to have_http_status(:found)
+    expect(response.headers["Location"]).to end_with(dashboard_path)
 
     follow_redirect!
 
-    created_habit_card = habit_card_for(last_response.body, "Morning Stretch")
+    created_habit_card = habit_card_for(response.body, "Morning Stretch")
 
-    expect(last_response.status).to eq(200)
-    expect(last_response.body).to include("Daily Missions")
+    expect(response).to have_http_status(:ok)
+    expect(response.body).to include("Daily Missions")
     expect(created_habit_card).to be_present
     expect(created_habit_card.text).to include("Morning Stretch")
     expect(created_habit_card.text).to include("fitness")
 
     expect do
-      post habit_habit_logs_path(habit), habit_log: attributes_for(
-        :habit_log,
-        date: Date.current,
-        completed: true
-      ).merge(habit_id: habit.id)
+      post habit_habit_logs_path(habit), params: {
+        habit_log: attributes_for(
+          :habit_log,
+          date: Date.current,
+          completed: true
+        ).merge(habit_id: habit.id)
+      }
     end.to change(HabitLog, :count).by(1)
 
-    expect(last_response.status).to eq(302)
-    expect(last_response["Location"]).to end_with(dashboard_path)
+    expect(response).to have_http_status(:found)
+    expect(response.headers["Location"]).to end_with(dashboard_path)
     expect(habit.reload.completed_on?(Date.current)).to be(true)
     expect(user.reload.total_xp).to eq(30)
 
     follow_redirect!
 
-    completed_habit_card = habit_card_for(last_response.body, "Morning Stretch")
+    completed_habit_card = habit_card_for(response.body, "Morning Stretch")
 
     expect(completed_habit_card).to be_present
     expect(completed_habit_card.text).to include("Completed")
@@ -84,41 +86,43 @@ RSpec.describe "Main feature user flow" do
     follow_redirect!
 
     expect do
-      post habits_path, habit: habit_attributes
+      post habits_path, params: { habit: habit_attributes }
     end.to change(Habit, :count).by(1)
       .and change(Tag, :count).by(1)
 
     habit = user.habits.order(:created_at).last
 
-    expect(last_response.status).to eq(302)
-    expect(last_response["Location"]).to end_with(dashboard_path)
+    expect(response).to have_http_status(:found)
+    expect(response.headers["Location"]).to end_with(dashboard_path)
 
     follow_redirect!
 
-    created_habit_card = habit_card_for(last_response.body, "Weekly Review")
+    created_habit_card = habit_card_for(response.body, "Weekly Review")
 
-    expect(last_response.status).to eq(200)
-    expect(last_response.body).to include("Weekly Missions")
+    expect(response).to have_http_status(:ok)
+    expect(response.body).to include("Weekly Missions")
     expect(created_habit_card).to be_present
     expect(created_habit_card.text).to include("Weekly Review")
     expect(created_habit_card.text).to include("productivity")
 
     expect do
-      post habit_habit_logs_path(habit), habit_log: attributes_for(
-        :habit_log,
-        date: Date.current,
-        completed: true
-      ).merge(habit_id: habit.id)
+      post habit_habit_logs_path(habit), params: {
+        habit_log: attributes_for(
+          :habit_log,
+          date: Date.current,
+          completed: true
+        ).merge(habit_id: habit.id)
+      }
     end.to change(HabitLog, :count).by(1)
 
-    expect(last_response.status).to eq(302)
-    expect(last_response["Location"]).to end_with(dashboard_path)
+    expect(response).to have_http_status(:found)
+    expect(response.headers["Location"]).to end_with(dashboard_path)
     expect(habit.reload.completed_on?(Date.current)).to be(true)
     expect(user.reload.total_xp).to eq(30)
 
     follow_redirect!
 
-    completed_habit_card = habit_card_for(last_response.body, "Weekly Review")
+    completed_habit_card = habit_card_for(response.body, "Weekly Review")
 
     expect(completed_habit_card).to be_present
     expect(completed_habit_card.text).to include("Completed")

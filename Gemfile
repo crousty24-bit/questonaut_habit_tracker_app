@@ -49,6 +49,7 @@ group :development, :test do
 
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem "rubocop-rails-omakase", require: false
+  gem "rspec-rails"
 end
 
 group :development do
@@ -70,7 +71,6 @@ gem 'pry'
 gem 'administrate'
 gem 'stripe'
 gem 'dotenv-rails'
-gem 'rspec'
 gem 'table_print'
 
 gem 'sass-embedded', '~> 1.98'

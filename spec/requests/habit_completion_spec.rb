@@ -13,16 +13,18 @@ RSpec.describe "Habit completion" do
     follow_redirect!
 
     expect do
-      post habit_habit_logs_path(habit), habit_log: {
-        date: Date.current,
-        completed: true,
-        habit_id: habit.id
+      post habit_habit_logs_path(habit), params: {
+        habit_log: {
+          date: Date.current,
+          completed: true,
+          habit_id: habit.id
+        }
       }
     end.to change(HabitLog, :count).by(1)
 
     log = habit.habit_logs.order(:created_at).last
 
-    expect(last_response.status).to eq(302)
+    expect(response).to have_http_status(:found)
     expect(log.completed).to be(true)
     expect(log.date).to eq(Date.current)
   end
@@ -34,13 +36,15 @@ RSpec.describe "Habit completion" do
     login_as(user)
     follow_redirect!
 
-    post habit_habit_logs_path(habit), habit_log: {
-      date: Date.current,
-      completed: true,
-      habit_id: habit.id
+    post habit_habit_logs_path(habit), params: {
+      habit_log: {
+        date: Date.current,
+        completed: true,
+        habit_id: habit.id
+      }
     }
 
-    expect(last_response.status).to eq(302)
+    expect(response).to have_http_status(:found)
     expect(user.reload.total_xp).to eq(10)
     expect(user.level).to eq(1)
   end
@@ -52,23 +56,27 @@ RSpec.describe "Habit completion" do
     login_as(user)
     follow_redirect!
 
-    post habit_habit_logs_path(habit), habit_log: {
-      date: Date.current,
-      completed: true,
-      habit_id: habit.id
+    post habit_habit_logs_path(habit), params: {
+      habit_log: {
+        date: Date.current,
+        completed: true,
+        habit_id: habit.id
+      }
     }
 
     expect(user.reload.total_xp).to eq(10)
     expect(habit.habit_logs.count).to eq(1)
 
-    post habit_habit_logs_path(habit), habit_log: {
-      date: Date.current,
-      completed: true,
-      habit_id: habit.id
+    post habit_habit_logs_path(habit), params: {
+      habit_log: {
+        date: Date.current,
+        completed: true,
+        habit_id: habit.id
+      }
     }
 
-    expect(last_response.status).to eq(302)
-    expect(last_response["Location"]).to include("/dashboard")
+    expect(response).to have_http_status(:found)
+    expect(response.headers["Location"]).to include("/dashboard")
     expect(user.reload.total_xp).to eq(10)
     expect(habit.habit_logs.count).to eq(1)
   end
@@ -81,13 +89,15 @@ RSpec.describe "Habit completion" do
     login_as(user)
     follow_redirect!
 
-    post habit_habit_logs_path(habit), habit_log: {
-      date: Date.current,
-      completed: true,
-      habit_id: habit.id
+    post habit_habit_logs_path(habit), params: {
+      habit_log: {
+        date: Date.current,
+        completed: true,
+        habit_id: habit.id
+      }
     }
 
-    expect(last_response.status).to eq(302)
+    expect(response).to have_http_status(:found)
     expect(habit.habit_logs.count).to eq(1)
     expect(habit.habit_logs.first.completed).to be(true)
     expect(user.reload.total_xp).to eq(10)
@@ -110,13 +120,15 @@ RSpec.describe "Habit completion" do
       login_as(user)
       follow_redirect!
 
-      post habit_habit_logs_path(habit), habit_log: {
-        date: Date.new(2026, 3, 30),
-        completed: true,
-        habit_id: habit.id
+      post habit_habit_logs_path(habit), params: {
+        habit_log: {
+          date: Date.new(2026, 3, 30),
+          completed: true,
+          habit_id: habit.id
+        }
       }
 
-      expect(last_response.status).to eq(302)
+      expect(response).to have_http_status(:found)
       expect(user.reload.badges.pluck(:name)).to include(
         "Streak 3",
         "Streak 7",
