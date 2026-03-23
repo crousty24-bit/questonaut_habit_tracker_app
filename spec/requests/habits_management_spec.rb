@@ -36,13 +36,13 @@ RSpec.describe "Habit management" do
     follow_redirect!
 
     expect do
-      post habits_path, habit: habit_attributes
+      post habits_path, params: { habit: habit_attributes }
     end.to change(Habit, :count).by(1)
       .and change(Tag, :count).by(1)
 
     created_habit = Habit.order(:created_at).last
 
-    expect(last_response.status).to eq(302)
+    expect(response).to have_http_status(:found)
     expect(created_habit.title).to eq("Morning Stretch")
     expect(created_habit.primary_category).to eq("fitness")
     expect(user.reload.total_xp).to eq(20)
@@ -55,15 +55,17 @@ RSpec.describe "Habit management" do
     login_as(user)
     follow_redirect!
 
-    post habits_path, habit: attributes_for(
-      :habit,
-      title: "Morning Stretch",
-      description: "Ten minutes of mobility work",
-      frequency: "daily",
-      category_name: "fitness"
-    )
+    post habits_path, params: {
+      habit: attributes_for(
+        :habit,
+        title: "Morning Stretch",
+        description: "Ten minutes of mobility work",
+        frequency: "daily",
+        category_name: "fitness"
+      )
+    }
 
-    expect(last_response.status).to eq(302)
+    expect(response).to have_http_status(:found)
     expect(user.reload.badges.pluck(:name)).to include("First Mission")
   end
 
@@ -74,14 +76,16 @@ RSpec.describe "Habit management" do
     login_as(user)
     follow_redirect!
 
-    patch habit_path(habit), habit: {
-      title: "Read a chapter",
-      description: "Read one full chapter",
-      frequency: "weekly",
-      category_name: "productivity"
+    patch habit_path(habit), params: {
+      habit: {
+        title: "Read a chapter",
+        description: "Read one full chapter",
+        frequency: "weekly",
+        category_name: "productivity"
+      }
     }
 
-    expect(last_response.status).to eq(302)
+    expect(response).to have_http_status(:found)
     expect(habit.reload.title).to eq("Read a chapter")
     expect(habit.description).to eq("Read one full chapter")
     expect(habit.frequency).to eq("weekly")
@@ -99,7 +103,7 @@ RSpec.describe "Habit management" do
       delete habit_path(habit)
     end.to change(Habit, :count).by(-1)
 
-    expect(last_response.status).to eq(302)
+    expect(response).to have_http_status(:found)
     expect(user.habits.reload).to be_empty
   end
 
@@ -110,19 +114,21 @@ RSpec.describe "Habit management" do
     follow_redirect!
 
     expect do
-      post habits_path, habit: attributes_for(
-        :habit,
-        title: "",
-        description: "Still trying to create a mission",
-        frequency: "daily",
-        category_name: "fitness"
-      )
+      post habits_path, params: {
+        habit: attributes_for(
+          :habit,
+          title: "",
+          description: "Still trying to create a mission",
+          frequency: "daily",
+          category_name: "fitness"
+        )
+      }
     end.not_to change(Habit, :count)
 
-    expect(last_response.status).to eq(422)
-    expect(html_text_for(last_response.body)).to include("Title can't be blank")
-    expect(last_response.body).to include('id="createHabitModal"')
-    expect(last_response.body).to include("dashboard-mission-modal active")
+    expect(response).to have_http_status(:unprocessable_content)
+    expect(html_text_for(response.body)).to include("Title can't be blank")
+    expect(response.body).to include('id="createHabitModal"')
+    expect(response.body).to include("dashboard-mission-modal active")
   end
 
   it "re-renders the dashboard with edit modal errors when mission update fails" do
@@ -132,18 +138,20 @@ RSpec.describe "Habit management" do
     login_as(user)
     follow_redirect!
 
-    patch habit_path(habit), habit: {
-      title: "",
-      description: "Updated description",
-      frequency: "weekly",
-      category_name: "learning"
+    patch habit_path(habit), params: {
+      habit: {
+        title: "",
+        description: "Updated description",
+        frequency: "weekly",
+        category_name: "learning"
+      }
     }
 
-    expect(last_response.status).to eq(422)
+    expect(response).to have_http_status(:unprocessable_content)
     expect(habit.reload.title).to eq("Focus Session")
-    expect(html_text_for(last_response.body)).to include("Title can't be blank")
-    expect(last_response.body).to include('id="editHabitModal"')
-    expect(last_response.body).to include("dashboard-mission-modal active")
+    expect(html_text_for(response.body)).to include("Title can't be blank")
+    expect(response.body).to include('id="editHabitModal"')
+    expect(response.body).to include("dashboard-mission-modal active")
   end
 
   it "resets the create mission modal after a successful create" do
@@ -153,17 +161,19 @@ RSpec.describe "Habit management" do
     follow_redirect!
 
     post habits_path,
-         { habit: {
-           title: "Launch Prep",
-           description: "Prepare the cockpit",
-           frequency: "weekly",
-           category_name: "fitness"
-         } },
-         turbo_stream_headers
+         params: {
+           habit: {
+             title: "Launch Prep",
+             description: "Prepare the cockpit",
+             frequency: "weekly",
+             category_name: "fitness"
+           }
+         },
+         headers: turbo_stream_headers
 
-    expect(last_response.status).to eq(200)
+    expect(response).to have_http_status(:ok)
 
-    create_form = create_modal_form_from(last_response.body)
+    create_form = create_modal_form_from(response.body)
 
     expect(create_form["action"]).to eq("/habits")
     expect(create_form["method"]).to eq("post")
@@ -182,17 +192,19 @@ RSpec.describe "Habit management" do
     follow_redirect!
 
     patch habit_path(habit),
-          { habit: {
-            title: "Read a chapter",
-            description: "Read one full chapter",
-            frequency: "weekly",
-            category_name: "productivity"
-          } },
-          turbo_stream_headers
+          params: {
+            habit: {
+              title: "Read a chapter",
+              description: "Read one full chapter",
+              frequency: "weekly",
+              category_name: "productivity"
+            }
+          },
+          headers: turbo_stream_headers
 
-    expect(last_response.status).to eq(200)
+    expect(response).to have_http_status(:ok)
 
-    create_form = create_modal_form_from(last_response.body)
+    create_form = create_modal_form_from(response.body)
 
     expect(create_form["action"]).to eq("/habits")
     expect(create_form.at_css('input[name="_method"][value="patch"]')).to be_nil
@@ -209,11 +221,11 @@ RSpec.describe "Habit management" do
     login_as(user)
     follow_redirect!
 
-    delete habit_path(habit), {}, turbo_stream_headers
+    delete habit_path(habit), headers: turbo_stream_headers
 
-    expect(last_response.status).to eq(200)
+    expect(response).to have_http_status(:ok)
 
-    create_form = create_modal_form_from(last_response.body)
+    create_form = create_modal_form_from(response.body)
 
     expect(create_form["action"]).to eq("/habits")
     expect(create_form.at_css('input[name="_method"][value="patch"]')).to be_nil

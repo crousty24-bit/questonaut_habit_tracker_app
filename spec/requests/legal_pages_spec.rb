@@ -4,15 +4,15 @@ RSpec.describe "Legal pages" do
   it "renders the terms page" do
     get terms_path
 
-    expect(last_response.status).to eq(200)
-    expect(last_response.body).to include("Terms of Use")
+    expect(response).to have_http_status(:ok)
+    expect(response.body).to include("Terms of Use")
   end
 
   it "renders the cookies policy page" do
     get cookies_path
 
-    expect(last_response.status).to eq(200)
-    expect(last_response.body).to include("Cookie Policy")
-    expect(last_response.body).to include("Reset my choice")
+    expect(response).to have_http_status(:ok)
+    expect(response.body).to include("Cookie Policy")
+    expect(response.body).to include("Reset my choice")
   end
 end

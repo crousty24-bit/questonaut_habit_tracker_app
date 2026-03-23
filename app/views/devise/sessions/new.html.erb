@@ -46,7 +46,7 @@
           <div class="auth-row">
             <%= f.label :password, class: "form-label" %>
             <% if devise_mapping.recoverable? %>
-              <%= link_to "Forgot password?", new_password_path(resource_name), class: "auth-inline-link" %>
+              <%= link_to "Forgot password?", new_user_password_path, class: "auth-inline-link" %>
             <% end %>
           </div>
           <%= f.password_field :password, autocomplete: "current-password", placeholder: "Enter your password", class: "input" %>

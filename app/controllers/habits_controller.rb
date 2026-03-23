@@ -2,7 +2,7 @@ class HabitsController < ApplicationController
   include DashboardState
 
   before_action :authenticate_user!
-  before_action :set_habit, only: %i[show edit update destroy]
+  before_action :set_habit, only: %i[update destroy]
 
   def create
     @habit = current_user.habits.new(habit_params)
