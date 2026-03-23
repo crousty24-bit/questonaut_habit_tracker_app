@@ -9,7 +9,13 @@ Rails.application.routes.draw do
   controller :pages do
     get "pages/home", action: :home, as: :pages_home
     get "dashboard", action: :dashboard, as: :dashboard
+    get "terms", action: :terms, as: :terms
+    get "cookies", action: :cookie_policy, as: :cookies
   end
+
+  get "cgu", to: redirect("/terms")
+
+  resource :cookie_consent, only: %i[create destroy]
 
   # Statistics pages
   scope :statistics, controller: :badges, as: :statistics do

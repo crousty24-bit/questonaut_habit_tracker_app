@@ -1,0 +1,55 @@
+@use "base/variables" as *;
+
+.site-footer {
+  border-top: 1px solid $border-dim;
+  padding: $sp-6;
+  color: $text-secondary;
+}
+
+.site-footer__inner {
+  max-width: 80rem;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $sp-4;
+}
+
+.site-footer__left {
+  display: flex;
+  align-items: center;
+  gap: $sp-3;
+}
+
+.site-footer__brand {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  color: white;
+}
+
+.site-footer__links {
+  display: flex;
+  gap: $sp-4;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.site-footer__link {
+  color: $text-secondary;
+  transition: $transition-fast;
+
+  &:hover,
+  &:focus-visible {
+    color: white;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+}
+
+@media (max-width: 640px) {
+  .site-footer__inner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+

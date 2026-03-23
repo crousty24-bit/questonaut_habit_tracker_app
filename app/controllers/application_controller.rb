@@ -16,7 +16,7 @@ class ApplicationController < ActionController::Base
   end
 
   def configure_permitted_parameters
-    extra_keys = %i[name username]
+    extra_keys = %i[name username terms_accepted]
 
     devise_parameter_sanitizer.permit(:sign_up, keys: extra_keys)
     devise_parameter_sanitizer.permit(:account_update, keys: extra_keys)
