@@ -5,35 +5,33 @@ RSpec.describe User do
     allow_any_instance_of(User).to receive(:welcome_send)
   end
 
+  describe "associations" do
+    subject(:user) { build(:user) }
+
+    it { is_expected.to have_many(:habits).dependent(:destroy) }
+    it { is_expected.to have_many(:user_badges).dependent(:destroy) }
+    it { is_expected.to have_many(:badges).through(:user_badges) }
+  end
+
   describe "validations" do
+    subject(:user) { build(:user) }
+
+    it { is_expected.to validate_presence_of(:name) }
+    it { is_expected.to validate_length_of(:name).is_at_least(3).is_at_most(15) }
+    it { is_expected.to allow_value("pilot@example.com").for(:email) }
+    it { is_expected.not_to allow_value("not-an-email").for(:email) }
+
     it "rejects a forbidden commander name" do
-      user = User.new(
-        name: "admin pilot",
-        email: "pilot@example.com",
-        password: "password123",
-        password_confirmation: "password123"
-      )
+      user.name = "admin pilot"
 
       expect(user).not_to be_valid
       expect(user.errors.details[:name]).to include(hash_including(error: :forbidden_content))
-    end
-
-    it "rejects an invalid email address" do
-      user = User.new(
-        name: "Pilot Vega",
-        email: "not-an-email",
-        password: "password123",
-        password_confirmation: "password123"
-      )
-
-      expect(user).not_to be_valid
-      expect(user.errors.of_kind?(:email, :invalid)).to be(true)
     end
   end
 
   describe "#update_login_streak" do
     it "updates the streak only once per day" do
-      user = create_user(email: "streak@example.com", login_streak: 0, last_daily_login: nil)
+      user = create(:user, email: "streak@example.com", login_streak: 0, last_daily_login: nil)
 
       travel_to(Date.new(2026, 3, 19)) do
         expect(user.update_login_streak).to be(true)
@@ -48,10 +46,10 @@ RSpec.describe User do
   describe "#add_xp" do
     it "awards every configured level milestone when the user reaches them" do
       Badge::LEVEL_IMAGE_KEYS.each_key do |level|
-        Badge.create!(name: "Level #{level}")
+        create(:badge, name: "Level #{level}")
       end
 
-      user = create_user(email: "levels@example.com")
+      user = create(:user, email: "levels@example.com")
 
       user.add_xp(24_900)
 
@@ -64,8 +62,8 @@ RSpec.describe User do
 
   describe "#award_daily_login" do
     it "awards the Welcome badge on the first login day" do
-      Badge.create!(name: "Welcome")
-      user = create_user(email: "welcome-login@example.com", login_streak: 0, last_daily_login: nil)
+      create(:badge, name: "Welcome")
+      user = create(:user, email: "welcome-login@example.com", login_streak: 0, last_daily_login: nil)
 
       travel_to(Date.new(2026, 3, 19)) do
         user.award_daily_login
@@ -76,11 +74,12 @@ RSpec.describe User do
     end
 
     it "awards the 30-day login badge and Veteran badge at the right milestones" do
-      Badge.create!(name: "Daily Login")
-      Badge.create!(name: "Veteran")
+      create(:badge, name: "Daily Login")
+      create(:badge, name: "Veteran")
 
       travel_to(Date.new(2026, 3, 19)) do
-        user = create_user(
+        user = create(
+          :user,
           email: "daily-login@example.com",
           login_streak: 29,
           last_daily_login: Date.current - 1.day

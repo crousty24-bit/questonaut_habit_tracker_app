@@ -14,7 +14,14 @@ RSpec.describe "Main feature user flow" do
   end
 
   it "lets a signed-in user create and validate a daily mission from the dashboard" do
-    user = create_user(email: "daily-flow@example.com")
+    user = create(:user, email: "daily-flow@example.com")
+    habit_attributes = attributes_for(
+      :habit,
+      title: "Morning Stretch",
+      description: "Ten minutes of mobility work",
+      frequency: "daily",
+      category_name: "fitness"
+    )
 
     login_as(user)
     follow_redirect!
@@ -23,12 +30,7 @@ RSpec.describe "Main feature user flow" do
     expect(last_response.body).to include("Welcome Back, Commander")
 
     expect do
-      post habits_path, habit: {
-        title: "Morning Stretch",
-        description: "Ten minutes of mobility work",
-        frequency: "daily",
-        category_name: "fitness"
-      }
+      post habits_path, habit: habit_attributes
     end.to change(Habit, :count).by(1)
       .and change(Tag, :count).by(1)
 
@@ -48,11 +50,11 @@ RSpec.describe "Main feature user flow" do
     expect(created_habit_card.text).to include("fitness")
 
     expect do
-      post habit_habit_logs_path(habit), habit_log: {
+      post habit_habit_logs_path(habit), habit_log: attributes_for(
+        :habit_log,
         date: Date.current,
-        completed: true,
-        habit_id: habit.id
-      }
+        completed: true
+      ).merge(habit_id: habit.id)
     end.to change(HabitLog, :count).by(1)
 
     expect(last_response.status).to eq(302)
@@ -69,18 +71,20 @@ RSpec.describe "Main feature user flow" do
   end
 
   it "lets a signed-in user create and validate a weekly mission from the dashboard" do
-    user = create_user(email: "weekly-flow@example.com")
+    user = create(:user, email: "weekly-flow@example.com")
+    habit_attributes = attributes_for(
+      :habit,
+      title: "Weekly Review",
+      description: "Review the week and plan the next one",
+      frequency: "weekly",
+      category_name: "productivity"
+    )
 
     login_as(user)
     follow_redirect!
 
     expect do
-      post habits_path, habit: {
-        title: "Weekly Review",
-        description: "Review the week and plan the next one",
-        frequency: "weekly",
-        category_name: "productivity"
-      }
+      post habits_path, habit: habit_attributes
     end.to change(Habit, :count).by(1)
       .and change(Tag, :count).by(1)
 
@@ -100,11 +104,11 @@ RSpec.describe "Main feature user flow" do
     expect(created_habit_card.text).to include("productivity")
 
     expect do
-      post habit_habit_logs_path(habit), habit_log: {
+      post habit_habit_logs_path(habit), habit_log: attributes_for(
+        :habit_log,
         date: Date.current,
-        completed: true,
-        habit_id: habit.id
-      }
+        completed: true
+      ).merge(habit_id: habit.id)
     end.to change(HabitLog, :count).by(1)
 
     expect(last_response.status).to eq(302)

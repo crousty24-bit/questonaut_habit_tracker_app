@@ -2,18 +2,12 @@ require "rails_helper"
 
 RSpec.describe "Authentication" do
   it "completes the signup process and sends a welcome email" do
-    visit new_user_session_path
-
-    click_link "Sign up"
+    visit_sign_up_from_sign_in
 
     expect(page).to have_current_path(new_user_registration_path, ignore_query: true)
 
     expect do
-      fill_in "user_name", with: "Captain Nova"
-      fill_in "user_email", with: "captain.nova@example.com"
-      fill_in "user_password", with: TestDataHelpers::DEFAULT_PASSWORD
-      fill_in "user_password_confirmation", with: TestDataHelpers::DEFAULT_PASSWORD
-      click_button "Start Mission"
+      submit_sign_up_form(name: "Captain Nova", email: "captain.nova@example.com")
     end.to change(User, :count).by(1)
       .and change { ActionMailer::Base.deliveries.count }.by(1)
 
@@ -29,16 +23,15 @@ RSpec.describe "Authentication" do
   end
 
   it "keeps the visitor on signup when the submitted data is invalid" do
-    visit new_user_session_path
-
-    click_link "Sign up"
+    visit_sign_up_from_sign_in
 
     expect do
-      fill_in "user_name", with: "No"
-      fill_in "user_email", with: "not-an-email"
-      fill_in "user_password", with: "short"
-      fill_in "user_password_confirmation", with: "different"
-      click_button "Start Mission"
+      submit_sign_up_form(
+        name: "No",
+        email: "not-an-email",
+        password: "short",
+        password_confirmation: "different"
+      )
     end.not_to change(User, :count)
 
     expect(page).to have_css("#error_explanation")
@@ -51,17 +44,13 @@ RSpec.describe "Authentication" do
   end
 
   it "completes the login process for an existing user" do
-    user = create_user(name: "Pilot Vega", email: "pilot.vega@example.com")
+    user = create(:user, name: "Pilot Vega", email: "pilot.vega@example.com")
 
-    visit root_path
-
-    click_link "Launch Mission"
+    visit_sign_in_from_home
 
     expect(page).to have_current_path(new_user_session_path, ignore_query: true)
 
-    fill_in "user_email", with: user.email
-    fill_in "user_password", with: TestDataHelpers::DEFAULT_PASSWORD
-    click_button "Launch Mission"
+    submit_sign_in_form(email: user.email)
 
     expect(page).to have_current_path(dashboard_path, ignore_query: true)
     expect(page).to have_button("Logout")
@@ -70,15 +59,10 @@ RSpec.describe "Authentication" do
   end
 
   it "rejects login with invalid credentials" do
-    user = create_user(name: "Pilot Vega", email: "pilot.vega@example.com")
+    user = create(:user, name: "Pilot Vega", email: "pilot.vega@example.com")
 
-    visit root_path
-
-    click_link "Launch Mission"
-
-    fill_in "user_email", with: user.email
-    fill_in "user_password", with: "wrong-password"
-    click_button "Launch Mission"
+    visit_sign_in_from_home
+    submit_sign_in_form(email: user.email, password: "wrong-password")
 
     expect(page).to have_current_path(new_user_session_path, ignore_query: true)
     expect(page).to have_css(".auth-header__title", text: "Log In")
@@ -87,7 +71,7 @@ RSpec.describe "Authentication" do
   end
 
   it "allows an authenticated user to log out" do
-    user = create_user(name: "Commander Orion", email: "orion@example.com")
+    user = create(:user, name: "Commander Orion", email: "orion@example.com")
 
     sign_in_via_ui(user)
     click_button "Logout"

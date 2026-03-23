@@ -18,19 +18,25 @@ RSpec.describe "Habit management" do
     dashboard_fragment_from(body).at_css("#createHabitModal form")
   end
 
+  def html_text_for(body)
+    Nokogiri::HTML5.parse(body).text
+  end
+
   it "allows an authenticated user to create a new mission" do
-    user = create_user(email: "creator@example.com")
+    user = create(:user, email: "creator@example.com")
+    habit_attributes = attributes_for(
+      :habit,
+      title: "Morning Stretch",
+      description: "Ten minutes of mobility work",
+      frequency: "daily",
+      category_name: "fitness"
+    )
 
     login_as(user)
     follow_redirect!
 
     expect do
-      post habits_path, habit: {
-        title: "Morning Stretch",
-        description: "Ten minutes of mobility work",
-        frequency: "daily",
-        category_name: "fitness"
-      }
+      post habits_path, habit: habit_attributes
     end.to change(Habit, :count).by(1)
       .and change(Tag, :count).by(1)
 
@@ -43,26 +49,27 @@ RSpec.describe "Habit management" do
   end
 
   it "awards the First Mission badge when the user creates their first habit" do
-    Badge.create!(name: "First Mission")
-    user = create_user(email: "first-mission@example.com")
+    create(:badge, name: "First Mission")
+    user = create(:user, email: "first-mission@example.com")
 
     login_as(user)
     follow_redirect!
 
-    post habits_path, habit: {
+    post habits_path, habit: attributes_for(
+      :habit,
       title: "Morning Stretch",
       description: "Ten minutes of mobility work",
       frequency: "daily",
       category_name: "fitness"
-    }
+    )
 
     expect(last_response.status).to eq(302)
     expect(user.reload.badges.pluck(:name)).to include("First Mission")
   end
 
   it "allows an authenticated user to edit a mission" do
-    user = create_user(email: "editor@example.com")
-    habit = create_habit(user: user, title: "Read", description: "Read 10 pages", category_name: "learning")
+    user = create(:user, email: "editor@example.com")
+    habit = create(:habit, user: user, title: "Read", description: "Read 10 pages", category_name: "learning")
 
     login_as(user)
     follow_redirect!
@@ -82,8 +89,8 @@ RSpec.describe "Habit management" do
   end
 
   it "allows an authenticated user to delete a mission" do
-    user = create_user(email: "destroyer@example.com")
-    habit = create_habit(user: user, title: "Journal")
+    user = create(:user, email: "destroyer@example.com")
+    habit = create(:habit, user: user, title: "Journal")
 
     login_as(user)
     follow_redirect!
@@ -96,8 +103,51 @@ RSpec.describe "Habit management" do
     expect(user.habits.reload).to be_empty
   end
 
+  it "re-renders the dashboard with create modal errors when mission creation fails" do
+    user = create(:user, email: "invalid-create@example.com")
+
+    login_as(user)
+    follow_redirect!
+
+    expect do
+      post habits_path, habit: attributes_for(
+        :habit,
+        title: "",
+        description: "Still trying to create a mission",
+        frequency: "daily",
+        category_name: "fitness"
+      )
+    end.not_to change(Habit, :count)
+
+    expect(last_response.status).to eq(422)
+    expect(html_text_for(last_response.body)).to include("Title can't be blank")
+    expect(last_response.body).to include('id="createHabitModal"')
+    expect(last_response.body).to include("dashboard-mission-modal active")
+  end
+
+  it "re-renders the dashboard with edit modal errors when mission update fails" do
+    user = create(:user, email: "invalid-update@example.com")
+    habit = create(:habit, user: user, title: "Focus Session")
+
+    login_as(user)
+    follow_redirect!
+
+    patch habit_path(habit), habit: {
+      title: "",
+      description: "Updated description",
+      frequency: "weekly",
+      category_name: "learning"
+    }
+
+    expect(last_response.status).to eq(422)
+    expect(habit.reload.title).to eq("Focus Session")
+    expect(html_text_for(last_response.body)).to include("Title can't be blank")
+    expect(last_response.body).to include('id="editHabitModal"')
+    expect(last_response.body).to include("dashboard-mission-modal active")
+  end
+
   it "resets the create mission modal after a successful create" do
-    user = create_user(email: "creator-modal@example.com")
+    user = create(:user, email: "creator-modal@example.com")
 
     login_as(user)
     follow_redirect!
@@ -125,8 +175,8 @@ RSpec.describe "Habit management" do
   end
 
   it "resets the create mission modal after a successful edit" do
-    user = create_user(email: "editor-modal@example.com")
-    habit = create_habit(user: user, title: "Read", description: "Read 10 pages", category_name: "learning")
+    user = create(:user, email: "editor-modal@example.com")
+    habit = create(:habit, user: user, title: "Read", description: "Read 10 pages", category_name: "learning")
 
     login_as(user)
     follow_redirect!
@@ -153,8 +203,8 @@ RSpec.describe "Habit management" do
   end
 
   it "resets the create mission modal after a successful delete" do
-    user = create_user(email: "destroyer-modal@example.com")
-    habit = create_habit(user: user, title: "Journal", description: "Log the day", category_name: "nutrition")
+    user = create(:user, email: "destroyer-modal@example.com")
+    habit = create(:habit, user: user, title: "Journal", description: "Log the day", category_name: "nutrition")
 
     login_as(user)
     follow_redirect!

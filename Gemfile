@@ -59,10 +59,11 @@ end
 group :test do
   # Use system testing [https://guides.rubyonrails.org/testing.html#system-testing]
   gem "capybara"
+  gem "factory_bot_rails"
+  gem "faker"
   gem "selenium-webdriver"
+  gem "shoulda-matchers"
 end
-gem 'faker'
-
 
 gem 'devise'
 gem 'pry'
@@ -79,4 +80,3 @@ group :development do
   gem "better_errors"   
   gem "binding_of_caller" 
 end
-
