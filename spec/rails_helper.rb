@@ -9,6 +9,7 @@ require "selenium-webdriver"
 require "rack/test"
 require "socket"
 require "active_support/testing/time_helpers"
+require "shoulda/matchers"
 
 Dir[File.join(__dir__, "support", "**", "*.rb")].sort.each { |file| require file }
 
@@ -52,6 +53,7 @@ end
 RSpec.configure do |config|
   config.include ActiveSupport::Testing::TimeHelpers
   config.include Capybara::DSL, type: :system
+  config.include FactoryBot::Syntax::Methods
   config.include Rails.application.routes.url_helpers
   config.include RequestSpecHelpers, type: :request
   config.include SystemAuthHelpers, type: :system
@@ -65,7 +67,15 @@ RSpec.configure do |config|
     metadata[:type] = :request
   end
 
+  config.define_derived_metadata(file_path: %r{/spec/models/}) do |metadata|
+    metadata[:type] = :model
+  end
+
+  config.include Shoulda::Matchers::ActiveModel, type: :model
+  config.include Shoulda::Matchers::ActiveRecord, type: :model
+
   config.before(:suite) do
+    Faker::UniqueGenerator.clear
     TestDatabaseHelpers.clean
   end
 
@@ -98,5 +108,12 @@ RSpec.configure do |config|
   config.after(type: :system) do
     Capybara.use_default_driver
     Capybara.reset_sessions!
+  end
+end
+
+Shoulda::Matchers.configure do |config|
+  config.integrate do |with|
+    with.test_framework :rspec
+    with.library :rails
   end
 end
