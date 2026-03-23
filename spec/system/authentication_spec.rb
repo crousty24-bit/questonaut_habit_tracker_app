@@ -1,6 +1,23 @@
 require "rails_helper"
 
 RSpec.describe "Authentication" do
+  it "requires accepting the terms to sign up" do
+    visit new_user_registration_path
+
+    expect do
+      submit_sign_up_form(
+        name: "Captain Nova",
+        email: "captain.nova.terms@example.com",
+        password: TestDataHelpers::DEFAULT_PASSWORD,
+        password_confirmation: TestDataHelpers::DEFAULT_PASSWORD,
+        accept_terms: false
+      )
+    end.not_to change(User, :count)
+
+    expect(page).to have_css("#error_explanation")
+    expect(page).to have_text("Terms accepted must be accepted")
+  end
+
   it "completes the signup process and sends a welcome email" do
     visit_sign_up_from_sign_in
 

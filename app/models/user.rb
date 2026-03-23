@@ -1,5 +1,7 @@
 # app/models/user.rb
 class User < ApplicationRecord
+  attr_accessor :terms_accepted
+
   before_validation :normalize_username
   after_create :welcome_send
   after_create do
@@ -18,6 +20,8 @@ class User < ApplicationRecord
     length: { minimum: 3, maximum: 15 },
     username: true
 
+  validates :terms_accepted, acceptance: { accept: "1" }, on: :create
+
   validate :email_format_is_valid
 
   def username
@@ -30,6 +34,15 @@ class User < ApplicationRecord
 
   def welcome_send
     UserMailer.welcome_email(self).deliver_now
+  rescue ArgumentError,
+         Net::SMTPAuthenticationError,
+         Net::SMTPFatalError,
+         Net::SMTPSyntaxError,
+         Net::SMTPServerBusy,
+         IOError,
+         SocketError,
+         Errno::ECONNREFUSED => error
+    Rails.logger.warn("[User#welcome_send] Welcome email delivery skipped: #{error.class} - #{error.message}")
   end
 
   # --------------------

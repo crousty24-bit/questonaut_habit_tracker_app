@@ -4,6 +4,7 @@ FactoryBot.define do
     sequence(:name) { |n| "Cmdr#{n}" }
     password { TestDataHelpers::DEFAULT_PASSWORD }
     password_confirmation { password }
+    terms_accepted { "1" }
     total_xp { 0 }
     level { 1 }
     login_streak { 0 }

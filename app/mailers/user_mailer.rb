@@ -1,5 +1,6 @@
 class UserMailer < ApplicationMailer
-  default from: Rails.application.credentials.dig(:GMAIL_LOGIN)
+  default from: -> { Rails.application.credentials.dig(:GMAIL_LOGIN).presence || "from@example.com" }
+
   def welcome_email(user)
     @user = user
 

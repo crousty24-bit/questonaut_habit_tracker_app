@@ -15,11 +15,12 @@ module SystemAuthHelpers
     click_button "Launch Mission"
   end
 
-  def submit_sign_up_form(name:, email:, password: TestDataHelpers::DEFAULT_PASSWORD, password_confirmation: password)
+  def submit_sign_up_form(name:, email:, password: TestDataHelpers::DEFAULT_PASSWORD, password_confirmation: password, accept_terms: true)
     fill_in "user_name", with: name
     fill_in "user_email", with: email
     fill_in "user_password", with: password
     fill_in "user_password_confirmation", with: password_confirmation
+    check "user_terms_accepted" if accept_terms
     click_button "Start Mission"
   end
 

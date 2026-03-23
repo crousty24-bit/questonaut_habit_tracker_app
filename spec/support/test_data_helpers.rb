@@ -4,7 +4,8 @@ module TestDataHelpers
   def user_attributes(**attributes)
     {
       password: DEFAULT_PASSWORD,
-      password_confirmation: DEFAULT_PASSWORD
+      password_confirmation: DEFAULT_PASSWORD,
+      terms_accepted: "1"
     }.merge(attributes)
   end
 

@@ -1,0 +1,42 @@
+<% content_for :title, "Cookie Policy - Questonaut" %>
+
+<div class="legal-page">
+  <div class="legal-page__inner glass-panel">
+    <h1 class="legal-page__title brand-font">Cookie Policy</h1>
+    <p class="legal-page__meta">Last updated: 2026-03-23</p>
+
+    <h2 class="legal-page__heading brand-font">1. Why cookies?</h2>
+    <p>
+      Questonaut uses cookies and similar technologies to provide the Service, secure sessions, and improve the user experience.
+    </p>
+
+    <h2 class="legal-page__heading brand-font">2. Essential cookies</h2>
+    <p>
+      These cookies are required for the Service to operate and cannot be disabled from the interface. They include, in particular:
+    </p>
+    <ul class="legal-page__list">
+      <li>session cookies (authentication, keeping you signed in);</li>
+      <li>security cookies (CSRF protection, request integrity).</li>
+    </ul>
+
+    <h2 class="legal-page__heading brand-font">3. Non-essential cookies</h2>
+    <p>
+      At this time, Questonaut does not deploy advertising cookies. If non-essential cookies (analytics, personalization) are added
+      in the future, you will be able to choose via the consent banner.
+    </p>
+
+    <h2 class="legal-page__heading brand-font">4. Managing consent</h2>
+    <p>
+      Your choice is stored for 6 months via a consent cookie. You can change it at any time:
+    </p>
+    <div class="legal-page__actions">
+      <%= button_to "Reset my choice", cookie_consent_path, method: :delete, class: "btn btn-secondary btn-md" %>
+      <%= link_to "Back to home", root_path, class: "btn btn-ghost btn-md" %>
+    </div>
+
+    <h2 class="legal-page__heading brand-font">5. More information</h2>
+    <p>
+      For any cookie-related questions, please refer to the project documentation (README) and the code repository.
+    </p>
+  </div>
+</div>

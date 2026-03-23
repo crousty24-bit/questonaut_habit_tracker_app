@@ -1,0 +1,59 @@
+@use "base/variables" as *;
+
+.legal-page {
+  padding-top: 6rem;
+  padding-bottom: 4rem;
+  padding-inline: $sp-6;
+}
+
+.legal-page__inner {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: $sp-10;
+}
+
+.legal-page__title {
+  font-size: 2rem;
+  color: white;
+  margin-bottom: $sp-2;
+}
+
+.legal-page__meta {
+  color: $text-secondary;
+  margin-bottom: $sp-8;
+}
+
+.legal-page__heading {
+  color: white;
+  font-size: 1.25rem;
+  margin-top: $sp-8;
+  margin-bottom: $sp-2;
+}
+
+.legal-page__list {
+  margin-left: 1.25rem;
+  color: $text-secondary;
+
+  li {
+    margin-top: $sp-2;
+  }
+}
+
+.legal-page p {
+  color: $text-secondary;
+  margin-top: $sp-2;
+}
+
+.legal-page__actions {
+  margin-top: $sp-4;
+  display: flex;
+  gap: $sp-3;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 640px) {
+  .legal-page__inner {
+    padding: $sp-6;
+  }
+}
+
