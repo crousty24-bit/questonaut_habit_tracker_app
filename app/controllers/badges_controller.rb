@@ -12,6 +12,7 @@ class BadgesController < ApplicationController
     @unlocked_badges_count = current_user.badges.count
     @total_badges_count = Badge.count
     @category_distribution = category_distribution
+    @weekly_progress = weekly_progress
     @detailed_habits = @habits.sort_by { |habit| [-habit_success_rate(habit), -streak_for(habit)] }.first(4)
   end
 
@@ -93,6 +94,23 @@ class BadgesController < ApplicationController
       counts[habit.primary_category] += 1
     end
     counts.sort_by { |_, value| -value }.to_h
+  end
+
+  def weekly_progress
+    week_start = Date.current.beginning_of_week(:monday)
+    week_dates = (week_start..week_start.end_of_week(:monday)).to_a
+    completed_counts = @completed_logs.where(date: week_dates).group(:date).count
+    french_day_labels = %w[Lundi Mardi Mercredi Jeudi Vendredi Samedi Dimanche]
+
+    week_dates.each_with_index.map do |date, index|
+      completed_value = completed_counts[date].to_i * 10
+
+      {
+        label: french_day_labels[index],
+        value: completed_value,
+        height_percent: [(completed_value * 100.0 / 50).round, 100].min
+      }
+    end
   end
 
   def badges_for_collection(group)
