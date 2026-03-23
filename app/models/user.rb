@@ -36,9 +36,11 @@ class User < ApplicationRecord
   # XP & LEVEL
   # --------------------
   def add_xp(amount)
+    previous_level = level.presence || 1
     self.total_xp = total_xp.to_i + amount.to_i
     update_level
-    save(validate: false)
+    save!(validate: false)
+    BadgeAwarder.call(self, context: :level_up) if level.to_i > previous_level
   end
 
   def update_level
@@ -71,12 +73,10 @@ class User < ApplicationRecord
 
   def award_daily_login
     return unless update_login_streak
-    if login_streak >= 7
-      add_xp(5)
-      BadgeAwarder.call(self, context: :login)
-    end
-  end
 
+    add_xp(5) if login_streak >= 7
+    BadgeAwarder.call(self, context: :login)
+  end
 
   private
 

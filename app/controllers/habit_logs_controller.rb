@@ -29,7 +29,7 @@ class HabitLogsController < ApplicationController
       if @habit_log.save
         if @habit_log.completed? && !already_completed
           current_user.add_xp(10) unless @habit_log.previously_new_record?
-          BadgeAwarder.call(current_user, context: :habit_logged, habit: @habit)
+          BadgeAwarder.call(current_user, context: :habit_logged, habit: @habit, awarded_on: @habit_log.date)
         end
 
         format.turbo_stream { render_dashboard_update }

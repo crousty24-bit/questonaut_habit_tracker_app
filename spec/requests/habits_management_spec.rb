@@ -1,6 +1,10 @@
 require "rails_helper"
 
 RSpec.describe "Habit management" do
+  before do
+    allow_any_instance_of(User).to receive(:welcome_send)
+  end
+
   def turbo_stream_headers
     { "HTTP_ACCEPT" => "text/vnd.turbo-stream.html" }
   end
@@ -36,6 +40,24 @@ RSpec.describe "Habit management" do
     expect(created_habit.title).to eq("Morning Stretch")
     expect(created_habit.primary_category).to eq("fitness")
     expect(user.reload.total_xp).to eq(20)
+  end
+
+  it "awards the First Mission badge when the user creates their first habit" do
+    Badge.create!(name: "First Mission")
+    user = create_user(email: "first-mission@example.com")
+
+    login_as(user)
+    follow_redirect!
+
+    post habits_path, habit: {
+      title: "Morning Stretch",
+      description: "Ten minutes of mobility work",
+      frequency: "daily",
+      category_name: "fitness"
+    }
+
+    expect(last_response.status).to eq(302)
+    expect(user.reload.badges.pluck(:name)).to include("First Mission")
   end
 
   it "allows an authenticated user to edit a mission" do
