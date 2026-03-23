@@ -8,6 +8,7 @@ module TestDataHelpers
         email: email,
         password: password,
         password_confirmation: password,
+        terms_accepted: "1",
         total_xp: 0,
         level: 1
       }.merge(attributes)

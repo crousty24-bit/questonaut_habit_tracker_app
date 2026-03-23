@@ -29,6 +29,8 @@ RSpec.describe Habit do
         category_name: "health"
       }.merge(attributes)
     )
+  end
+
   describe "#current_streak" do
     it "keeps yesterday's streak during the current 24-hour validation window" do
       user = create_user(email: "habit-streak-current@example.com")

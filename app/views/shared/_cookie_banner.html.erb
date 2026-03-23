@@ -1,0 +1,23 @@
+<% unless cookies[:cookie_consent].present? %>
+  <div class="cookie-banner" role="dialog" aria-live="polite" aria-label="Cookie preferences">
+    <div class="cookie-banner__panel glass-panel">
+      <div class="cookie-banner__content">
+        <div class="cookie-banner__title brand-font">Cookies</div>
+        <div class="cookie-banner__text">
+          Questonaut uses essential cookies (login, security) to work properly.
+          You can accept non-essential cookies (if added later) or continue with essential cookies only.
+          <%= link_to "Learn more", cookies_path, class: "cookie-banner__link" %>.
+        </div>
+      </div>
+
+      <div class="cookie-banner__actions">
+        <%= button_to "Essential only", cookie_consent_path(level: "essential"),
+              method: :post,
+              class: "btn btn-ghost btn-md" %>
+        <%= button_to "Accept all", cookie_consent_path(level: "all"),
+              method: :post,
+              class: "btn btn-primary btn-md" %>
+      </div>
+    </div>
+  </div>
+<% end %>

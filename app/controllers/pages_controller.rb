@@ -9,4 +9,11 @@ class PagesController < ApplicationController
   def dashboard
     load_dashboard_state
   end
+
+  def terms
+  end
+
+  def cookie_policy
+    render :cookies
+  end
 end

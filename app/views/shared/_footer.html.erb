@@ -1,0 +1,13 @@
+<footer class="site-footer" role="contentinfo">
+  <div class="site-footer__inner">
+    <div class="site-footer__left">
+      <span class="site-footer__brand">Questonaut</span>
+      <span class="site-footer__meta">© <%= Time.current.year %></span>
+    </div>
+
+    <nav class="site-footer__links" aria-label="Footer">
+      <%= link_to "Terms of Use", terms_path, class: "site-footer__link" %>
+      <%= link_to "Cookie Policy", cookies_path, class: "site-footer__link" %>
+    </nav>
+  </div>
+</footer>
