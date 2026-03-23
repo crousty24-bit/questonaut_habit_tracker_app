@@ -21,6 +21,15 @@ RSpec.describe "Badges views", type: :view do
       assign(:unlocked_badges_count, 2)
       assign(:total_badges_count, 6)
       assign(:category_distribution, { "learning" => 1, "fitness" => 1 })
+      assign(:weekly_progress, [
+        { label: "Lundi", value: 10, height_percent: 20 },
+        { label: "Mardi", value: 20, height_percent: 40 },
+        { label: "Mercredi", value: 30, height_percent: 60 },
+        { label: "Jeudi", value: 0, height_percent: 0 },
+        { label: "Vendredi", value: 10, height_percent: 20 },
+        { label: "Samedi", value: 0, height_percent: 0 },
+        { label: "Dimanche", value: 0, height_percent: 0 }
+      ])
       assign(:detailed_habits, habits)
 
       render template: "badges/index"

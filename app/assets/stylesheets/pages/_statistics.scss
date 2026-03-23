@@ -63,6 +63,254 @@
   gap: $sp-2;
 }
 
+.statistics-weekly-chart,
+.statistics-category-chart,
+.statistics-chart-tooltip {
+  --space-bg: #030712;
+  --panel-bg: rgba(10, 20, 40, 0.8);
+  --starlight-cyan: #00f2ff;
+  --matrix-green: #00ff88;
+  --amber-flare: #ff9900;
+  --cosmic-magenta: #cc00ff;
+  --pulsar-red: #ff3333;
+  --void-purple: #660099;
+  --nebula-blue: #0099cc;
+  --solar-yellow: #ffd300;
+  --orbital-orange: #ff6600;
+  --aura-indigo: #4b0082;
+}
+
+.statistics-weekly-chart {
+  display: grid;
+  grid-template-columns: 2.5rem minmax(0, 1fr);
+  grid-template-rows: 12rem auto;
+  column-gap: $sp-4;
+  row-gap: $sp-3;
+  padding: $sp-4;
+  border: 1px solid $border-dim;
+  border-radius: $radius-lg;
+  background: rgba(255, 255, 255, 0.03);
+  position: relative;
+  overflow: hidden;
+}
+
+.statistics-weekly-chart__axis {
+  grid-column: 1;
+  grid-row: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-end;
+  height: 100%;
+}
+
+.statistics-weekly-chart__tick {
+  color: $text-secondary;
+  font-size: 0.75rem;
+  line-height: 1;
+}
+
+.statistics-weekly-chart__plot {
+  grid-column: 2;
+  grid-row: 1;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  align-items: flex-end;
+  gap: $sp-3;
+  min-width: 0;
+  height: 100%;
+  padding: $sp-3 $sp-3 $sp-2;
+  border: 1px solid $border-soft;
+  border-radius: $radius-md;
+  background:
+    repeating-linear-gradient(
+      to top,
+      rgba(255, 255, 255, 0.08) 0,
+      rgba(255, 255, 255, 0.08) 1px,
+      transparent 1px,
+      transparent 20%
+    ),
+    rgba(255, 255, 255, 0.02);
+}
+
+.statistics-weekly-chart__item {
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  align-items: center;
+  gap: $sp-2;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+
+  &:focus-visible {
+    outline: 1px solid var(--starlight-cyan);
+    outline-offset: 4px;
+    border-radius: $radius-sm;
+  }
+}
+
+.statistics-weekly-chart__value {
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1;
+  transition: opacity 0.3s ease, text-shadow 0.3s ease;
+}
+
+.statistics-weekly-chart__column-wrap {
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  height: 100%;
+}
+
+.statistics-weekly-chart__column {
+  width: min(100%, 3rem);
+  border-radius: $radius-md $radius-md 0 0;
+  background: linear-gradient(180deg, var(--starlight-cyan), var(--nebula-blue));
+  box-shadow: 0 14px 32px var(--nebula-blue);
+  transform-origin: bottom center;
+  transition: height 0.3s ease, opacity 0.3s ease, filter 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.statistics-weekly-chart__item.is-active .statistics-weekly-chart__column {
+  background: linear-gradient(180deg, var(--starlight-cyan), var(--matrix-green));
+  box-shadow: 0 0 28px var(--starlight-cyan);
+  filter: drop-shadow(0 0 15px var(--starlight-cyan));
+  transform: scaleY(1.05);
+}
+
+.statistics-weekly-chart__item.is-active .statistics-weekly-chart__value {
+  text-shadow: 0 0 12px var(--starlight-cyan);
+}
+
+.statistics-weekly-chart__item.is-dimmed .statistics-weekly-chart__column {
+  opacity: 0.3;
+}
+
+.statistics-weekly-chart__item.is-dimmed .statistics-weekly-chart__value,
+.statistics-weekly-chart__item.is-dimmed .statistics-weekly-chart__column-wrap {
+  opacity: 0.45;
+}
+
+.statistics-weekly-chart__x-axis {
+  grid-column: 2;
+  grid-row: 2;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: $sp-3;
+  min-width: 0;
+}
+
+.statistics-weekly-chart__label {
+  width: 100%;
+  color: $text-secondary;
+  font-size: 0.75rem;
+  line-height: 1.35;
+  text-align: center;
+  word-break: break-word;
+  transition: opacity 0.3s ease;
+}
+
+.statistics-category-chart {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.statistics-category-chart__pie {
+  width: min(100%, 15rem);
+  overflow: visible;
+  filter: drop-shadow(0 18px 36px var(--space-bg));
+}
+
+.statistics-category-chart__slice {
+  cursor: pointer;
+  stroke: var(--space-bg);
+  stroke-width: 1.5;
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 0.3s ease, filter 0.3s ease, stroke 0.3s ease, stroke-width 0.3s ease, opacity 0.3s ease;
+}
+
+.statistics-category-chart__slice.is-active,
+.statistics-category-chart__slice:hover {
+  filter: brightness(1.08);
+  stroke: white;
+  stroke-width: 1;
+}
+
+.statistics-category-chart__slice:focus-visible {
+  outline: none;
+  filter: brightness(1.08);
+  stroke: white;
+  stroke-width: 1;
+}
+
+.statistics-chart-tooltip {
+  position: absolute;
+  left: 0;
+  top: 0;
+  min-width: 10rem;
+  max-width: 14rem;
+  padding: $sp-3 $sp-4;
+  border: 1px solid var(--starlight-cyan);
+  border-radius: $radius-md;
+  background: var(--panel-bg);
+  backdrop-filter: blur(10px);
+  box-shadow:
+    0 18px 40px var(--space-bg),
+    0 0 18px var(--starlight-cyan);
+  color: white;
+  font-family: "Space Grotesk", sans-serif;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, calc(-100% - 12px)) scale(0.96);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  z-index: 3;
+}
+
+.statistics-chart-tooltip.is-visible {
+  opacity: 1;
+  transform: translate(-50%, calc(-100% - 12px)) scale(1);
+}
+
+.statistics-chart-tooltip__eyebrow {
+  color: rgba(148, 163, 184, 0.95);
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.statistics-chart-tooltip__title {
+  margin-top: $sp-1;
+  display: inline-flex;
+  align-items: center;
+  gap: $sp-2;
+  color: white;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.statistics-chart-tooltip__value {
+  margin-top: $sp-1;
+  color: var(--starlight-cyan);
+  font-size: 1.1rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  text-shadow: 0 0 12px var(--starlight-cyan);
+}
+
+.statistics-chart-tooltip__dot {
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 999px;
+  box-shadow: 0 0 0 1px var(--starlight-cyan);
+}
+
 .statistics-progress-item__top,
 .statistics-category-item__top {
   display: flex;
@@ -180,6 +428,12 @@
 @media (max-width: 640px) {
   .statistics-grid {
     grid-template-columns: 1fr;
+  }
+
+  .statistics-weekly-chart {
+    grid-template-columns: 2rem minmax(0, 1fr);
+    grid-template-rows: 10rem auto;
+    padding: $sp-3;
   }
 
   .statistics-analysis__item {

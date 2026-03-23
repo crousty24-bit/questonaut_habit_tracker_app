@@ -48,45 +48,73 @@
     </div>
   </div>
 
-  <div class="statistics-panels">
+  <div class="statistics-panels" data-controller="statistics-charts">
     <div class="glass-panel statistics-panel">
       <h2 class="statistics-panel__title">Weekly Progress</h2>
-      <div class="statistics-progress-list">
-        <% if @detailed_habits.any? %>
-          <% @detailed_habits.each do |habit| %>
-            <% rate = habit_success_rate.call(habit) %>
-            <div class="statistics-progress-item">
-              <div class="statistics-progress-item__top">
-                <span><%= habit.title %></span>
-                <strong><%= rate %>%</strong>
+      <% if @habits.any? %>
+        <div class="statistics-weekly-chart"
+             role="img"
+             aria-label="Weekly progress by day"
+             data-statistics-charts-target="weeklyChart">
+          <div class="statistics-weekly-chart__axis">
+            <% [50, 40, 30, 20, 10, 0].each do |tick| %>
+              <span class="statistics-weekly-chart__tick"><%= tick %></span>
+            <% end %>
+          </div>
+          <div class="statistics-weekly-chart__plot">
+            <% (@weekly_progress || []).each do |day| %>
+              <div class="statistics-weekly-chart__item"
+                   tabindex="0"
+                   data-statistics-charts-target="weeklyItem"
+                   data-label="<%= day[:label] %>"
+                   data-value="<%= day[:value] %>"
+                   data-action="mouseenter->statistics-charts#activateWeeklyItem mousemove->statistics-charts#moveWeeklyTooltip mouseleave->statistics-charts#resetWeeklyChart focus->statistics-charts#activateWeeklyItem blur->statistics-charts#resetWeeklyChart">
+                <strong class="statistics-weekly-chart__value"><%= day[:value] %></strong>
+                <div class="statistics-weekly-chart__column-wrap">
+                  <div class="statistics-weekly-chart__column" style="height: <%= day[:height_percent] %>%"></div>
+                </div>
               </div>
-              <div class="xp-bar thin">
-                <div class="xp-fill" style="width: <%= rate %>%"></div>
-              </div>
-            </div>
-          <% end %>
-        <% else %>
-          <div class="placeholder-chart">Start completing missions to unlock progress data.</div>
-        <% end %>
-      </div>
+            <% end %>
+          </div>
+          <div class="statistics-weekly-chart__x-axis">
+            <% (@weekly_progress || []).each do |day| %>
+              <span class="statistics-weekly-chart__label"><%= day[:label] %></span>
+            <% end %>
+          </div>
+          <div class="statistics-chart-tooltip statistics-chart-tooltip--weekly"
+               data-statistics-charts-target="weeklyTooltip"></div>
+        </div>
+      <% else %>
+        <div class="placeholder-chart">Start completing missions to unlock progress data.</div>
+      <% end %>
     </div>
 
     <div class="glass-panel statistics-panel">
       <h2 class="statistics-panel__title">Category Distribution</h2>
       <% if @category_distribution.any? %>
-        <div class="statistics-category-list">
-          <% @category_distribution.each do |category, count| %>
-            <% percentage = ((count.to_f / @habits.count) * 100).round %>
-            <div class="statistics-category-item">
-              <div class="statistics-category-item__top">
-                <span><%= category_icon_for.call(category) %> <%= category.capitalize %></span>
-                <strong><%= count %> mission<%= "s" if count != 1 %></strong>
-              </div>
-              <div class="xp-bar thin">
-                <div class="xp-fill orange" style="width: <%= percentage %>%"></div>
-              </div>
-            </div>
-          <% end %>
+        <% category_segments = category_distribution_segments(@category_distribution, @habits.count) %>
+        <div class="statistics-category-chart" data-statistics-charts-target="categoryChart">
+          <svg class="statistics-category-chart__pie"
+               viewBox="0 0 200 200"
+               role="img"
+               aria-label="Category distribution pie chart">
+            <% category_segments.each do |segment| %>
+              <% path = category_slice_path(segment) %>
+              <% next if path.blank? %>
+              <path class="statistics-category-chart__slice"
+                    d="<%= path %>"
+                    fill="<%= segment[:color] %>"
+                    tabindex="0"
+                    data-statistics-charts-target="categorySlice"
+                    data-label="<%= segment[:category].capitalize %>"
+                    data-percentage="<%= segment[:percentage] %>"
+                    data-color="<%= segment[:color] %>"
+                    data-mid-angle="<%= segment[:mid_angle] %>"
+                    data-action="mouseenter->statistics-charts#activateCategorySlice mousemove->statistics-charts#moveCategoryTooltip mouseleave->statistics-charts#resetCategoryChart focus->statistics-charts#activateCategorySlice blur->statistics-charts#resetCategoryChart"></path>
+            <% end %>
+          </svg>
+          <div class="statistics-chart-tooltip statistics-chart-tooltip--category"
+               data-statistics-charts-target="categoryTooltip"></div>
         </div>
       <% else %>
         <div class="placeholder-chart">Create a few missions to reveal your category spread.</div>
