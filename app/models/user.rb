@@ -20,7 +20,7 @@ class User < ApplicationRecord
     length: { minimum: 3, maximum: 15 },
     username: true
 
-  validates :terms_accepted, acceptance: { accept: "1" }, on: :create
+  validates :terms_accepted, acceptance: { accept: "1", message: "You must accept the Terms of Use" }, on: :create
 
   validate :email_format_is_valid
 
