@@ -39,6 +39,13 @@ class Habit < ApplicationRecord
     streak_ending_on(target_date)
   end
 
+  def success_rate
+    total_logs = habit_logs.count
+    return 0 if total_logs.zero?
+
+    ((habit_logs.count(&:completed?) / total_logs.to_f) * 100).round
+  end
+
   def streak_reset_alert?(as_of: Date.current)
     return false unless frequency == "daily"
     return false if completed_on?(as_of - 1.day)

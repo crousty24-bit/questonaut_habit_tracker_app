@@ -1,0 +1,59 @@
+@use "base/variables" as *;
+
+.statistics-analysis__list {
+  display: flex;
+  flex-direction: column;
+  gap: $sp-4;
+}
+
+.statistics-analysis__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $sp-4;
+  padding: $sp-4;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid $border-dim;
+  border-radius: $radius-lg;
+}
+
+.statistics-analysis__habit {
+  display: flex;
+  align-items: center;
+  gap: $sp-4;
+}
+
+.statistics-analysis__habit-title {
+  color: white;
+  font-weight: 600;
+}
+
+.statistics-analysis__habit-category {
+  color: $text-secondary;
+  font-size: 0.875rem;
+}
+
+.statistics-analysis__metrics {
+  text-align: right;
+}
+
+.statistics-analysis__success {
+  color: $green;
+  font-weight: 700;
+}
+
+.statistics-analysis__streak {
+  color: $text-secondary;
+  font-size: 0.875rem;
+}
+
+@media (max-width: 640px) {
+  .statistics-analysis__item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .statistics-analysis__metrics {
+    text-align: left;
+  }
+}

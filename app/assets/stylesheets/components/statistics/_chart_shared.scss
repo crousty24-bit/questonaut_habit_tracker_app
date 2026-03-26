@@ -1,0 +1,32 @@
+@use "base/variables" as *;
+
+.statistics-weekly-chart,
+.statistics-category-chart,
+.statistics-chart-tooltip {
+  --space-bg: #030712;
+  --panel-bg: rgba(10, 20, 40, 0.8);
+  --starlight-cyan: #00f2ff;
+  --matrix-green: #00ff88;
+  --amber-flare: #ff9900;
+  --cosmic-magenta: #cc00ff;
+  --pulsar-red: #ff3333;
+  --void-purple: #660099;
+  --nebula-blue: #0099cc;
+  --solar-yellow: #ffd300;
+  --orbital-orange: #ff6600;
+  --aura-indigo: #4b0082;
+}
+
+.statistics-progress-item__top,
+.statistics-category-item__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: $sp-4;
+  color: $text-secondary;
+  font-size: 0.875rem;
+
+  strong {
+    color: white;
+  }
+}

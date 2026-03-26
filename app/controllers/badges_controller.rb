@@ -13,7 +13,7 @@ class BadgesController < ApplicationController
     @total_badges_count = Badge.count
     @category_distribution = category_distribution
     @weekly_progress = weekly_progress
-    @detailed_habits = @habits.sort_by { |habit| [-habit_success_rate(habit), -streak_for(habit)] }.first(4)
+    @detailed_habits = @habits.sort_by { |habit| [-habit.success_rate, -streak_for(habit)] }.first(4)
   end
 
   def collection
@@ -81,13 +81,6 @@ class BadgesController < ApplicationController
     habit.current_streak(as_of: Date.current)
   end
 
-  def habit_success_rate(habit)
-    total_logs = habit.habit_logs.count
-    return 0 if total_logs.zero?
-
-    ((habit.habit_logs.count(&:completed?) / total_logs.to_f) * 100).round
-  end
-
   def category_distribution
     counts = Hash.new(0)
     @habits.each do |habit|
@@ -100,13 +93,13 @@ class BadgesController < ApplicationController
     week_start = Date.current.beginning_of_week(:monday)
     week_dates = (week_start..week_start.end_of_week(:monday)).to_a
     completed_counts = @completed_logs.where(date: week_dates).group(:date).count
-    french_day_labels = %w[Lundi Mardi Mercredi Jeudi Vendredi Samedi Dimanche]
+    day_labels = %w[Monday Tuesday Wednesday Thursday Friday Saturday Sunday]
 
     week_dates.each_with_index.map do |date, index|
       completed_value = completed_counts[date].to_i * 10
 
       {
-        label: french_day_labels[index],
+        label: day_labels[index],
         value: completed_value,
         height_percent: [(completed_value * 100.0 / 50).round, 100].min
       }

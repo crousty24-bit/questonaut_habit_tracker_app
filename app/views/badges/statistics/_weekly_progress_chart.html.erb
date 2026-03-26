@@ -1,0 +1,38 @@
+<div class="glass-panel statistics-panel">
+  <h2 class="statistics-panel__title">Weekly Progress</h2>
+  <% if habits.any? %>
+    <div class="statistics-weekly-chart"
+         role="img"
+         aria-label="Weekly progress by day"
+         data-statistics-charts-target="weeklyChart">
+      <div class="statistics-weekly-chart__axis">
+        <% [50, 40, 30, 20, 10, 0].each do |tick| %>
+          <span class="statistics-weekly-chart__tick"><%= tick %></span>
+        <% end %>
+      </div>
+      <div class="statistics-weekly-chart__plot">
+        <% Array(weekly_progress).each do |day| %>
+          <div class="statistics-weekly-chart__item"
+               tabindex="0"
+               data-statistics-charts-target="weeklyItem"
+               data-label="<%= day[:label] %>"
+               data-value="<%= day[:value] %>"
+               data-action="mouseenter->statistics-charts#activateWeeklyItem mousemove->statistics-charts#moveWeeklyTooltip mouseleave->statistics-charts#resetWeeklyChart focus->statistics-charts#activateWeeklyItem blur->statistics-charts#resetWeeklyChart">
+            <div class="statistics-weekly-chart__column-wrap">
+              <div class="statistics-weekly-chart__column" style="height: <%= day[:height_percent] %>%"></div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+      <div class="statistics-weekly-chart__x-axis">
+        <% Array(weekly_progress).each do |day| %>
+          <span class="statistics-weekly-chart__label"><%= day[:label] %></span>
+        <% end %>
+      </div>
+      <div class="statistics-chart-tooltip statistics-chart-tooltip--weekly"
+           data-statistics-charts-target="weeklyTooltip"></div>
+    </div>
+  <% else %>
+    <div class="placeholder-chart">Start completing missions to unlock progress data.</div>
+  <% end %>
+</div>
