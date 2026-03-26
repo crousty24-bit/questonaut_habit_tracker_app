@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-labelledby="title desc">
+  <title id="title">Questonaut mark</title>
+  <desc id="desc">Stylized Q logo with an orbital path.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#5bd2ff"/>
+      <stop offset="100%" stop-color="#3e9cff"/>
+    </linearGradient>
+    <linearGradient id="trail" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffd166"/>
+      <stop offset="100%" stop-color="#95f28f"/>
+    </linearGradient>
+  </defs>
+  <rect width="160" height="160" rx="40" fill="#08111f"/>
+  <circle cx="80" cy="80" r="46" fill="none" stroke="url(#bg)" stroke-width="16"/>
+  <path d="M110 110l22 22" stroke="url(#bg)" stroke-width="16" stroke-linecap="round"/>
+  <path d="M36 52c16-22 43-31 69-22 18 6 33 20 41 38" fill="none" stroke="url(#trail)" stroke-width="8" stroke-linecap="round" opacity=".9"/>
+  <circle cx="122" cy="70" r="7" fill="#ffd166"/>
+</svg>
