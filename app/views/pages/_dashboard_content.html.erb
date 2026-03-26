@@ -17,16 +17,6 @@
   weekly_timer_deadline = habit_timer_deadline(period: :weekly, now: @now)
   weekly_timer_seconds_remaining = habit_timer_seconds_remaining(period: :weekly, now: @now)
 
-  category_icon_for = lambda do |category|
-    {
-      "health" => "❤️",
-      "productivity" => "⚡",
-      "learning" => "📚",
-      "fitness" => "💪",
-      "nutrition" => "🥗"
-    }[category] || "🎯"
-  end
-
   best_streak = @habits.map { |habit| habit.current_streak(as_of: @today) }.max || 0
   login_streak = current_user.login_streak || 0
   new_habit = @new_habit || current_user.habits.new(category_name: "health")
@@ -80,8 +70,15 @@
         <span class="xp-panel__label">Progress to Level <%= level + 1 %></span>
         <span class="xp-panel__value"><%= total_xp %> / <%= next_level_xp %> XP</span>
       </div>
-      <div class="xp-bar">
-        <div class="xp-fill" style="width: <%= progress_percent %>%"></div>
+      <div class="xp-panel__bar-stack" style="--xp-progress: <%= progress_percent %>%;">
+        <div class="xp-panel__flight-layer" aria-hidden="true">
+          <div class="xp-panel__rocket-track">
+            <span class="xp-bar__rocket">🚀</span>
+          </div>
+        </div>
+        <div class="xp-bar xp-bar--dashboard">
+          <div class="xp-fill" style="width: <%= progress_percent %>%"></div>
+        </div>
       </div>
     </div>
 
@@ -177,7 +174,7 @@
                 <article class="habit-card <%= 'completed' if completed %>" data-dashboard-target="card" data-category="<%= category %>">
                   <div class="dashboard-habit">
                     <div class="dashboard-habit__main">
-                      <div class="cat-icon <%= category %>"><%= category_icon_for.call(category) %></div>
+                      <div class="cat-icon <%= category %>"><%= category_icon_for(category) %></div>
 
                       <div class="dashboard-habit__content">
                         <div class="dashboard-habit__topline">

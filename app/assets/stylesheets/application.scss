@@ -22,6 +22,12 @@
 @use "components/badges";
 @use "components/alerts";
 @use "components/modals";
+@use "components/statistics/summary_cards";
+@use "components/statistics/chart_shared";
+@use "components/statistics/weekly_progress_chart";
+@use "components/statistics/category_distribution_chart";
+@use "components/statistics/chart_tooltip";
+@use "components/statistics/detailed_analysis";
 
 @use "pages/home";              /* styles specific to the landing page */
 @use "pages/auth";              /* login, signup, reset password (Devise) */

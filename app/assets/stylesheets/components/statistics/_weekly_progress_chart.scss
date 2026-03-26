@@ -1,0 +1,148 @@
+@use "base/variables" as *;
+
+.statistics-weekly-chart {
+  display: grid;
+  grid-template-columns: 2.1rem minmax(0, 1fr);
+  grid-template-rows: 12rem auto;
+  column-gap: $sp-3;
+  row-gap: $sp-3;
+  padding: $sp-4;
+  border: 1px solid $border-dim;
+  border-radius: $radius-lg;
+  background: rgba(255, 255, 255, 0.03);
+  position: relative;
+  overflow: hidden;
+}
+
+.statistics-weekly-chart__axis {
+  grid-column: 1;
+  grid-row: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-end;
+  height: 100%;
+}
+
+.statistics-weekly-chart__tick {
+  color: $text-secondary;
+  font-size: 0.75rem;
+  line-height: 1;
+}
+
+.statistics-weekly-chart__plot {
+  grid-column: 2;
+  grid-row: 1;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  align-items: flex-end;
+  gap: $sp-2;
+  min-width: 0;
+  height: 100%;
+  padding: $sp-3 $sp-2 $sp-2;
+  border: 1px solid $border-soft;
+  border-radius: $radius-md;
+  background:
+    repeating-linear-gradient(
+      to top,
+      rgba(255, 255, 255, 0.08) 0,
+      rgba(255, 255, 255, 0.08) 1px,
+      transparent 1px,
+      transparent 20%
+    ),
+    rgba(255, 255, 255, 0.02);
+}
+
+.statistics-weekly-chart__item {
+  height: 100%;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr);
+  align-items: stretch;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+
+  &:focus-visible {
+    outline: 1px solid var(--starlight-cyan);
+    outline-offset: 4px;
+    border-radius: $radius-sm;
+  }
+}
+
+.statistics-weekly-chart__value {
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1;
+  transition: opacity 0.3s ease, text-shadow 0.3s ease;
+}
+
+.statistics-weekly-chart__column-wrap {
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  height: 100%;
+}
+
+.statistics-weekly-chart__column {
+  width: min(100%, 3rem);
+  border-radius: $radius-md $radius-md 0 0;
+  background: linear-gradient(180deg, var(--starlight-cyan), var(--nebula-blue));
+  box-shadow: 0 14px 32px var(--nebula-blue);
+  transform-origin: bottom center;
+  transition: height 0.3s ease, opacity 0.3s ease, filter 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.statistics-weekly-chart__item.is-active .statistics-weekly-chart__column {
+  background: linear-gradient(180deg, var(--starlight-cyan), var(--matrix-green));
+  box-shadow: 0 0 28px var(--starlight-cyan);
+  filter: drop-shadow(0 0 15px var(--starlight-cyan));
+  transform: scaleY(1.05);
+}
+
+.statistics-weekly-chart__item.is-active .statistics-weekly-chart__value {
+  text-shadow: 0 0 12px var(--starlight-cyan);
+}
+
+.statistics-weekly-chart__item.is-dimmed .statistics-weekly-chart__column {
+  opacity: 0.3;
+}
+
+.statistics-weekly-chart__item.is-dimmed .statistics-weekly-chart__value,
+.statistics-weekly-chart__item.is-dimmed .statistics-weekly-chart__column-wrap {
+  opacity: 0.45;
+}
+
+.statistics-weekly-chart__x-axis {
+  grid-column: 2;
+  grid-row: 2;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: $sp-2;
+  justify-items: center;
+  min-width: 0;
+}
+
+.statistics-weekly-chart__label {
+  width: 100%;
+  color: $text-secondary;
+  font-size: clamp(0.52rem, 0.78vw, 0.7rem);
+  line-height: 1.15;
+  text-align: center;
+  white-space: nowrap;
+  word-break: normal;
+  letter-spacing: -0.01em;
+  transition: opacity 0.3s ease;
+}
+
+@media (max-width: 640px) {
+  .statistics-weekly-chart {
+    grid-template-columns: 2rem minmax(0, 1fr);
+    grid-template-rows: 10rem auto;
+    padding: $sp-3;
+  }
+
+  .statistics-weekly-chart__label {
+    font-size: 0.5rem;
+  }
+}

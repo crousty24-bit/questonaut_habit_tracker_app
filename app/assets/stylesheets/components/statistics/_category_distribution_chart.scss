@@ -1,0 +1,35 @@
+.statistics-category-chart {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.statistics-category-chart__pie {
+  width: min(100%, 15rem);
+  overflow: visible;
+  filter: drop-shadow(0 18px 36px var(--space-bg));
+}
+
+.statistics-category-chart__slice {
+  cursor: pointer;
+  stroke: var(--space-bg);
+  stroke-width: 1.5;
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 0.3s ease, filter 0.3s ease, stroke 0.3s ease, stroke-width 0.3s ease, opacity 0.3s ease;
+}
+
+.statistics-category-chart__slice.is-active,
+.statistics-category-chart__slice:hover {
+  filter: brightness(1.08);
+  stroke: white;
+  stroke-width: 1;
+}
+
+.statistics-category-chart__slice:focus-visible {
+  outline: none;
+  filter: brightness(1.08);
+  stroke: white;
+  stroke-width: 1;
+}

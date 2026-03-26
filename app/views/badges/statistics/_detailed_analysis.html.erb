@@ -1,0 +1,27 @@
+<div class="glass-panel statistics-analysis">
+  <h2 class="statistics-analysis__title">Detailed Analysis</h2>
+  <div class="statistics-analysis__list">
+    <% if detailed_habits.any? %>
+      <% detailed_habits.each do |habit| %>
+        <% category = habit.primary_category %>
+        <% rate = habit.success_rate %>
+        <% streak = habit.current_streak(as_of: Date.current) %>
+        <div class="statistics-analysis__item">
+          <div class="statistics-analysis__habit">
+            <div class="cat-icon <%= category %>"><%= category_icon_for(category) %></div>
+            <div>
+              <div class="statistics-analysis__habit-title"><%= habit.title %></div>
+              <div class="statistics-analysis__habit-category"><%= category.capitalize %></div>
+            </div>
+          </div>
+          <div class="statistics-analysis__metrics">
+            <div class="statistics-analysis__success"><%= rate %>% success</div>
+            <div class="statistics-analysis__streak">Current streak: <%= streak %>d</div>
+          </div>
+        </div>
+      <% end %>
+    <% else %>
+      <div class="placeholder-chart">No mission analysis yet. Validate a few habits to generate insights.</div>
+    <% end %>
+  </div>
+</div>

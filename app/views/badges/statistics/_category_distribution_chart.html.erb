@@ -1,0 +1,31 @@
+<div class="glass-panel statistics-panel">
+  <h2 class="statistics-panel__title">Category Distribution</h2>
+  <% if category_distribution.any? %>
+    <% category_segments = category_distribution_segments(category_distribution, habits_count) %>
+    <div class="statistics-category-chart" data-statistics-charts-target="categoryChart">
+      <svg class="statistics-category-chart__pie"
+           viewBox="0 0 200 200"
+           role="img"
+           aria-label="Category distribution pie chart">
+        <% category_segments.each do |segment| %>
+          <% path = category_slice_path(segment) %>
+          <% next if path.blank? %>
+          <path class="statistics-category-chart__slice"
+                d="<%= path %>"
+                fill="<%= segment[:color] %>"
+                tabindex="0"
+                data-statistics-charts-target="categorySlice"
+                data-label="<%= segment[:category].capitalize %>"
+                data-percentage="<%= segment[:percentage] %>"
+                data-color="<%= segment[:color] %>"
+                data-mid-angle="<%= segment[:mid_angle] %>"
+                data-action="mouseenter->statistics-charts#activateCategorySlice mousemove->statistics-charts#moveCategoryTooltip mouseleave->statistics-charts#resetCategoryChart focus->statistics-charts#activateCategorySlice blur->statistics-charts#resetCategoryChart"></path>
+        <% end %>
+      </svg>
+      <div class="statistics-chart-tooltip statistics-chart-tooltip--category"
+           data-statistics-charts-target="categoryTooltip"></div>
+    </div>
+  <% else %>
+    <div class="placeholder-chart">Create a few missions to reveal your category spread.</div>
+  <% end %>
+</div>
