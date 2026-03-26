@@ -3,12 +3,13 @@
   level = current_user.level || 1
   next_level_xp = [level * 100, 100].max
   progress_percent = [[current_user.xp_progress_percentage, 0].max, 100].min
-  active_habits = @habits.count
-  daily_habits = @habits.select { |habit| habit.frequency == "daily" }
-  weekly_habits = @habits.select { |habit| habit.frequency == "weekly" }
-  completed_today = @habits.count { |habit| habit.completed_on?(@today) }
-  weekly_completed = @weekly_completed_logs.count
-  weekly_completion_rate = active_habits.positive? ? [(weekly_completed.to_f / (active_habits * 7) * 100).round, 100].min : 0
+  cockpit_habits = @dashboard_habits || @habits
+  active_habits = cockpit_habits.count
+  daily_habits = cockpit_habits.select { |habit| habit.frequency == "daily" }
+  weekly_habits = cockpit_habits.select { |habit| habit.frequency == "weekly" }
+  completed_today = @dashboard_completed_today || cockpit_habits.count { |habit| habit.completed_on?(@today) }
+  weekly_completed = @dashboard_weekly_completed || @weekly_completed_logs.count
+  weekly_completion_rate = @dashboard_weekly_completion_rate || (active_habits.positive? ? [(weekly_completed.to_f / (active_habits * 7) * 100).round, 100].min : 0)
   xp_this_week = weekly_completed * 10
   active_category = @current_category.presence || "all"
   dashboard_base_path = dashboard_path({ category: @current_category.presence }.compact)
@@ -16,9 +17,18 @@
   daily_timer_seconds_remaining = habit_timer_seconds_remaining(now: @now)
   weekly_timer_deadline = habit_timer_deadline(period: :weekly, now: @now)
   weekly_timer_seconds_remaining = habit_timer_seconds_remaining(period: :weekly, now: @now)
+  avatar_options = User::AVATAR_OPTIONS.map do |id, config|
+    { id: id, name: config[:name], asset: asset_path(config[:asset]) }
+  end
+  current_avatar = avatar_options.find { |avatar| avatar[:id] == current_user.avatar_key } || avatar_options.first
+  featured_quests = @cockpit_featured_quests || []
+  cockpit_badges = @cockpit_badges || []
+  unlocked_badges = @cockpit_unlocked_badges_count || cockpit_badges.count { |badge| badge[:unlocked] }
+  core_temperature = @dashboard_core_temperature || [[18 + (active_habits - completed_today) * 16, 96].min, 14].max
+  oxygen_reserve = @dashboard_oxygen_reserve || (active_habits.positive? ? [[(completed_today.to_f / active_habits * 100).round, 100].min, 22].max : 22)
 
-  best_streak = @habits.map { |habit| habit.current_streak(as_of: @today) }.max || 0
-  login_streak = current_user.login_streak || 0
+  best_streak = @dashboard_best_streak || cockpit_habits.map { |habit| habit.current_streak(as_of: @today) }.max || 0
+  login_streak = @dashboard_login_streak || current_user.login_streak || 0
   new_habit = @new_habit || current_user.habits.new(category_name: "health")
   editing_habit = @editing_habit || current_user.habits.new
   deleting_habit = @deleting_habit
@@ -34,69 +44,216 @@
 <div class="stars-bg" data-controller="stars"></div>
 
 <section class="page-wrapper dashboard-page" data-controller="dashboard">
-  <div class="glass-panel neon-glow dashboard-hero">
+  <div class="glass-panel neon-glow dashboard-hero dashboard-hero--cockpit"
+       data-controller="cockpit-dashboard"
+       data-action="mousemove->cockpit-dashboard#parallax mouseleave->cockpit-dashboard#reset">
     <div class="dashboard-hero__halo dashboard-hero__halo--cyan"></div>
     <div class="dashboard-hero__halo dashboard-hero__halo--purple"></div>
+    <div class="dashboard-cockpit__vignette" aria-hidden="true"></div>
+    <div class="dashboard-cockpit__scanlines" aria-hidden="true"></div>
+    <div class="dashboard-cockpit__viewport" aria-hidden="true">
+      <div class="dashboard-cockpit__starfield"></div>
+      <div class="dashboard-cockpit__planet"></div>
+      <div class="dashboard-cockpit__horizon"></div>
+    </div>
+    <div class="dashboard-cockpit__pilot">
+      <img id="current-avatar"
+           class="dashboard-cockpit__pilot-image"
+           src="<%= current_avatar[:asset] %>"
+           alt="<%= current_avatar[:name] %>">
+      <div class="dashboard-cockpit__pilot-meta">
+        <strong id="current-avatar-name"><%= current_avatar[:name] %></strong>
+        <span><%= current_user.name.presence || current_user.email %></span>
+      </div>
+    </div>
+    <div class="dashboard-cockpit__frame dashboard-cockpit__frame--left" aria-hidden="true"></div>
+    <div class="dashboard-cockpit__frame dashboard-cockpit__frame--right" aria-hidden="true"></div>
+    <div class="dashboard-cockpit__frame dashboard-cockpit__frame--bottom" aria-hidden="true"></div>
 
-    <div class="dashboard-hero__top">
-      <div class="dashboard-hero__main">
-        <div class="profile-avatar-wrap">
-          <div class="avatar">👨‍🚀</div>
-          <div class="avatar-badge">✓</div>
-        </div>
-
-        <div class="dashboard-hero__copy">
-          <h1 class="dashboard-title brand-font">Welcome Back, Commander</h1>
-          <p class="dashboard-subtitle">
+    <div class="dashboard-cockpit">
+      <header class="dashboard-cockpit__header">
+        <div>
+          <div class="dashboard-hero__eyebrow">Command Bridge</div>
+          <h1 class="dashboard-title dashboard-title--cockpit">Welcome Back Commander</h1>
+          <p class="dashboard-subtitle dashboard-subtitle--cockpit">
             Day <%= [login_streak, 1].max %> of your exploration mission
           </p>
-          <div class="dashboard-meta">
-            <span class="level-badge">LEVEL <%= level %></span>
-            <span class="dashboard-meta__xp"><%= total_xp %> XP</span>
+          <div class="dashboard-streaks dashboard-streaks--cockpit">
+            <div class="dashboard-streak-chip dashboard-streak-chip--orange">
+              <span class="dashboard-streak-chip__icon">🔥</span>
+              <span class="dashboard-streak-chip__label">Login streak</span>
+              <strong><%= login_streak %> days</strong>
+            </div>
+            <div class="dashboard-streak-chip dashboard-streak-chip--cyan">
+              <span class="dashboard-streak-chip__icon">⚡</span>
+              <span class="dashboard-streak-chip__label">Best streak</span>
+              <strong><%= best_streak %> days</strong>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="dashboard-hero__action">
-        <button type="button" class="btn btn-primary btn-md dashboard-cta" data-action="dashboard#openCreateModal">
+        <button type="button" class="btn btn-primary btn-md dashboard-cta dashboard-cta--cockpit" data-action="dashboard#openCreateModal">
           <span>+</span>
           <span>New Mission</span>
         </button>
-      </div>
-    </div>
+      </header>
 
-    <div class="xp-panel">
-      <div class="dashboard-progress">
-        <span class="xp-panel__label">Progress to Level <%= level + 1 %></span>
-        <span class="xp-panel__value"><%= total_xp %> / <%= next_level_xp %> XP</span>
-      </div>
-      <div class="xp-panel__bar-stack" style="--xp-progress: <%= progress_percent %>%;">
-        <div class="xp-panel__flight-layer" aria-hidden="true">
-          <div class="xp-panel__rocket-track">
-            <span class="xp-bar__rocket">🚀</span>
+      <div class="dashboard-cockpit__grid">
+        <aside class="cockpit-widget cockpit-widget--streak">
+          <div class="cockpit-widget__header">
+            <span class="cockpit-widget__label">Streak Control</span>
+            <strong class="cockpit-widget__headline">Daily Activation</strong>
           </div>
-        </div>
-        <div class="xp-bar xp-bar--dashboard">
-          <div class="xp-fill" style="width: <%= progress_percent %>%"></div>
-        </div>
-      </div>
-    </div>
 
-    <div class="dashboard-overview">
-      <div class="dashboard-overview__card">
-        <span class="dashboard-overview__icon streak-flame">🔥</span>
-        <span class="dashboard-overview__value"><%= login_streak %>d</span>
-        <span class="dashboard-overview__label">Login Streak</span>
+          <div class="cockpit-throttle">
+            <div class="cockpit-throttle__track">
+              <% 20.times do |segment| %>
+                <% filled_segments = [[login_streak, 20].min, 0].max %>
+                <% active_segment = segment >= 20 - filled_segments %>
+                <span class="cockpit-throttle__segment <%= 'is-active' if active_segment %>"></span>
+              <% end %>
+            </div>
+          </div>
+
+          <div class="cockpit-streak-display">
+            <span class="cockpit-streak-display__value"><%= login_streak %></span>
+            <span class="cockpit-streak-display__label">JOURS ACTIVÉS</span>
+          </div>
+        </aside>
+
+        <section class="cockpit-widget cockpit-widget--terminal">
+          <div class="cockpit-terminal__header">
+            <div>
+              <span class="cockpit-widget__label">Mission Terminal</span>
+              <strong class="cockpit-widget__headline">Quest Logs</strong>
+            </div>
+            <span class="cockpit-terminal__status">ONLINE</span>
+          </div>
+
+          <div class="cockpit-terminal__list">
+            <% if featured_quests.any? %>
+              <% featured_quests.each do |quest| %>
+                <article class="cockpit-quest-card" style="--quest-accent: <%= quest[:accent] %>;">
+                  <div class="cockpit-quest-card__meta">
+                    <div>
+                      <h3 class="cockpit-quest-card__title"><%= quest[:title] %></h3>
+                      <p class="cockpit-quest-card__type"><%= quest[:type] %></p>
+                    </div>
+                    <span class="cockpit-quest-card__xp">+<%= quest[:xp_reward] %> XP</span>
+                  </div>
+
+                  <div class="cockpit-quest-card__progress">
+                    <div class="cockpit-quest-card__bar">
+                      <span style="width: <%= quest[:progress_value] %>%"></span>
+                    </div>
+                    <strong><%= quest[:progress_value] %>%</strong>
+                  </div>
+
+                  <div class="cockpit-quest-card__actions">
+                    <button type="button" class="cockpit-btn cockpit-btn--primary" data-action="dashboard#openCreateModal">POURSUIVRE</button>
+                    <button type="button" class="cockpit-btn cockpit-btn--secondary">DÉTAILS</button>
+                  </div>
+                </article>
+              <% end %>
+            <% else %>
+              <article class="cockpit-quest-card cockpit-quest-card--empty">
+                <div class="cockpit-quest-card__meta">
+                  <div>
+                    <h3 class="cockpit-quest-card__title">Aucune mission active</h3>
+                    <p class="cockpit-quest-card__type">Terminal en attente</p>
+                  </div>
+                </div>
+                <div class="cockpit-quest-card__actions">
+                  <button type="button" class="cockpit-btn cockpit-btn--primary" data-action="dashboard#openCreateModal">LANCER UNE MISSION</button>
+                </div>
+              </article>
+            <% end %>
+          </div>
+        </section>
+
+        <aside class="cockpit-widget cockpit-widget--badges">
+          <div class="cockpit-widget__header">
+            <span class="cockpit-widget__label">Badge Matrix</span>
+            <strong class="cockpit-widget__headline"><%= unlocked_badges %> / 6 unlocked</strong>
+          </div>
+
+          <div class="cockpit-badge-grid">
+            <% cockpit_badges.each do |badge| %>
+              <% unlocked = badge[:unlocked] %>
+              <article class="cockpit-badge <%= "cockpit-badge--#{badge[:color]}" if unlocked %> <%= 'is-unlocked' if unlocked %>">
+                <div class="cockpit-badge__hex">
+                  <% if badge[:badge].image_path.present? %>
+                    <%= image_tag badge_image(badge[:badge], unlocked: unlocked),
+                                  class: "cockpit-badge__asset #{'is-locked' unless unlocked}",
+                                  alt: badge[:badge].display_name,
+                                  loading: "lazy",
+                                  decoding: "async" %>
+                  <% else %>
+                    <span class="cockpit-badge__icon"><%= badge[:name].first.upcase %></span>
+                  <% end %>
+                </div>
+                <strong class="cockpit-badge__name"><%= badge[:name] %></strong>
+                <% if unlocked %>
+                  <span class="cockpit-badge__state"><%= badge[:subtitle].presence || "Unlocked" %></span>
+                <% else %>
+                  <div class="cockpit-badge__lock-progress">
+                    <span style="width: <%= badge[:progress_percent] %>%"></span>
+                  </div>
+                <% end %>
+              </article>
+            <% end %>
+          </div>
+        </aside>
       </div>
-      <div class="dashboard-overview__card">
-        <span class="dashboard-overview__icon">🏆</span>
-        <span class="dashboard-overview__value"><%= current_user.badges.count %></span>
-        <span class="dashboard-overview__label">Badges Unlocked</span>
-      </div>
-      <div class="dashboard-overview__card">
-        <span class="dashboard-overview__icon">✅</span>
-        <span class="dashboard-overview__value"><%= completed_today %>/<%= active_habits %></span>
-        <span class="dashboard-overview__label">Completed Today</span>
+
+      <div class="dashboard-cockpit__pilot-row">
+        <article class="cockpit-widget cockpit-widget--xp">
+          <div class="cockpit-widget__header">
+            <span class="cockpit-widget__label">Propulsion Charge</span>
+            <strong class="cockpit-widget__headline">XP Capacity</strong>
+          </div>
+
+          <div class="xp-panel xp-panel--hero xp-panel--cockpit">
+            <div class="xp-panel__bar-stack" style="--xp-progress: <%= progress_percent %>%;">
+              <div class="xp-panel__flight-layer" aria-hidden="true">
+                <div class="xp-panel__rocket-track">
+                  <span class="xp-bar__rocket">🚀</span>
+                </div>
+              </div>
+              <div class="xp-bar xp-bar--dashboard">
+                <div class="xp-fill" style="width: <%= progress_percent %>%"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="cockpit-xp-meta">
+            <span>Level <%= level %></span>
+            <span><%= progress_percent %>% charge</span>
+          </div>
+        </article>
+
+        <div class="dashboard-cockpit__gauges">
+          <article class="cockpit-gauge cockpit-gauge--streak">
+            <span class="cockpit-gauge__label">Login Streak</span>
+            <strong class="cockpit-gauge__value"><%= login_streak %> d</strong>
+            <div class="cockpit-gauge__bar"><span style="width: <%= [[login_streak * 5, 100].min, 8].max %>%"></span></div>
+          </article>
+          <article class="cockpit-gauge cockpit-gauge--best-streak">
+            <span class="cockpit-gauge__label">Best Streak</span>
+            <strong class="cockpit-gauge__value"><%= best_streak %> d</strong>
+            <div class="cockpit-gauge__bar"><span style="width: <%= [[best_streak * 5, 100].min, 8].max %>%"></span></div>
+          </article>
+          <article class="cockpit-gauge cockpit-gauge--temperature">
+            <span class="cockpit-gauge__label">Température Noyau</span>
+            <strong class="cockpit-gauge__value"><%= core_temperature %>%</strong>
+            <div class="cockpit-gauge__bar"><span style="width: <%= core_temperature %>%"></span></div>
+          </article>
+          <article class="cockpit-gauge cockpit-gauge--oxygen">
+            <span class="cockpit-gauge__label">Réserves Oxygène</span>
+            <strong class="cockpit-gauge__value"><%= oxygen_reserve %>%</strong>
+            <div class="cockpit-gauge__bar"><span style="width: <%= oxygen_reserve %>%"></span></div>
+          </article>
+        </div>
       </div>
     </div>
   </div>
