@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Questonaut</title>
+  <link rel="stylesheet" href="assets/css/main.css">
+  <script defer src="assets/js/main.js"></script>
+</head>
+<body data-page="features" data-title="Questonaut | Feature Overview" data-description="A concise overview of Questonaut's MVP features: authentication, missions, validation flow, XP, badges, and statistics." data-og-image="assets/img/og/questonaut-og.png">
+  <div data-include="partials/header.html"></div>
+
+  <main class="shell page-main">
+    <section class="page-hero reveal">
+      <p class="eyebrow">Features</p>
+      <h1>A focused MVP, built around one end-to-end habit loop.</h1>
+      <p class="lede">
+        Questonaut keeps the scope intentional: users can sign up, manage missions, validate progress, earn rewards,
+        and review performance without leaving the core product flow.
+      </p>
+    </section>
+
+    <section class="section">
+      <div class="feature-grid">
+        <article class="panel reveal">
+          <h2>Authentication</h2>
+          <p>Simple sign up, sign in, account edit, and password recovery powered by Devise.</p>
+          <ul class="check-list">
+            <li>Onboarding starts from the landing page</li>
+            <li>Protected dashboard once logged in</li>
+            <li>Account recovery stays in scope for the MVP</li>
+          </ul>
+        </article>
+
+        <article class="panel reveal">
+          <h2>Missions</h2>
+          <p>Habits are framed as missions so the domain stays playful without losing clarity.</p>
+          <ul class="check-list">
+            <li>Create, edit, and delete habits</li>
+            <li>Daily and weekly frequencies</li>
+            <li>Category-based organization</li>
+          </ul>
+        </article>
+
+        <article class="panel reveal">
+          <h2>Validation flow</h2>
+          <p>The validation action is designed to be quick, visible, and repeatable every day.</p>
+          <ul class="check-list">
+            <li>Mission completion logging</li>
+            <li>Streak-aware feedback</li>
+            <li>Single clear action from the dashboard</li>
+          </ul>
+        </article>
+
+        <article class="panel reveal">
+          <h2>Gamification</h2>
+          <p>Consistency earns progress. Rewards are intentionally lightweight but motivating.</p>
+          <ul class="check-list">
+            <li>XP gained from key actions</li>
+            <li>Level progression from total XP</li>
+            <li>Unlockable badges and login streaks</li>
+          </ul>
+        </article>
+
+        <article class="panel reveal">
+          <h2>Dashboard</h2>
+          <p>The main product surface gathers everything a user needs to understand current momentum.</p>
+          <ul class="check-list">
+            <li>XP and level progress</li>
+            <li>Mission groups and filters</li>
+            <li>Recent badges and weekly summary</li>
+          </ul>
+        </article>
+
+        <article class="panel reveal">
+          <h2>Statistics</h2>
+          <p>Mission history becomes readable through charts, counts, and detailed analysis.</p>
+          <ul class="check-list">
+            <li>Success rate and mission days</li>
+            <li>Best streak and badge totals</li>
+            <li>Weekly progress and category distribution</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-heading reveal">
+        <p class="eyebrow">Tech Stack</p>
+        <h2>Built to stay understandable.</h2>
+      </div>
+
+      <div class="chip-board reveal">
+        <span class="chip">Ruby on Rails 8</span>
+        <span class="chip">Hotwire</span>
+        <span class="chip">Turbo</span>
+        <span class="chip">Stimulus</span>
+        <span class="chip">Tailwind CSS</span>
+        <span class="chip">SCSS</span>
+        <span class="chip">SQLite</span>
+        <span class="chip">Devise</span>
+        <span class="chip">RSpec</span>
+        <span class="chip">Kamal</span>
+      </div>
+    </section>
+
+    <section class="section">
+      <div data-include="partials/cta.html"></div>
+    </section>
+  </main>
+
+  <div data-include="partials/footer.html"></div>
+</body>
+</html>
