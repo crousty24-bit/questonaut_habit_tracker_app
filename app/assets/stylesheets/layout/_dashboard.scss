@@ -444,6 +444,43 @@
   }
 }
 
+.xp-bar--dashboard {
+  margin-top: 0;
+}
+
+.xp-panel__bar-stack {
+  position: relative;
+  margin-top: $sp-2;
+  padding-top: 1.55rem;
+  padding-bottom: 0.45rem;
+}
+
+.xp-panel__flight-layer {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 1.55rem;
+  pointer-events: none;
+}
+
+.xp-panel__rocket-track {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: clamp(1.1rem, var(--xp-progress), calc(100% - 1.1rem));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.xp-bar__rocket {
+  font-size: 2.25rem;
+  line-height: 1;
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.45));
+}
+
 // ─── Missions section header ──────────────────────────────────
 .missions-header {
   display: flex;

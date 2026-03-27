@@ -91,9 +91,9 @@
         </div>
 
         <div class="form-group">
-          <label class="form-label">
-            <%= f.check_box :terms_accepted, class: "mr-2" %>
-            I accept the <%= link_to "Terms of Use (CGU)", terms_path, target: "_blank", rel: "noopener" %>.
+          <label class="form-label inline-flex items-center gap-2">
+            <%= f.check_box :terms_accepted, class: "mr-0 shrink-0" %>
+            <span>I accept the <%= link_to "Terms of Use", terms_path, target: "_blank", rel: "noopener" %>.</span>
             <span class="required">*</span>
           </label>
         </div>

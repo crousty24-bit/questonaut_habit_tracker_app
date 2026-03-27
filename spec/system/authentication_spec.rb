@@ -15,7 +15,8 @@ RSpec.describe "Authentication" do
     end.not_to change(User, :count)
 
     expect(page).to have_css("#error_explanation")
-    expect(page).to have_text("Terms accepted must be accepted")
+    expect(page).to have_text("You must accept the Terms of Use")
+    expect(page).to have_no_text("Terms accepted")
   end
 
   it "completes the signup process and sends a welcome email" do

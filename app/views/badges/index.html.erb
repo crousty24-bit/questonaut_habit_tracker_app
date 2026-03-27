@@ -1,24 +1,5 @@
 <% content_for :title, "Statistics" %>
 
-<%
-  category_icon_for = lambda do |category|
-    {
-      "health" => "❤️",
-      "productivity" => "⚡",
-      "learning" => "📚",
-      "fitness" => "💪",
-      "nutrition" => "🥗"
-    }[category] || "🎯"
-  end
-
-  habit_success_rate = lambda do |habit|
-    total_logs = habit.habit_logs.count
-    next 0 if total_logs.zero?
-
-    ((habit.habit_logs.count(&:completed?) / total_logs.to_f) * 100).round
-  end
-%>
-
 <div class="stars-bg" data-controller="stars"></div>
 
 <section class="page-wrapper statistics-page">
@@ -29,97 +10,20 @@
     </p>
   </div>
 
-  <div class="statistics-grid">
-    <div class="stat-card glass-panel">
-      <div class="stat-value"><%= @success_rate %>%</div>
-      <div class="stat-label">Success Rate</div>
-    </div>
-    <div class="stat-card glass-panel">
-      <div class="stat-value"><%= @mission_days %></div>
-      <div class="stat-label">Mission Days</div>
-    </div>
-    <div class="stat-card glass-panel">
-      <div class="stat-value"><%= @best_streak %></div>
-      <div class="stat-label">Best Streak</div>
-    </div>
-    <div class="stat-card glass-panel">
-      <div class="stat-value"><%= @unlocked_badges_count %></div>
-      <div class="stat-label">Badges Unlocked</div>
-    </div>
-  </div>
+  <%= render "badges/statistics/summary_cards",
+             success_rate: @success_rate,
+             mission_days: @mission_days,
+             best_streak: @best_streak,
+             unlocked_badges_count: @unlocked_badges_count %>
 
   <div class="statistics-panels" data-controller="statistics-charts">
-    <div class="glass-panel statistics-panel">
-      <h2 class="statistics-panel__title">Weekly Progress</h2>
-      <% if @habits.any? %>
-        <div class="statistics-weekly-chart"
-             role="img"
-             aria-label="Weekly progress by day"
-             data-statistics-charts-target="weeklyChart">
-          <div class="statistics-weekly-chart__axis">
-            <% [50, 40, 30, 20, 10, 0].each do |tick| %>
-              <span class="statistics-weekly-chart__tick"><%= tick %></span>
-            <% end %>
-          </div>
-          <div class="statistics-weekly-chart__plot">
-            <% (@weekly_progress || []).each do |day| %>
-              <div class="statistics-weekly-chart__item"
-                   tabindex="0"
-                   data-statistics-charts-target="weeklyItem"
-                   data-label="<%= day[:label] %>"
-                   data-value="<%= day[:value] %>"
-                   data-action="mouseenter->statistics-charts#activateWeeklyItem mousemove->statistics-charts#moveWeeklyTooltip mouseleave->statistics-charts#resetWeeklyChart focus->statistics-charts#activateWeeklyItem blur->statistics-charts#resetWeeklyChart">
-                <strong class="statistics-weekly-chart__value"><%= day[:value] %></strong>
-                <div class="statistics-weekly-chart__column-wrap">
-                  <div class="statistics-weekly-chart__column" style="height: <%= day[:height_percent] %>%"></div>
-                </div>
-              </div>
-            <% end %>
-          </div>
-          <div class="statistics-weekly-chart__x-axis">
-            <% (@weekly_progress || []).each do |day| %>
-              <span class="statistics-weekly-chart__label"><%= day[:label] %></span>
-            <% end %>
-          </div>
-          <div class="statistics-chart-tooltip statistics-chart-tooltip--weekly"
-               data-statistics-charts-target="weeklyTooltip"></div>
-        </div>
-      <% else %>
-        <div class="placeholder-chart">Start completing missions to unlock progress data.</div>
-      <% end %>
-    </div>
+    <%= render "badges/statistics/weekly_progress_chart",
+               habits: @habits,
+               weekly_progress: @weekly_progress %>
 
-    <div class="glass-panel statistics-panel">
-      <h2 class="statistics-panel__title">Category Distribution</h2>
-      <% if @category_distribution.any? %>
-        <% category_segments = category_distribution_segments(@category_distribution, @habits.count) %>
-        <div class="statistics-category-chart" data-statistics-charts-target="categoryChart">
-          <svg class="statistics-category-chart__pie"
-               viewBox="0 0 200 200"
-               role="img"
-               aria-label="Category distribution pie chart">
-            <% category_segments.each do |segment| %>
-              <% path = category_slice_path(segment) %>
-              <% next if path.blank? %>
-              <path class="statistics-category-chart__slice"
-                    d="<%= path %>"
-                    fill="<%= segment[:color] %>"
-                    tabindex="0"
-                    data-statistics-charts-target="categorySlice"
-                    data-label="<%= segment[:category].capitalize %>"
-                    data-percentage="<%= segment[:percentage] %>"
-                    data-color="<%= segment[:color] %>"
-                    data-mid-angle="<%= segment[:mid_angle] %>"
-                    data-action="mouseenter->statistics-charts#activateCategorySlice mousemove->statistics-charts#moveCategoryTooltip mouseleave->statistics-charts#resetCategoryChart focus->statistics-charts#activateCategorySlice blur->statistics-charts#resetCategoryChart"></path>
-            <% end %>
-          </svg>
-          <div class="statistics-chart-tooltip statistics-chart-tooltip--category"
-               data-statistics-charts-target="categoryTooltip"></div>
-        </div>
-      <% else %>
-        <div class="placeholder-chart">Create a few missions to reveal your category spread.</div>
-      <% end %>
-    </div>
+    <%= render "badges/statistics/category_distribution_chart",
+               category_distribution: @category_distribution,
+               habits_count: @habits.count %>
   </div>
 
   <%= turbo_frame_tag "statistics_badge_collection", src: statistics_badge_collection_path, loading: "lazy" do %>
@@ -133,31 +37,5 @@
     </div>
   <% end %>
 
-  <div class="glass-panel statistics-analysis">
-    <h2 class="statistics-analysis__title">Detailed Analysis</h2>
-    <div class="statistics-analysis__list">
-      <% if @detailed_habits.any? %>
-        <% @detailed_habits.each do |habit| %>
-          <% category = habit.primary_category %>
-          <% rate = habit_success_rate.call(habit) %>
-          <% streak = habit.current_streak(as_of: Date.current) %>
-          <div class="statistics-analysis__item">
-            <div class="statistics-analysis__habit">
-              <div class="cat-icon <%= category %>"><%= category_icon_for.call(category) %></div>
-              <div>
-                <div class="statistics-analysis__habit-title"><%= habit.title %></div>
-                <div class="statistics-analysis__habit-category"><%= category.capitalize %></div>
-              </div>
-            </div>
-            <div class="statistics-analysis__metrics">
-              <div class="statistics-analysis__success"><%= rate %>% success</div>
-              <div class="statistics-analysis__streak">Current streak: <%= streak %>d</div>
-            </div>
-          </div>
-        <% end %>
-      <% else %>
-        <div class="placeholder-chart">No mission analysis yet. Validate a few habits to generate insights.</div>
-      <% end %>
-    </div>
-  </div>
+  <%= render "badges/statistics/detailed_analysis", detailed_habits: @detailed_habits %>
 </section>
