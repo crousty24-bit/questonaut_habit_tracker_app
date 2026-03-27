@@ -41,7 +41,7 @@ RSpec.describe "Pages views", type: :view do
       render template: "pages/dashboard"
 
       expect(rendered).to include('turbo-frame id="dashboard_content"')
-      expect(parsed_html).to have_text("Welcome Back, Commander")
+      expect(parsed_html).to have_text("Welcome Back Commander")
       expect(parsed_html).to have_text("Morning Stretch")
     end
   end
@@ -54,12 +54,12 @@ RSpec.describe "Pages views", type: :view do
 
       render partial: "pages/dashboard_content"
 
-      expect(parsed_html).to have_text("No missions yet")
-      expect(parsed_html).to have_button("Create Mission")
-      expect(parsed_html).to have_text("Current Login Streak")
+      expect(parsed_html).to have_text("Aucune mission active")
+      expect(parsed_html).to have_button("New Mission")
+      expect(parsed_html).not_to have_text("Recent Badges")
     end
 
-    it "shows daily and weekly mission sections when missions exist" do
+    it "shows mission cards in the cockpit terminal when missions exist" do
       user = create(:user, login_streak: 5, total_xp: 120, level: 2)
       daily_habit = create(:habit, user: user, title: "Hydrate", category_name: "nutrition", frequency: "daily")
       weekly_habit = create(:habit, :weekly, user: user, title: "Weekly Review", category_name: "productivity")
@@ -69,11 +69,12 @@ RSpec.describe "Pages views", type: :view do
 
       render partial: "pages/dashboard_content"
 
-      expect(parsed_html).to have_text("Daily Missions")
-      expect(parsed_html).to have_text("Weekly Missions")
+      expect(parsed_html).to have_text("Mission Terminal")
+      expect(parsed_html).to have_text("Quest Logs")
       expect(parsed_html).to have_text("Hydrate")
       expect(parsed_html).to have_text("Weekly Review")
-      expect(parsed_html).to have_text("Completed Today")
+      expect(parsed_html).to have_button("COMPLÉTÉE", disabled: true)
+      expect(parsed_html).to have_button("MODIFIER")
     end
   end
 

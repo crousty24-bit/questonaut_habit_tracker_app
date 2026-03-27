@@ -1,5 +1,20 @@
 # app/models/user.rb
 class User < ApplicationRecord
+  AVATAR_OPTIONS = {
+    "avatar_marine" => {
+      name: "avatar_marine.png",
+      asset: "avatar/avatar_marine.png"
+    },
+    "avatar_feminin" => {
+      name: "avatar_feminin.png",
+      asset: "avatar/avatar_feminin.png"
+    },
+    "avatar_alien" => {
+      name: "avatar_alien.png",
+      asset: "avatar/avatar_alien.png"
+    }
+  }.freeze
+
   attr_accessor :terms_accepted
 
   before_validation :normalize_username
@@ -21,6 +36,7 @@ class User < ApplicationRecord
     username: true
 
   validates :terms_accepted, acceptance: { accept: "1", message: "You must accept the Terms of Use" }, on: :create
+  validates :avatar_key, inclusion: { in: AVATAR_OPTIONS.keys }
 
   validate :email_format_is_valid
 
@@ -43,6 +59,14 @@ class User < ApplicationRecord
          SocketError,
          Errno::ECONNREFUSED => error
     Rails.logger.warn("[User#welcome_send] Welcome email delivery skipped: #{error.class} - #{error.message}")
+  end
+
+  def avatar_name
+    AVATAR_OPTIONS.fetch(avatar_key.presence || "avatar_marine")[:name]
+  end
+
+  def avatar_asset
+    AVATAR_OPTIONS.fetch(avatar_key.presence || "avatar_marine")[:asset]
   end
 
   # --------------------

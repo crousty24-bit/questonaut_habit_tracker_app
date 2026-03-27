@@ -52,6 +52,23 @@ RSpec.describe Habit do
 
       expect(habit.current_streak(as_of: Date.new(2026, 3, 20))).to eq(0)
     end
+
+    it "tracks consecutive completed weeks for weekly missions" do
+      habit = create(:habit, :weekly, title: "Weekly Review")
+      create(:habit_log, habit: habit, date: Date.new(2026, 3, 3), completed: true)
+      create(:habit_log, habit: habit, date: Date.new(2026, 3, 10), completed: true)
+      create(:habit_log, habit: habit, date: Date.new(2026, 3, 17), completed: true)
+
+      expect(habit.current_streak(as_of: Date.new(2026, 3, 19))).to eq(3)
+    end
+
+    it "resets weekly streaks after a missed week" do
+      habit = create(:habit, :weekly, title: "Weekly Review")
+      create(:habit_log, habit: habit, date: Date.new(2026, 3, 3), completed: true)
+      create(:habit_log, habit: habit, date: Date.new(2026, 3, 10), completed: true)
+
+      expect(habit.current_streak(as_of: Date.new(2026, 3, 25))).to eq(0)
+    end
   end
 
   describe "#streak_reset_alert?" do

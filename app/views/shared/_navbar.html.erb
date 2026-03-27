@@ -1,3 +1,11 @@
+<%
+  navbar_avatar_options = User::AVATAR_OPTIONS.map do |id, config|
+    { id: id, name: config[:name], asset: asset_path(config[:asset]) }
+  end
+  default_navbar_avatar = navbar_avatar_options.find { |avatar| avatar[:id] == current_user&.avatar_key } || navbar_avatar_options.first
+%>
+
+<div class="nav-profile-shell" data-controller="profile-menu">
 <nav class="top-nav" id="navbar">
   <div class="nav-inner">
 
@@ -28,8 +36,58 @@
           <div class="nav-user-meta__name"><%= current_user.name.presence || current_user.email %></div>
           <div class="nav-user-meta__level">Level <%= current_user.level || 1 %></div>
         </div>
-        <div class="nav-avatar">
-          👨‍🚀
+        <div class="nav-profile-menu">
+          <button type="button"
+                  class="nav-avatar nav-avatar--button"
+                  aria-label="Open profile menu"
+                  aria-expanded="false"
+                  data-profile-menu-target="trigger"
+                  data-action="profile-menu#toggle">
+            <%= image_tag default_navbar_avatar[:asset],
+                          alt: default_navbar_avatar[:name],
+                          class: "nav-avatar__image",
+                          data: { profile_menu_target: "navAvatarImage" } %>
+          </button>
+
+          <div class="nav-profile-dropdown"
+               hidden
+               data-profile-menu-target="menu">
+            <div class="nav-profile-dropdown__header">
+              <strong><%= current_user.name.presence || current_user.email %></strong>
+              <span>Commander menu</span>
+            </div>
+
+            <div class="nav-profile-dropdown__list">
+              <button type="button"
+                      class="nav-profile-dropdown__item"
+                      data-modal-name="profile"
+                      data-action="profile-menu#openModal">
+                Profil
+              </button>
+
+              <button type="button"
+                      class="nav-profile-dropdown__item"
+                      data-modal-name="settings"
+                      data-action="profile-menu#openModal">
+                Parametres
+              </button>
+
+              <button type="button"
+                      class="nav-profile-dropdown__item"
+                      data-modal-name="avatar"
+                      data-action="profile-menu#openModal">
+                Personnaliser l'avatar
+              </button>
+
+              <button type="button"
+                      class="nav-profile-dropdown__item"
+                      data-modal-name="premium"
+                      data-action="profile-menu#openModal">
+                Abonnement premium
+                <span class="nav-profile-dropdown__badge">New</span>
+              </button>
+            </div>
+          </div>
         </div>
         <%= button_to "Logout", destroy_user_session_path,
             method: :delete,
@@ -43,3 +101,164 @@
 
   </div>
 </nav>
+
+<% if user_signed_in? %>
+  <div class="nav-feature-modals">
+    <div class="modal-overlay nav-feature-modal"
+         data-profile-menu-target="modal"
+         data-modal="profile"
+         data-action="click->profile-menu#maybeCloseModal">
+      <div class="modal-box nav-feature-modal__box">
+        <div class="modal-header">
+          <h3 class="modal-title">Commander profile</h3>
+          <button type="button" class="modal-close" data-action="profile-menu#closeModal">&times;</button>
+        </div>
+
+        <div class="nav-feature-modal__hero">
+          <div class="nav-feature-modal__avatar">
+            <%= image_tag default_navbar_avatar[:asset],
+                          alt: default_navbar_avatar[:name],
+                          class: "nav-feature-modal__avatar-image",
+                          data: { profile_menu_target: "profileAvatarImage" } %>
+          </div>
+          <div>
+            <h4><%= current_user.name.presence || "Questonaut user" %></h4>
+            <p><%= current_user.email %></p>
+          </div>
+        </div>
+
+        <div class="nav-feature-modal__grid">
+          <div class="nav-feature-card">
+            <span>Level</span>
+            <strong><%= current_user.level || 1 %></strong>
+          </div>
+          <div class="nav-feature-card">
+            <span>Total XP</span>
+            <strong><%= current_user.total_xp || 0 %></strong>
+          </div>
+        </div>
+
+        <div class="dashboard-modal-form__actions">
+          <button type="button" class="btn btn-primary btn-md dashboard-modal-form__button" data-action="profile-menu#openModal" data-modal-name="avatar">Customize avatar</button>
+          <button type="button" class="btn btn-ghost btn-md dashboard-modal-form__button" data-action="profile-menu#closeModal">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-overlay nav-feature-modal"
+         data-profile-menu-target="modal"
+         data-modal="settings"
+         data-action="click->profile-menu#maybeCloseModal">
+      <div class="modal-box nav-feature-modal__box">
+        <div class="modal-header">
+          <h3 class="modal-title">Settings</h3>
+          <button type="button" class="modal-close" data-action="profile-menu#closeModal">&times;</button>
+        </div>
+
+        <div class="nav-feature-list">
+          <div class="nav-feature-list__item">
+            <strong>Compte</strong>
+            <span>Update email, password and account access.</span>
+          </div>
+          <div class="nav-feature-list__item">
+            <strong>Navigation</strong>
+            <span>Manage your main account preferences from the existing Devise flow.</span>
+          </div>
+        </div>
+
+        <div class="dashboard-modal-form__actions">
+          <button type="button" class="btn btn-primary btn-md dashboard-modal-form__button" data-action="profile-menu#openModal" data-modal-name="premium">Explore premium</button>
+          <button type="button" class="btn btn-ghost btn-md dashboard-modal-form__button" data-action="profile-menu#closeModal">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-overlay nav-feature-modal"
+         data-profile-menu-target="modal"
+         data-modal="avatar"
+         data-action="click->profile-menu#maybeCloseModal">
+      <div class="modal-box nav-feature-modal__box">
+        <div class="modal-header">
+          <h3 class="modal-title">Avatar customization</h3>
+          <button type="button" class="modal-close" data-action="profile-menu#closeModal">&times;</button>
+        </div>
+
+        <div class="nav-avatar-builder">
+          <div class="nav-avatar-builder__preview">
+            <%= image_tag default_navbar_avatar[:asset],
+                          alt: default_navbar_avatar[:name],
+                          class: "nav-avatar-builder__preview-image",
+                          data: { profile_menu_target: "avatarPreviewImage" } %>
+          </div>
+          <div class="nav-avatar-builder__heading">
+            <strong data-profile-menu-target="avatarPreviewName"><%= default_navbar_avatar[:name] %></strong>
+            <span>Select your dashboard avatar</span>
+          </div>
+
+          <div class="nav-avatar-builder__options">
+            <% navbar_avatar_options.each_with_index do |avatar, index| %>
+              <button type="button"
+                      class="nav-avatar-option <%= 'is-active' if avatar[:id] == default_navbar_avatar[:id] %>"
+                      aria-pressed="<%= avatar[:id] == default_navbar_avatar[:id] %>"
+                      data-profile-menu-target="avatarOption"
+                      data-avatar-id="<%= avatar[:id] %>"
+                      data-avatar-name="<%= avatar[:name] %>"
+                      data-avatar-src="<%= avatar[:asset] %>"
+                      data-action="profile-menu#selectAvatar">
+                <span class="nav-avatar-option__thumb">
+                  <%= image_tag avatar[:asset], alt: avatar[:name], class: "nav-avatar-option__image" %>
+                </span>
+                <span class="nav-avatar-option__name"><%= avatar[:name] %></span>
+              </button>
+            <% end %>
+          </div>
+          <p class="settings-note">Selection preview updates instantly. Save applies the avatar to the dashboard and navbar for this session.</p>
+        </div>
+
+        <div class="dashboard-modal-form__actions">
+          <button type="button" class="btn btn-primary btn-md dashboard-modal-form__button" data-action="profile-menu#saveAvatar">Save avatar</button>
+          <button type="button" class="btn btn-ghost btn-md dashboard-modal-form__button" data-action="profile-menu#closeModal">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-overlay nav-feature-modal"
+         data-profile-menu-target="modal"
+         data-modal="premium"
+         data-action="click->profile-menu#maybeCloseModal">
+      <div class="modal-box nav-feature-modal__box nav-feature-modal__box--premium">
+        <div class="modal-header">
+          <h3 class="modal-title">Premium membership</h3>
+          <button type="button" class="modal-close" data-action="profile-menu#closeModal">&times;</button>
+        </div>
+
+        <div class="nav-premium-banner">
+          <span class="nav-profile-dropdown__badge">Premium</span>
+          <h4>Level up your missions</h4>
+          <p>Unlock deeper analytics, exclusive avatar packs, advanced streak tools and future commander perks.</p>
+        </div>
+
+        <div class="nav-feature-list">
+          <div class="nav-feature-list__item">
+            <strong>Advanced stats</strong>
+            <span>See richer progress trends and premium mission insights.</span>
+          </div>
+          <div class="nav-feature-list__item">
+            <strong>Exclusive cosmetics</strong>
+            <span>Access special profile themes and avatar collections.</span>
+          </div>
+          <div class="nav-feature-list__item">
+            <strong>Upcoming rewards</strong>
+            <span>Be first in line for future premium-only features.</span>
+          </div>
+        </div>
+
+        <div class="dashboard-modal-form__actions">
+          <button type="button" class="btn btn-primary btn-md dashboard-modal-form__button" data-action="profile-menu#closeModal">Notify me</button>
+          <button type="button" class="btn btn-ghost btn-md dashboard-modal-form__button" data-action="profile-menu#closeModal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>
+</div>

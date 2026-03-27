@@ -2,6 +2,14 @@ ENV["RAILS_ENV"] ||= "test"
 require_relative "../config/environment"
 require "rails/test_help"
 
+module Rails
+  module LineFiltering
+    def run(*args, **kwargs)
+      super(*args, **kwargs)
+    end
+  end
+end
+
 module ActiveSupport
   class TestCase
     # Run tests in parallel with specified workers

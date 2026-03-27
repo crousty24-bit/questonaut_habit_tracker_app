@@ -139,4 +139,48 @@ RSpec.describe "Habit completion" do
       )
     end
   end
+
+  it "returns an unprocessable response instead of crashing when the completion date is invalid" do
+    user = create_user(email: "invalid-date@example.com")
+    habit = create_habit(user: user, title: "Stretch")
+
+    login_as(user)
+    follow_redirect!
+
+    expect do
+      post habit_habit_logs_path(habit), params: {
+        habit_log: {
+          date: "not-a-date",
+          completed: true,
+          habit_id: habit.id
+        }
+      }
+    end.not_to change(HabitLog, :count)
+
+    expect(response).to have_http_status(:unprocessable_content)
+  end
+
+  it "redirects habit log update and destroy actions back to the dashboard" do
+    user = create_user(email: "log-redirects@example.com")
+    habit = create_habit(user: user, title: "Journal")
+    habit_log = HabitLog.create!(habit: habit, date: Date.current, completed: false)
+
+    login_as(user)
+    follow_redirect!
+
+    patch habit_habit_log_path(habit, habit_log), params: {
+      habit_log: {
+        completed: true,
+        date: Date.current
+      }
+    }
+
+    expect(response).to have_http_status(:see_other)
+    expect(response.headers["Location"]).to end_with(dashboard_path)
+
+    delete habit_habit_log_path(habit, habit_log)
+
+    expect(response).to have_http_status(:see_other)
+    expect(response.headers["Location"]).to end_with(dashboard_path)
+  end
 end

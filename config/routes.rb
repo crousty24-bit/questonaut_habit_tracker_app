@@ -16,6 +16,7 @@ Rails.application.routes.draw do
   get "cgu", to: redirect("/terms")
 
   resource :cookie_consent, only: %i[create destroy]
+  resource :profile_avatar, only: :update
 
   # Statistics pages
   scope :statistics, controller: :badges, as: :statistics do
