@@ -18,7 +18,7 @@ class HabitLogsController < ApplicationController
 
   def create
     @habit = current_user.habits.find(params[:habit_id])
-    log_date = habit_log_params[:date].present? ? Date.parse(habit_log_params[:date].to_s) : Date.current
+    log_date = parsed_log_date
     completed_value = ActiveModel::Type::Boolean.new.cast(habit_log_params[:completed])
 
     @habit_log = @habit.habit_logs.find_or_initialize_by(date: log_date)
@@ -26,7 +26,7 @@ class HabitLogsController < ApplicationController
     @habit_log.completed = completed_value
 
     respond_to do |format|
-      if @habit_log.save
+      if log_date && @habit_log.save
         if @habit_log.completed? && !already_completed
           current_user.add_xp(10) unless @habit_log.previously_new_record?
           BadgeAwarder.call(current_user, context: :habit_logged, habit: @habit, awarded_on: @habit_log.date)
@@ -38,15 +38,21 @@ class HabitLogsController < ApplicationController
                       notice: (@habit_log.completed? && !already_completed ? "Mission successfully validated." : "Mission was already validated for today.")
         end
       else
+        @habit_log ||= @habit.habit_logs.build(completed: completed_value)
+        @habit_log.errors.add(:date, "is invalid") unless log_date
+
         format.turbo_stream { render_dashboard_update(status: :unprocessable_entity) }
-        format.html { render :new, status: :unprocessable_entity }
+        format.html do
+          load_dashboard_state
+          render "pages/dashboard", status: :unprocessable_entity
+        end
       end
     end
   end
 
   def update
     if @habit_log.update(habit_log_params)
-      redirect_to @habit_log, notice: "Habit log was successfully updated.", status: :see_other
+      redirect_to dashboard_path, notice: "Habit log was successfully updated.", status: :see_other
     else
       render :edit, status: :unprocessable_entity
     end
@@ -54,7 +60,7 @@ class HabitLogsController < ApplicationController
 
   def destroy
     @habit_log.destroy!
-    redirect_to habit_logs_path, notice: "Habit log was successfully destroyed.", status: :see_other
+    redirect_to dashboard_path, notice: "Habit log was successfully destroyed.", status: :see_other
   end
 
   private
@@ -65,5 +71,14 @@ class HabitLogsController < ApplicationController
 
   def habit_log_params
     params.require(:habit_log).permit(:date, :completed, :habit_id)
+  end
+
+  def parsed_log_date
+    raw_date = habit_log_params[:date]
+    return Date.current if raw_date.blank?
+
+    Date.iso8601(raw_date.to_s)
+  rescue ArgumentError
+    nil
   end
 end

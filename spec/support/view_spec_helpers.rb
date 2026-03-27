@@ -40,6 +40,7 @@ module ViewSpecHelpers
 
   def assign_dashboard_state(user:, habits:, today: Date.current, now: Time.zone.parse("2026-03-23 12:00:00"))
     assign(:habits, habits)
+    assign(:dashboard_habits, habits)
     assign(:today, today)
     assign(:now, now)
     assign(:weekly_completed_logs, HabitLog.joins(:habit).where(habits: { user_id: user.id }).where(date: 6.days.ago..today, completed: true))
@@ -47,6 +48,21 @@ module ViewSpecHelpers
     assign(:new_habit, user.habits.new(category_name: "health"))
     assign(:editing_habit, user.habits.new)
     assign(:deleting_habit, nil)
+    assign(:dashboard_login_streak, user.login_streak.to_i)
+    assign(:dashboard_best_streak, habits.map { |habit| habit.current_streak(as_of: today) }.max || 0)
+    assign(:dashboard_completed_today, habits.count { |habit| habit.completed_on?(today) })
+    assign(:cockpit_featured_quests, habits.map do |habit|
+      {
+        habit: habit,
+        title: habit.title,
+        type: "Maintenance",
+        xp_reward: 10,
+        progress_value: habit.completed_on?(today) ? 100 : 18,
+        accent: "#00f3ff"
+      }
+    end)
+    assign(:cockpit_badges, [])
+    assign(:cockpit_unlocked_badges_count, 0)
     assign(:recent_badges, [])
     assign(:streak_reset_habits, [])
   end

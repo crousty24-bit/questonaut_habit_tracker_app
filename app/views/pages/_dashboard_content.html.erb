@@ -5,24 +5,15 @@
   progress_percent = [[current_user.xp_progress_percentage, 0].max, 100].min
   cockpit_habits = @dashboard_habits || @habits
   active_habits = cockpit_habits.count
-  daily_habits = cockpit_habits.select { |habit| habit.frequency == "daily" }
-  weekly_habits = cockpit_habits.select { |habit| habit.frequency == "weekly" }
   completed_today = @dashboard_completed_today || cockpit_habits.count { |habit| habit.completed_on?(@today) }
-  weekly_completed = @dashboard_weekly_completed || @weekly_completed_logs.count
-  weekly_completion_rate = @dashboard_weekly_completion_rate || (active_habits.positive? ? [(weekly_completed.to_f / (active_habits * 7) * 100).round, 100].min : 0)
-  xp_this_week = weekly_completed * 10
-  active_category = @current_category.presence || "all"
-  dashboard_base_path = dashboard_path({ category: @current_category.presence }.compact)
-  daily_timer_deadline = habit_timer_deadline(now: @now)
-  daily_timer_seconds_remaining = habit_timer_seconds_remaining(now: @now)
-  weekly_timer_deadline = habit_timer_deadline(period: :weekly, now: @now)
-  weekly_timer_seconds_remaining = habit_timer_seconds_remaining(period: :weekly, now: @now)
+  dashboard_base_path = dashboard_path
   avatar_options = User::AVATAR_OPTIONS.map do |id, config|
     { id: id, name: config[:name], asset: asset_path(config[:asset]) }
   end
   current_avatar = avatar_options.find { |avatar| avatar[:id] == current_user.avatar_key } || avatar_options.first
   featured_quests = @cockpit_featured_quests || []
   cockpit_badges = @cockpit_badges || []
+  cockpit_badges_total_count = @cockpit_badges_total_count || cockpit_badges.count
   unlocked_badges = @cockpit_unlocked_badges_count || cockpit_badges.count { |badge| badge[:unlocked] }
   core_temperature = @dashboard_core_temperature || [[18 + (active_habits - completed_today) * 16, 96].min, 14].max
   oxygen_reserve = @dashboard_oxygen_reserve || (active_habits.positive? ? [[(completed_today.to_f / active_habits * 100).round, 100].min, 22].max : 22)
@@ -133,11 +124,15 @@
           <div class="cockpit-terminal__list">
             <% if featured_quests.any? %>
               <% featured_quests.each do |quest| %>
+                <% habit = quest[:habit] %>
+                <% completed = habit.completed_on?(@today) %>
+                <% category = habit.primary_category %>
+                <% streak = habit.current_streak(as_of: @today) %>
                 <article class="cockpit-quest-card" style="--quest-accent: <%= quest[:accent] %>;">
                   <div class="cockpit-quest-card__meta">
                     <div>
                       <h3 class="cockpit-quest-card__title"><%= quest[:title] %></h3>
-                      <p class="cockpit-quest-card__type"><%= quest[:type] %></p>
+                      <p class="cockpit-quest-card__type"><%= quest[:type] %> • <%= category.humanize %> • 🔥 <%= streak %> day<%= "s" if streak != 1 %></p>
                     </div>
                     <span class="cockpit-quest-card__xp">+<%= quest[:xp_reward] %> XP</span>
                   </div>
@@ -150,8 +145,29 @@
                   </div>
 
                   <div class="cockpit-quest-card__actions">
-                    <button type="button" class="cockpit-btn cockpit-btn--primary" data-action="dashboard#openCreateModal">POURSUIVRE</button>
-                    <button type="button" class="cockpit-btn cockpit-btn--secondary">DÉTAILS</button>
+                    <% if completed %>
+                      <button type="button" class="cockpit-btn cockpit-btn--primary" disabled>COMPLÉTÉE</button>
+                    <% else %>
+                      <%= button_to "VALIDER",
+                                    habit_habit_logs_path(habit),
+                                    method: :post,
+                                    params: { habit_log: { date: @today, completed: true, habit_id: habit.id } },
+                                    class: "cockpit-btn cockpit-btn--primary" %>
+                    <% end %>
+                    <button type="button"
+                            class="cockpit-btn cockpit-btn--secondary"
+                            data-action="dashboard#openEditModal"
+                            data-habit-id="<%= habit.id %>"
+                            data-habit-path="<%= habit_path(habit) %>"
+                            data-habit-title="<%= habit.title %>"
+                            data-habit-description="<%= habit.description.to_s %>"
+                            data-habit-frequency="<%= habit.frequency %>"
+                            data-habit-category="<%= category %>">MODIFIER</button>
+                    <%= link_to dashboard_path(delete_mission_id: habit.id),
+                                class: "cockpit-btn cockpit-btn--secondary",
+                                data: { action: "dashboard#openDeleteModal", habit_delete_path: habit_path(habit), habit_title: habit.title } do %>
+                      SUPPRIMER
+                    <% end %>
                   </div>
                 </article>
               <% end %>
@@ -174,7 +190,7 @@
         <aside class="cockpit-widget cockpit-widget--badges">
           <div class="cockpit-widget__header">
             <span class="cockpit-widget__label">Badge Matrix</span>
-            <strong class="cockpit-widget__headline"><%= unlocked_badges %> / 6 unlocked</strong>
+            <strong class="cockpit-widget__headline"><%= unlocked_badges %> / <%= cockpit_badges_total_count %> unlocked</strong>
           </div>
 
           <div class="cockpit-badge-grid">
@@ -203,6 +219,12 @@
               </article>
             <% end %>
           </div>
+
+          <% if cockpit_badges_total_count > cockpit_badges.count %>
+            <div class="cockpit-widget__footer">
+              <%= link_to "View all badges", statistics_path, class: "cockpit-btn cockpit-btn--secondary cockpit-btn--full", data: { turbo_frame: "_top" } %>
+            </div>
+          <% end %>
         </aside>
       </div>
 
@@ -258,205 +280,24 @@
     </div>
   </div>
 
-  <div class="dashboard-grid">
-    <div class="dashboard-main">
-      <% if @streak_reset_habits.any? %>
-        <div class="dashboard-alert dashboard-alert--warning">
-          <div class="dashboard-alert__icon">⚠️</div>
-          <div class="dashboard-alert__content">
-            <h3 class="dashboard-alert__title">
-              <%= pluralize(@streak_reset_habits.count, "mission") %> missed the last 24 hours
-            </h3>
-            <p class="dashboard-alert__message">
-              The streak <%= @streak_reset_habits.one? ? "for this mission has" : "for these missions has" %> been reset to 0 because it was not validated yesterday.
-            </p>
-            <ul class="dashboard-alert__list">
-              <% @streak_reset_habits.each do |habit| %>
-                <li><strong><%= habit.title %></strong> reset from <%= habit.streak_before_reset(as_of: @today) %> to 0.</li>
-              <% end %>
-            </ul>
-          </div>
-        </div>
-      <% end %>
-
-      <div class="missions-header">
-        <div>
-          <h2 class="dashboard-section-title">Missions</h2>
-          <p class="dashboard-section-subtitle">
-            <span class="dashboard-accent"><%= completed_today %>/<%= active_habits %> completed</span>
-            today
-          </p>
-        </div>
-        <div class="dashboard-date"><%= @today.strftime("%A, %B %-d, %Y") %></div>
-      </div>
-
-      <div class="filter-bar dashboard-filter-bar">
-        <%= link_to "All", dashboard_path, class: "filter-btn #{'active' if active_category == 'all'}", data: { dashboard_target: "filterButton", dashboard_filter: "all", action: "dashboard#filter" } %>
-        <%= link_to "Health", dashboard_path(category: "health"), class: "filter-btn #{'active' if active_category == 'health'}", data: { dashboard_target: "filterButton", dashboard_filter: "health", action: "dashboard#filter" } %>
-        <%= link_to "Productivity", dashboard_path(category: "productivity"), class: "filter-btn #{'active' if active_category == 'productivity'}", data: { dashboard_target: "filterButton", dashboard_filter: "productivity", action: "dashboard#filter" } %>
-        <%= link_to "Learning", dashboard_path(category: "learning"), class: "filter-btn #{'active' if active_category == 'learning'}", data: { dashboard_target: "filterButton", dashboard_filter: "learning", action: "dashboard#filter" } %>
-        <%= link_to "Fitness", dashboard_path(category: "fitness"), class: "filter-btn #{'active' if active_category == 'fitness'}", data: { dashboard_target: "filterButton", dashboard_filter: "fitness", action: "dashboard#filter" } %>
-        <%= link_to "Nutrition", dashboard_path(category: "nutrition"), class: "filter-btn #{'active' if active_category == 'nutrition'}", data: { dashboard_target: "filterButton", dashboard_filter: "nutrition", action: "dashboard#filter" } %>
-      </div>
-
-      <div class="missions-list">
-        <% if @habits.any? %>
-          <% [["Daily Missions", daily_habits], ["Weekly Missions", weekly_habits]].each do |section_title, habits| %>
-            <% next if habits.empty? %>
-            <section class="dashboard-section-block" data-dashboard-target="section">
-              <div class="missions-section-header">
-                <div class="missions-section-label"><%= section_title %></div>
-                <% if section_title == "Daily Missions" %>
-                  <div class="habit-timer habit-timer--daily missions-section-timer"
-                       data-controller="habit-timer"
-                       data-habit-timer-expiry-value="<%= daily_timer_deadline.iso8601 %>">
-                    <span class="habit-timer__label" data-habit-timer-target="label">available in</span>
-                    <strong class="habit-timer__value" data-habit-timer-target="value"><%= format_habit_timer(daily_timer_seconds_remaining) %></strong>
-                  </div>
-                <% elsif section_title == "Weekly Missions" %>
-                  <div class="habit-timer habit-timer--weekly missions-section-timer"
-                       data-controller="habit-timer"
-                       data-habit-timer-expiry-value="<%= weekly_timer_deadline.iso8601 %>">
-                    <span class="habit-timer__label" data-habit-timer-target="label">available in</span>
-                    <strong class="habit-timer__value" data-habit-timer-target="value"><%= format_habit_timer(weekly_timer_seconds_remaining) %></strong>
-                  </div>
-                <% end %>
-              </div>
-
-              <% habits.each do |habit| %>
-                <% category = habit.primary_category %>
-                <% completed = habit.completed_on?(@today) %>
-                <% streak = habit.current_streak(as_of: @today) %>
-
-                <article class="habit-card <%= 'completed' if completed %>" data-dashboard-target="card" data-category="<%= category %>">
-                  <div class="dashboard-habit">
-                    <div class="dashboard-habit__main">
-                      <div class="cat-icon <%= category %>"><%= category_icon_for(category) %></div>
-
-                      <div class="dashboard-habit__content">
-                        <div class="dashboard-habit__topline">
-                          <h3 class="dashboard-habit__title <%= 'is-complete' if completed %>"><%= habit.title %></h3>
-                          <span class="category-tag cat-<%= category %>"><%= category %></span>
-                        </div>
-
-                        <p class="dashboard-habit__description">
-                          <%= habit.description.presence || "Stay consistent and complete this mission to earn XP." %>
-                        </p>
-
-                        <div class="dashboard-habit__meta">
-                          <span class="streak-flame">🔥 <%= streak %> day<%= "s" if streak != 1 %></span>
-                          <span class="dashboard-habit__xp">+10 XP</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div class="dashboard-habit__action">
-                      <div class="dashboard-habit__controls">
-                        <button type="button"
-                                class="habit-action-btn"
-                                title="Edit"
-                                data-action="dashboard#openEditModal"
-                                data-habit-id="<%= habit.id %>"
-                                data-habit-path="<%= habit_path(habit) %>"
-                                data-habit-title="<%= habit.title %>"
-                                data-habit-description="<%= habit.description.to_s %>"
-                                data-habit-frequency="<%= habit.frequency %>"
-                                data-habit-category="<%= category %>">✏️</button>
-                        <%= link_to dashboard_path({ category: @current_category.presence, delete_mission_id: habit.id }.compact),
-                                    class: "habit-action-btn delete",
-                                    title: "Delete",
-                                    data: { action: "dashboard#openDeleteModal", habit_delete_path: habit_path(habit), habit_title: habit.title } do %>
-                          &times;
-                        <% end %>
-                      </div>
-
-                      <% if completed %>
-                        <button class="mission-success-btn active" disabled>✓ Completed</button>
-                      <% else %>
-                        <%= button_to "🚀 Mission Success",
-                                      habit_habit_logs_path(habit),
-                                      method: :post,
-                                      params: { habit_log: { date: @today, completed: true, habit_id: habit.id } },
-                                      class: "mission-success-btn" %>
-                      <% end %>
-                    </div>
-                  </div>
-                </article>
-              <% end %>
-            </section>
+  <% if @streak_reset_habits.any? %>
+    <div class="dashboard-alert dashboard-alert--warning">
+      <div class="dashboard-alert__icon">⚠️</div>
+      <div class="dashboard-alert__content">
+        <h3 class="dashboard-alert__title">
+          <%= pluralize(@streak_reset_habits.count, "mission") %> missed the last 24 hours
+        </h3>
+        <p class="dashboard-alert__message">
+          The streak <%= @streak_reset_habits.one? ? "for this mission has" : "for these missions has" %> been reset to 0 because it was not validated yesterday.
+        </p>
+        <ul class="dashboard-alert__list">
+          <% @streak_reset_habits.each do |habit| %>
+            <li><strong><%= habit.title %></strong> reset from <%= habit.streak_before_reset(as_of: @today) %> to 0.</li>
           <% end %>
-        <% else %>
-          <div class="glass-panel dashboard-empty">
-            <h3 class="dashboard-empty__title">No missions yet</h3>
-            <p class="dashboard-empty__copy">
-              Create your first habit to start earning XP, building streaks, and unlocking badges.
-            </p>
-            <button type="button" class="btn btn-primary btn-md" data-action="dashboard#openCreateModal">Create First Mission</button>
-          </div>
-        <% end %>
+        </ul>
       </div>
     </div>
-
-    <aside class="sidebar">
-      <div class="glass-panel streak-card">
-        <div class="streak-card__glow"></div>
-        <div class="streak-flame dashboard-sidebar-icon">🔥</div>
-        <div class="streak-card__days"><%= login_streak %> Day<%= "s" if login_streak != 1 %></div>
-        <div class="streak-card__label">Current Login Streak</div>
-        <div class="streak-card__best">Best mission streak: <%= best_streak %> day<%= "s" if best_streak != 1 %></div>
-      </div>
-
-      <div class="glass-panel dashboard-widget">
-        <h3 class="dashboard-widget__title">🏅 Recent Badges</h3>
-        <div class="dashboard-badges">
-          <% if @recent_badges.any? %>
-            <% @recent_badges.each do |badge| %>
-              <div class="badge-item badge-item--recent">
-                <div class="badge-asset badge-asset--sm">
-                  <% if badge.image_path.present? %>
-                    <%= image_tag badge_image(badge),
-                                  class: "pixel-badge",
-                                  alt: badge.display_name,
-                                  width: 56,
-                                  height: 56,
-                                  loading: "lazy",
-                                  decoding: "async" %>
-                  <% else %>
-                    <div class="dashboard-badge-fallback"><%= badge.display_name.first.upcase %></div>
-                  <% end %>
-                </div>
-                <div class="badge-name"><%= badge.display_name %></div>
-              </div>
-            <% end %>
-          <% else %>
-            <p class="dashboard-widget__empty">Your first badges will appear here.</p>
-          <% end %>
-        </div>
-        <%= link_to "View all badges →", statistics_path, class: "dashboard-widget__link", data: { turbo_frame: "_top" } %>
-      </div>
-
-      <div class="glass-panel dashboard-widget">
-        <h3 class="dashboard-widget__title">📊 This Week</h3>
-        <div class="dashboard-stats">
-          <div class="dashboard-stat-row">
-            <span>Completion Rate</span>
-            <strong><%= weekly_completion_rate %>%</strong>
-          </div>
-          <div class="xp-bar thin">
-            <div class="xp-fill green" style="width: <%= weekly_completion_rate %>%"></div>
-          </div>
-          <div class="dashboard-stat-row">
-            <span>Active Habits</span>
-            <strong><%= active_habits %></strong>
-          </div>
-          <div class="dashboard-stat-row">
-            <span>XP Earned</span>
-            <strong class="dashboard-accent">+<%= xp_this_week %> XP</strong>
-          </div>
-        </div>
-      </div>
-    </aside>
-  </div>
+  <% end %>
 
   <div id="createHabitModal"
        class="modal-overlay dashboard-mission-modal <%= 'active' if @show_create_habit_modal %>"

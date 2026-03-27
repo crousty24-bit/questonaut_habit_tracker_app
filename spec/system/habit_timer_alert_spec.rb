@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe "Habit timer and missed streak alerts" do
-  it "shows a countdown next to the daily missions section" do
+  it "shows a daily mission inside the cockpit quest logs" do
     travel_to(Time.zone.parse("2026-03-19 10:15:00")) do
       user = create_user(email: "timer@example.com")
       create_habit(user: user, title: "Morning Yoga")
@@ -9,19 +9,15 @@ RSpec.describe "Habit timer and missed streak alerts" do
       sign_in_via_ui(user)
       visit dashboard_path
 
-      within(".missions-section-header", text: "Daily Missions") do
-        expect(page).to have_text("available in")
-        expect(page).to have_text("13:44:59")
-      end
-
-      within(".habit-card", text: "Morning Yoga") do
-        expect(page).not_to have_text("available in")
-        expect(page).not_to have_text("Time left today")
+      within(".cockpit-widget--terminal") do
+        expect(page).to have_text("Quest Logs")
+        expect(page).to have_text("Morning Yoga")
+        expect(page).to have_button("VALIDER")
       end
     end
   end
 
-  it "shows an orange countdown next to the weekly missions section" do
+  it "shows a weekly mission inside the cockpit quest logs" do
     travel_to(Time.zone.parse("2026-03-19 10:15:00")) do
       user = create_user(email: "weekly-timer@example.com")
       create_habit(user: user, title: "Weekly Review", frequency: "weekly")
@@ -29,15 +25,14 @@ RSpec.describe "Habit timer and missed streak alerts" do
       sign_in_via_ui(user)
       visit dashboard_path
 
-      within(".missions-section-header", text: "Weekly Missions") do
-        expect(page).to have_text("available in")
-        expect(page).to have_css(".habit-timer--weekly")
-        expect(page).to have_text("85:44:59")
+      within(".cockpit-widget--terminal") do
+        expect(page).to have_text("Weekly Review")
+        expect(page).to have_text("Maintenance")
       end
     end
   end
 
-  it "keeps the daily missions timer visible after a mission is validated" do
+  it "keeps the completed state visible after a mission is validated" do
     travel_to(Time.zone.parse("2026-03-19 10:15:00")) do
       user = create_user(email: "timer-completed@example.com")
       habit = create_habit(user: user, title: "Read 20 pages")
@@ -46,13 +41,8 @@ RSpec.describe "Habit timer and missed streak alerts" do
       sign_in_via_ui(user)
       visit dashboard_path
 
-      within(".missions-section-header", text: "Daily Missions") do
-        expect(page).to have_text("available in")
-        expect(page).to have_text("13:44:59")
-      end
-
-      within(".habit-card", text: "Read 20 pages") do
-        expect(page).not_to have_text("Next window in")
+      within(".cockpit-quest-card", text: "Read 20 pages") do
+        expect(page).to have_button("COMPLÉTÉE", disabled: true)
       end
     end
   end
@@ -72,7 +62,7 @@ RSpec.describe "Habit timer and missed streak alerts" do
       expect(page).to have_text("Daily Run")
       expect(page).to have_text("reset from 3 to 0")
 
-      within(".habit-card", text: "Daily Run") do
+      within(".cockpit-quest-card", text: "Daily Run") do
         expect(page).to have_text("🔥 0 days")
       end
     end

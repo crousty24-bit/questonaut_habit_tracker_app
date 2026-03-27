@@ -43,7 +43,7 @@ RSpec.describe "Access control" do
 
     get dashboard_path
     expect(response).to have_http_status(:ok)
-    expect(response.body).to include("Welcome Back, Commander")
+    expect(response.body).to include("Welcome Back Commander")
 
     get statistics_path
     expect(response).to have_http_status(:ok)
@@ -70,10 +70,10 @@ RSpec.describe "Access control" do
     get dashboard_path
 
     expect(response).to have_http_status(:ok)
-    expect(response.body).to include('data-dashboard-filter="nutrition"')
-    expect(response.body).to include('data-dashboard-filter="learning"')
-    expect(response.body).to include('data-category="nutrition"')
-    expect(response.body).to include('data-category="learning"')
+    expect(response.body).to include("Meal Prep")
+    expect(response.body).to include("Study Ruby")
+    expect(response.body).to include("Nutrition")
+    expect(response.body).to include("Learning")
   end
 
   it "prevents an authenticated user from updating another user's mission" do

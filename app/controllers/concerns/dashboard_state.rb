@@ -1,6 +1,8 @@
 module DashboardState
   extend ActiveSupport::Concern
 
+  COCKPIT_BADGES_LIMIT = 10
+
   private
 
   def load_dashboard_state
@@ -78,11 +80,12 @@ module DashboardState
     end
     @cockpit_featured_quests = build_cockpit_featured_quests(all_habits)
     @cockpit_badges = build_cockpit_badges(all_habits)
+    @cockpit_badges_total_count = Badge.count
     @cockpit_unlocked_badges_count = current_user.badges.count
   end
 
   def build_cockpit_featured_quests(habits)
-    habits.first(2).map do |habit|
+    habits.map do |habit|
       {
         habit: habit,
         title: habit.title,
@@ -97,7 +100,7 @@ module DashboardState
   def build_cockpit_badges(habits)
     user_badge_ids = current_user.badge_ids
 
-    Badge.all.sort_by(&:collection_sort_key).first(6).map do |badge|
+    Badge.all.sort_by(&:collection_sort_key).first(COCKPIT_BADGES_LIMIT).map do |badge|
       unlocked = user_badge_ids.include?(badge.id)
 
       {

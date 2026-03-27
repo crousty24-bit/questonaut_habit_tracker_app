@@ -10,7 +10,9 @@
 .dashboard-page {
   display: flex;
   flex-direction: column;
-  gap: $sp-8;
+  gap: clamp(1.25rem, 2vw, 1.9rem);
+  width: 100%;
+  max-width: 75rem;
 }
 
 .dashboard-hero {
@@ -241,6 +243,8 @@
   display: flex;
   gap: $sp-4;
   padding: $sp-5;
+  width: min(100%, 58rem);
+  margin: 0 auto;
   border-radius: $radius-lg;
   border: 1px solid rgba(255, 215, 0, 0.32);
   background: rgba(251, 191, 36, 0.08);
@@ -1042,8 +1046,8 @@
   --cockpit-pan-y: 0px;
   --cockpit-accent: #{$cyan};
   --cockpit-secondary: #{$purple};
-  padding: clamp(1rem, 1.5vw, 1.5rem);
-  border-radius: 28px;
+  padding: clamp(1.15rem, 1.8vw, 1.75rem);
+  border-radius: 30px;
   background:
     radial-gradient(circle at top right, rgba(0, 243, 255, 0.08), transparent 24%),
     radial-gradient(circle at bottom left, rgba(188, 19, 254, 0.08), transparent 28%),
@@ -1059,7 +1063,7 @@
   z-index: 2;
   display: flex;
   flex-direction: column;
-  gap: $sp-4;
+  gap: clamp(0.9rem, 1.6vw, 1.3rem);
   font-family: "Rajdhani", sans-serif;
 }
 
@@ -1234,7 +1238,8 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: $sp-4;
+  gap: clamp(1rem, 2vw, 1.5rem);
+  padding: 0.35rem 0 0.15rem;
 }
 
 .dashboard-title--cockpit,
@@ -1259,7 +1264,7 @@
 }
 
 .dashboard-streaks--cockpit {
-  margin-top: $sp-2;
+  margin-top: 0.85rem;
 }
 
 .dashboard-streak-chip--orange {
@@ -1275,20 +1280,23 @@
 }
 
 .dashboard-cta--cockpit {
-  margin-top: 0.15rem;
+  margin-top: 0.2rem;
+  min-width: 184px;
+  min-height: 48px;
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.26);
 }
 
 .dashboard-cockpit__grid {
   display: grid;
   grid-template-columns: minmax(200px, 0.82fr) minmax(0, 1.45fr) minmax(210px, 0.88fr);
-  gap: $sp-3;
+  gap: 0.9rem;
 }
 
 .cockpit-widget {
   position: relative;
   overflow: hidden;
-  padding: 0.85rem;
-  border-radius: 18px;
+  padding: 1rem;
+  border-radius: 20px;
   background:
     linear-gradient(180deg, rgba(18, 26, 42, 0.88), rgba(10, 16, 28, 0.94)),
     linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01));
@@ -1302,7 +1310,12 @@
 .cockpit-widget__header {
   display: flex;
   flex-direction: column;
-  gap: 0.18rem;
+  gap: 0.24rem;
+}
+
+.cockpit-widget__footer {
+  margin-top: auto;
+  padding-top: 0.1rem;
 }
 
 .cockpit-widget__label,
@@ -1319,7 +1332,7 @@
 
 .cockpit-widget__headline {
   color: rgba(255, 255, 255, 0.94);
-  font-size: 0.78rem;
+  font-size: 0.84rem;
   font-weight: 600;
   text-transform: none;
 }
@@ -1328,15 +1341,15 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 0.7rem;
+  gap: 0.9rem;
 }
 
 .cockpit-throttle {
   display: block;
-  width: 34%;
+  width: 100%;
   min-width: 38px;
-  max-width: 58px;
-  min-height: 220px;
+  max-width: 64px;
+  min-height: 238px;
 }
 
 .cockpit-throttle__track {
@@ -1368,7 +1381,7 @@
   flex-direction: column;
   gap: 0.25rem;
   align-items: flex-start;
-  padding: 0.65rem 0.75rem;
+  padding: 0.8rem 0.9rem;
   border-radius: 14px;
   background: linear-gradient(135deg, rgba(255, 107, 53, 0.12), rgba(251, 191, 36, 0.04));
   border: 1px solid rgba(255, 107, 53, 0.18);
@@ -1382,7 +1395,7 @@
 .cockpit-widget--terminal {
   display: flex;
   flex-direction: column;
-  gap: 0.7rem;
+  gap: 0.8rem;
 }
 
 .cockpit-terminal__header {
@@ -1390,7 +1403,7 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 0.7rem;
-  padding-bottom: 0.6rem;
+  padding-bottom: 0.75rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
@@ -1414,12 +1427,30 @@
 .cockpit-terminal__list {
   display: flex;
   flex-direction: column;
-  gap: 0.65rem;
+  gap: 0.75rem;
+  max-height: 31rem;
+  overflow-y: auto;
+  padding-right: 0.35rem;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 243, 255, 0.28) transparent;
+}
+
+.cockpit-terminal__list::-webkit-scrollbar {
+  width: 7px;
+}
+
+.cockpit-terminal__list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.cockpit-terminal__list::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(0, 243, 255, 0.22), rgba(188, 19, 254, 0.28));
 }
 
 .cockpit-quest-card {
   position: relative;
-  padding: 0.75rem;
+  padding: 0.9rem;
   border-radius: 16px;
   background: linear-gradient(180deg, rgba(13, 20, 32, 0.92), rgba(10, 14, 24, 0.96));
   border: 1px solid rgba(0, 243, 255, 0.08);
@@ -1459,7 +1490,7 @@
 .cockpit-quest-card__title {
   margin: 0;
   color: white;
-  font-size: 0.82rem;
+  font-size: 0.9rem;
   font-weight: 600;
   line-height: 1.2;
 }
@@ -1516,14 +1547,19 @@
   margin-top: 0.55rem;
   justify-content: flex-start;
   gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
+.cockpit-quest-card__actions form {
+  margin: 0;
 }
 
 .cockpit-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 32px;
-  padding: 0.45rem 0.7rem;
+  min-height: 36px;
+  padding: 0.5rem 0.8rem;
   border-radius: 999px;
   border: 1px solid transparent;
   font-family: "Orbitron", sans-serif;
@@ -1532,6 +1568,10 @@
   letter-spacing: 0.12em;
   text-transform: uppercase;
   transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+}
+
+.cockpit-btn--full {
+  width: 100%;
 }
 
 .cockpit-btn--primary {
@@ -1563,13 +1603,13 @@
 .cockpit-widget--badges {
   display: flex;
   flex-direction: column;
-  gap: 0.7rem;
+  gap: 0.85rem;
 }
 
 .cockpit-badge-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.55rem;
+  gap: 0.7rem;
 }
 
 .cockpit-badge {
@@ -1685,7 +1725,7 @@
 .dashboard-cockpit__pilot-row {
   display: grid;
   grid-template-columns: minmax(200px, 260px) minmax(0, 1fr);
-  gap: $sp-3;
+  gap: 0.9rem;
   align-items: stretch;
 }
 
@@ -1720,7 +1760,7 @@
 .dashboard-cockpit__gauges {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.7rem;
+  gap: 0.8rem;
   align-content: end;
 }
 
@@ -1728,8 +1768,8 @@
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  gap: 0.35rem;
-  padding: 0.75rem;
+  gap: 0.45rem;
+  padding: 0.9rem;
   border-radius: 16px;
   background: linear-gradient(180deg, rgba(13, 19, 31, 0.92), rgba(9, 13, 22, 0.98));
   border: 1px solid rgba(0, 243, 255, 0.08);
@@ -1769,6 +1809,10 @@
 }
 
 @media (max-width: 1120px) {
+  .dashboard-page {
+    max-width: 100%;
+  }
+
   .dashboard-cockpit__grid,
   .dashboard-cockpit__pilot-row {
     grid-template-columns: 1fr;
@@ -1784,6 +1828,10 @@
 }
 
 @media (max-width: 900px) {
+  .page-wrapper {
+    padding-top: 5.25rem;
+  }
+
   .dashboard-cockpit__grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -1803,6 +1851,12 @@
 }
 
 @media (max-width: 640px) {
+  .page-wrapper {
+    padding-left: $sp-4;
+    padding-right: $sp-4;
+    padding-bottom: $sp-8;
+  }
+
   .dashboard-cockpit__viewport {
     height: 24%;
     border-radius: 18px 18px 72px 72px;
@@ -1825,6 +1879,12 @@
 
   .cockpit-throttle {
     min-height: 260px;
+  }
+
+  .cockpit-terminal__list {
+    max-height: none;
+    overflow: visible;
+    padding-right: 0;
   }
 
   .cockpit-quest-card__meta,

@@ -8,8 +8,8 @@ RSpec.describe "Main feature user flow" do
   def habit_card_for(body, title)
     document = Nokogiri::HTML5.parse(body)
 
-    document.css(".habit-card").find do |card|
-      card.at_css(".dashboard-habit__title")&.text&.include?(title)
+    document.css(".cockpit-quest-card").find do |card|
+      card.at_css(".cockpit-quest-card__title")&.text&.include?(title)
     end
   end
 
@@ -27,7 +27,7 @@ RSpec.describe "Main feature user flow" do
     follow_redirect!
 
     expect(response).to have_http_status(:ok)
-    expect(response.body).to include("Welcome Back, Commander")
+    expect(response.body).to include("Welcome Back Commander")
 
     expect do
       post habits_path, params: { habit: habit_attributes }
@@ -44,10 +44,10 @@ RSpec.describe "Main feature user flow" do
     created_habit_card = habit_card_for(response.body, "Morning Stretch")
 
     expect(response).to have_http_status(:ok)
-    expect(response.body).to include("Daily Missions")
+    expect(response.body).to include("Quest Logs")
     expect(created_habit_card).to be_present
     expect(created_habit_card.text).to include("Morning Stretch")
-    expect(created_habit_card.text).to include("fitness")
+    expect(created_habit_card.text).to include("Fitness")
 
     expect do
       post habit_habit_logs_path(habit), params: {
@@ -69,7 +69,7 @@ RSpec.describe "Main feature user flow" do
     completed_habit_card = habit_card_for(response.body, "Morning Stretch")
 
     expect(completed_habit_card).to be_present
-    expect(completed_habit_card.text).to include("Completed")
+    expect(completed_habit_card.text).to include("COMPLÉTÉE")
   end
 
   it "lets a signed-in user create and validate a weekly mission from the dashboard" do
@@ -100,10 +100,10 @@ RSpec.describe "Main feature user flow" do
     created_habit_card = habit_card_for(response.body, "Weekly Review")
 
     expect(response).to have_http_status(:ok)
-    expect(response.body).to include("Weekly Missions")
+    expect(response.body).to include("Quest Logs")
     expect(created_habit_card).to be_present
     expect(created_habit_card.text).to include("Weekly Review")
-    expect(created_habit_card.text).to include("productivity")
+    expect(created_habit_card.text).to include("Productivity")
 
     expect do
       post habit_habit_logs_path(habit), params: {
@@ -125,6 +125,6 @@ RSpec.describe "Main feature user flow" do
     completed_habit_card = habit_card_for(response.body, "Weekly Review")
 
     expect(completed_habit_card).to be_present
-    expect(completed_habit_card.text).to include("Completed")
+    expect(completed_habit_card.text).to include("COMPLÉTÉE")
   end
 end
