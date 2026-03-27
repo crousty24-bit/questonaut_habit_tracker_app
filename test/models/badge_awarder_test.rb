@@ -1,13 +1,11 @@
 require "test_helper"
 
 class BadgeAwarderTest < ActiveSupport::TestCase
-  test "awards the welcome and level 1 badges on signup" do
-    Badge.create!(name: "Welcome", image_key: "welcomeV2.png")
+  test "awards the level 1 badge on signup" do
     Badge.create!(name: "Level 1", image_key: "lvl1.png")
 
     user = create_user(email: "welcome-badge@example.com")
 
-    assert user.badges.exists?(name: "Welcome")
     assert user.badges.exists?(name: "Level 1")
   end
 

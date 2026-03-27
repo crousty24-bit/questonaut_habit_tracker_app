@@ -2,6 +2,8 @@
   total_xp = current_user.total_xp || 0
   level = current_user.level || 1
   next_level_xp = [level * 100, 100].max
+  xp_for_current_level = [(level - 1) * 100, 0].max
+  xp_in_current_level = [total_xp - xp_for_current_level, 0].max
   progress_percent = [[current_user.xp_progress_percentage, 0].max, 100].min
   cockpit_habits = @dashboard_habits || @habits
   active_habits = cockpit_habits.count
@@ -20,6 +22,11 @@
 
   best_streak = @dashboard_best_streak || cockpit_habits.map { |habit| habit.current_streak(as_of: @today) }.max || 0
   login_streak = @dashboard_login_streak || current_user.login_streak || 0
+  throttle_metrics = [
+    { css_class: "", value: [[login_streak, 20].min, 0].max, hover_text: "Streak: #{login_streak}" },
+    { css_class: " cockpit-throttle--secondary", value: [[best_streak, 20].min, 0].max, hover_text: "Best streak: #{best_streak}" },
+    { css_class: " cockpit-throttle--tertiary", value: [[(progress_percent / 100.0 * 20).round, 20].min, 0].max, hover_text: "XP: #{xp_in_current_level}/100 to level #{level + 1}" }
+  ]
   new_habit = @new_habit || current_user.habits.new(category_name: "health")
   editing_habit = @editing_habit || current_user.habits.new
   deleting_habit = @deleting_habit
@@ -96,14 +103,21 @@
             <strong class="cockpit-widget__headline">Daily Activation</strong>
           </div>
 
-          <div class="cockpit-throttle">
-            <div class="cockpit-throttle__track">
-              <% 20.times do |segment| %>
-                <% filled_segments = [[login_streak, 20].min, 0].max %>
-                <% active_segment = segment >= 20 - filled_segments %>
-                <span class="cockpit-throttle__segment <%= 'is-active' if active_segment %>"></span>
-              <% end %>
-            </div>
+          <div class="cockpit-throttle-cluster">
+            <% throttle_metrics.each do |metric| %>
+              <div class="cockpit-throttle<%= metric[:css_class] %>"
+                   tabindex="0"
+                   title="<%= metric[:hover_text] %>"
+                   aria-label="<%= metric[:hover_text] %>">
+                <div class="cockpit-throttle__track">
+                  <% 20.times do |segment| %>
+                    <% filled_segments = metric[:value] %>
+                    <% active_segment = segment >= 20 - filled_segments %>
+                    <span class="cockpit-throttle__segment <%= 'is-active' if active_segment %>"></span>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
           </div>
 
           <div class="cockpit-streak-display">
@@ -121,14 +135,17 @@
             <span class="cockpit-terminal__status">ONLINE</span>
           </div>
 
-          <div class="cockpit-terminal__list">
+          <div class="cockpit-terminal__list" data-dashboard-target="section">
             <% if featured_quests.any? %>
               <% featured_quests.each do |quest| %>
                 <% habit = quest[:habit] %>
                 <% completed = habit.completed_on?(@today) %>
                 <% category = habit.primary_category %>
                 <% streak = habit.current_streak(as_of: @today) %>
-                <article class="cockpit-quest-card" style="--quest-accent: <%= quest[:accent] %>;">
+                <article class="cockpit-quest-card"
+                         style="--quest-accent: <%= quest[:accent] %>;"
+                         data-dashboard-target="card"
+                         data-category="<%= category %>">
                   <div class="cockpit-quest-card__meta">
                     <div>
                       <h3 class="cockpit-quest-card__title"><%= quest[:title] %></h3>
@@ -164,7 +181,7 @@
                             data-habit-frequency="<%= habit.frequency %>"
                             data-habit-category="<%= category %>">MODIFIER</button>
                     <%= link_to dashboard_path(delete_mission_id: habit.id),
-                                class: "cockpit-btn cockpit-btn--secondary",
+                                class: "cockpit-btn cockpit-btn--danger habit-action-btn delete",
                                 data: { action: "dashboard#openDeleteModal", habit_delete_path: habit_path(habit), habit_title: habit.title } do %>
                       SUPPRIMER
                     <% end %>
@@ -172,7 +189,9 @@
                 </article>
               <% end %>
             <% else %>
-              <article class="cockpit-quest-card cockpit-quest-card--empty">
+              <article class="cockpit-quest-card cockpit-quest-card--empty"
+                       data-dashboard-target="card"
+                       data-category="empty">
                 <div class="cockpit-quest-card__meta">
                   <div>
                     <h3 class="cockpit-quest-card__title">Aucune mission active</h3>
@@ -279,6 +298,19 @@
       </div>
     </div>
   </div>
+
+  <nav class="habits-filter-bar" aria-label="Mission category filters">
+    <%= link_to "All",
+                dashboard_path,
+                class: "btn btn-ghost btn-md #{'active' if @current_category.blank?}",
+                data: { action: "dashboard#filter", dashboard_filter: "all", dashboard_target: "filterButton" } %>
+    <% Habit::CATEGORIES.each do |category| %>
+      <%= link_to category.titleize,
+                  dashboard_path(category: category),
+                  class: "btn btn-ghost btn-md #{'active' if @current_category == category}",
+                  data: { action: "dashboard#filter", dashboard_filter: category, dashboard_target: "filterButton" } %>
+    <% end %>
+  </nav>
 
   <% if @streak_reset_habits.any? %>
     <div class="dashboard-alert dashboard-alert--warning">

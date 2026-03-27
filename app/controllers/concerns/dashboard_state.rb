@@ -30,7 +30,7 @@ module DashboardState
                                  .map(&:badge)
     @weekly_completed_logs = HabitLog.joins(:habit)
                                      .where(habits: { user_id: current_user.id }, date: 6.days.ago..@today, completed: true)
-    load_cockpit_state(all_habits)
+    load_cockpit_state(all_habits, visible_habits: @habits)
   end
 
   def render_dashboard_update(status: :ok)
@@ -62,7 +62,7 @@ module DashboardState
     current_user.habits.new
   end
 
-  def load_cockpit_state(all_habits)
+  def load_cockpit_state(all_habits, visible_habits: all_habits)
     @dashboard_login_streak = current_user.login_streak.to_i
     @dashboard_best_streak = all_habits.map { |habit| habit.current_streak(as_of: @today) }.max || 0
     @dashboard_completed_today = all_habits.count { |habit| habit.completed_on?(@today) }
@@ -78,7 +78,7 @@ module DashboardState
     else
       22
     end
-    @cockpit_featured_quests = build_cockpit_featured_quests(all_habits)
+    @cockpit_featured_quests = build_cockpit_featured_quests(visible_habits)
     @cockpit_badges = build_cockpit_badges(all_habits)
     @cockpit_badges_total_count = Badge.count
     @cockpit_unlocked_badges_count = current_user.badges.count
