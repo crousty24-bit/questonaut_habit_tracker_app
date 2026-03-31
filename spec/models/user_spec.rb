@@ -51,12 +51,57 @@ RSpec.describe User do
 
       user = create(:user, email: "levels@example.com")
 
-      user.add_xp(24_900)
+      user.add_xp(GamifiedXp.xp_threshold_for_level(Badge::LEVEL_IMAGE_KEYS.keys.max))
 
-      expect(user.reload.level).to eq(250)
+      expect(user.reload.level).to eq(Badge::LEVEL_IMAGE_KEYS.keys.max)
       expect(user.badges.where("name LIKE ?", "Level %").pluck(:name)).to match_array(
         Badge::LEVEL_IMAGE_KEYS.keys.map { |level| "Level #{level}" }
       )
+    end
+
+    it "supports multiple level ups from a single XP gain" do
+      user = create(:user, email: "multi-level@example.com")
+      xp_gain = 600
+
+      user.add_xp(xp_gain)
+
+      expect(user.reload.level).to eq(GamifiedXp.level_from_total_xp(xp_gain))
+      expect(user.xp_total).to eq(xp_gain)
+      expect(user.xp).to eq(GamifiedXp.xp_within_level(xp_gain))
+    end
+  end
+
+  describe "#xp_needed_for_current_level" do
+    it "uses the rebalanced early-game progression curve" do
+      user = build(:user, level: 1)
+
+      expect(user.xp_needed_for_current_level).to eq(49)
+
+      user.level = 2
+
+      expect(user.xp_needed_for_current_level).to eq(67)
+    end
+  end
+
+  describe "#recalc_level_from_total_xp" do
+    it "rebuilds level and in-level XP from the cumulative total" do
+      user = build(:user, xp_total: 600, level: 1, xp: 0)
+
+      user.recalc_level_from_total_xp
+
+      expect(user.level).to eq(GamifiedXp.level_from_total_xp(600))
+      expect(user.xp).to eq(GamifiedXp.xp_within_level(600))
+    end
+  end
+
+  describe "BadgeAwarder integration" do
+    it "triggers badge awarding when a level changes" do
+      user = create(:user, email: "badge-awarder-integration@example.com")
+      allow(BadgeAwarder).to receive(:call)
+
+      user.add_xp(user.xp_needed_for_current_level)
+
+      expect(BadgeAwarder).to have_received(:call).with(user, context: :level_up)
     end
   end
 

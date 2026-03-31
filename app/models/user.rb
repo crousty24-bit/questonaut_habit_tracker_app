@@ -48,6 +48,10 @@ class User < ApplicationRecord
     self[:name] = value
   end
 
+  def self.debug_xp_progression(io: $stdout)
+    GamifiedXp.debug_xp_progression(io: io)
+  end
+
   def welcome_send
     UserMailer.welcome_email(self).deliver_now
   rescue ArgumentError,
@@ -73,22 +77,59 @@ class User < ApplicationRecord
   # XP & LEVEL
   # --------------------
   def add_xp(amount)
-    previous_level = level.presence || 1
-    self.total_xp = total_xp.to_i + amount.to_i
-    update_level
+    xp_gain = amount.to_f.round
+    return false if xp_gain <= 0
+
+    previous_level = current_level
+    self.xp_total = xp_total.to_i + xp_gain
+    self.xp = xp.to_i + xp_gain
+
+    while !max_level? && xp.to_i >= xp_needed_for_current_level
+      level_up!
+    end
+
+    self.xp = 0 if max_level?
     save!(validate: false)
     BadgeAwarder.call(self, context: :level_up) if level.to_i > previous_level
-  end
-
-  def update_level
-    self.level = (total_xp.to_i / 100.0).floor + 1
+    level.to_i > previous_level
   end
 
   def xp_progress_percentage
-    current_level = level.presence || 1
-    xp_for_current_level = (current_level - 1) * 100
-    xp_in_current_level = total_xp.to_i - xp_for_current_level
-    (xp_in_current_level / 100.0 * 100).to_i
+    return 100 if max_level?
+    return 0 if xp_needed_for_current_level.zero?
+
+    [((xp.to_i.to_f / xp_needed_for_current_level) * 100).round, 100].min
+  end
+
+  def next_level_xp
+    xp_needed_for_current_level
+  end
+
+  def xp_needed_for_current_level
+    return 0 if max_level?
+
+    GamifiedXp.xp_needed_for_level(current_level)
+  end
+
+  def level_up!
+    return if max_level?
+
+    xp_cost = xp_needed_for_current_level
+    self.xp = xp.to_i - xp_cost
+    self.level = current_level + 1
+    self.xp = 0 if max_level?
+  end
+
+  def recalc_level_from_total_xp
+    self.xp_total = [xp_total.to_i, 0].max
+    self.level = GamifiedXp.level_from_total_xp(xp_total)
+    self.xp = GamifiedXp.xp_within_level(xp_total)
+    self.xp = 0 if max_level?
+    self
+  end
+
+  def max_level?
+    current_level >= GamifiedXp::MAX_LEVEL
   end
 
   # --------------------
@@ -111,11 +152,14 @@ class User < ApplicationRecord
   def award_daily_login
     return unless update_login_streak
 
-    add_xp(5) if login_streak >= 7
     BadgeAwarder.call(self, context: :login)
   end
 
   private
+
+  def current_level
+    level.to_i.nonzero? || 1
+  end
 
   def normalize_username
     self.username = username.to_s.squish.presence

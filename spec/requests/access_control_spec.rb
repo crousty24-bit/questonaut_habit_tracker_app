@@ -29,7 +29,7 @@ RSpec.describe "Access control" do
   it "redirects a visitor away from mission validation" do
     habit = create(:habit)
 
-    post habit_habit_logs_path(habit), params: { habit_log: attributes_for(:habit_log).merge(habit_id: habit.id) }
+    post habit_habit_logs_path(habit), params: { habit_log: attributes_for(:habit_log).merge(habit_id: habit.id, completed: true) }
 
     expect(response).to have_http_status(:found)
     expect(response.headers["Location"]).to include("/users/sign_in")
@@ -104,7 +104,7 @@ RSpec.describe "Access control" do
     login_as(intruder)
     follow_redirect!
 
-    post habit_habit_logs_path(habit), params: { habit_log: attributes_for(:habit_log).merge(habit_id: habit.id) }
+    post habit_habit_logs_path(habit), params: { habit_log: attributes_for(:habit_log).merge(habit_id: habit.id, completed: true) }
 
     expect(response).to have_http_status(:not_found)
   end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_03_26_173000) do
+ActiveRecord::Schema[8.0].define(version: 2026_03_27_101000) do
   create_table "badges", force: :cascade do |t|
     t.string "name"
     t.text "description"
@@ -21,12 +21,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_26_173000) do
   end
 
   create_table "habit_logs", force: :cascade do |t|
-    t.date "date"
-    t.boolean "completed"
+    t.date "validated_on", null: false
     t.integer "habit_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["habit_id"], name: "index_habit_logs_on_habit_id"
+    t.integer "streak_days", default: 0, null: false
+    t.index ["habit_id", "validated_on"], name: "index_habit_logs_on_habit_id_and_validated_on", unique: true
   end
 
   create_table "habits", force: :cascade do |t|
@@ -63,13 +63,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_26_173000) do
     t.datetime "reset_password_sent_at"
     t.datetime "remember_created_at"
     t.string "name"
-    t.integer "total_xp"
-    t.integer "level"
+    t.integer "xp_total", default: 0, null: false
+    t.integer "level", default: 1, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.date "last_daily_login"
     t.integer "login_streak"
     t.string "avatar_key", default: "avatar_marine", null: false
+    t.integer "xp", default: 0, null: false
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end

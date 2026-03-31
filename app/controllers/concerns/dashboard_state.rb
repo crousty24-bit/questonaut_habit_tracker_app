@@ -29,7 +29,7 @@ module DashboardState
                                  .limit(3)
                                  .map(&:badge)
     @weekly_completed_logs = HabitLog.joins(:habit)
-                                     .where(habits: { user_id: current_user.id }, date: 6.days.ago..@today, completed: true)
+                                     .where(habits: { user_id: current_user.id }, validated_on: 6.days.ago..@today)
     load_cockpit_state(all_habits, visible_habits: @habits)
   end
 
@@ -90,7 +90,7 @@ module DashboardState
         habit: habit,
         title: habit.title,
         type: cockpit_mission_type(habit),
-        xp_reward: 10,
+        xp_reward: GamifiedXp.xp_gain_for(level: current_user.level, streak: habit.projected_streak(as_of: @today)),
         progress_value: cockpit_habit_progress(habit),
         accent: cockpit_habit_accent(habit.primary_category)
       }
@@ -128,7 +128,7 @@ module DashboardState
     value = if habit.frequency == "daily"
       [habit.success_rate, 18].max
     else
-      weekly_count = habit.habit_logs.count { |log| log.completed? && log.date.between?(6.days.ago.to_date, @today) }
+      weekly_count = habit.habit_logs.count { |log| log.validated_on.between?(6.days.ago.to_date, @today) }
       [(weekly_count / 7.0 * 100).round, 14].max
     end
 

@@ -53,16 +53,15 @@ RSpec.describe "Main feature user flow" do
       post habit_habit_logs_path(habit), params: {
         habit_log: attributes_for(
           :habit_log,
-          date: Date.current,
-          completed: true
-        ).merge(habit_id: habit.id)
+          validated_on: Date.current
+        ).merge(habit_id: habit.id, completed: true)
       }
     end.to change(HabitLog, :count).by(1)
 
     expect(response).to have_http_status(:found)
     expect(response.headers["Location"]).to end_with(dashboard_path)
     expect(habit.reload.completed_on?(Date.current)).to be(true)
-    expect(user.reload.total_xp).to eq(30)
+    expect(user.reload.xp_total).to eq(GamifiedXp.xp_gain_for(level: 1, streak: 1))
 
     follow_redirect!
 
@@ -109,16 +108,15 @@ RSpec.describe "Main feature user flow" do
       post habit_habit_logs_path(habit), params: {
         habit_log: attributes_for(
           :habit_log,
-          date: Date.current,
-          completed: true
-        ).merge(habit_id: habit.id)
+          validated_on: Date.current
+        ).merge(habit_id: habit.id, completed: true)
       }
     end.to change(HabitLog, :count).by(1)
 
     expect(response).to have_http_status(:found)
     expect(response.headers["Location"]).to end_with(dashboard_path)
     expect(habit.reload.completed_on?(Date.current)).to be(true)
-    expect(user.reload.total_xp).to eq(30)
+    expect(user.reload.xp_total).to eq(GamifiedXp.xp_gain_for(level: 1, streak: 1))
 
     follow_redirect!
 

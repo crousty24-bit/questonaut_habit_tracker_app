@@ -43,7 +43,7 @@ module ViewSpecHelpers
     assign(:dashboard_habits, habits)
     assign(:today, today)
     assign(:now, now)
-    assign(:weekly_completed_logs, HabitLog.joins(:habit).where(habits: { user_id: user.id }).where(date: 6.days.ago..today, completed: true))
+    assign(:weekly_completed_logs, HabitLog.joins(:habit).where(habits: { user_id: user.id }).where(validated_on: 6.days.ago..today))
     assign(:current_category, nil)
     assign(:new_habit, user.habits.new(category_name: "health"))
     assign(:editing_habit, user.habits.new)
@@ -56,7 +56,7 @@ module ViewSpecHelpers
         habit: habit,
         title: habit.title,
         type: "Maintenance",
-        xp_reward: 10,
+        xp_reward: GamifiedXp.xp_gain_for(level: user.level, streak: habit.projected_streak(as_of: today)),
         progress_value: habit.completed_on?(today) ? 100 : 18,
         accent: "#00f3ff"
       }

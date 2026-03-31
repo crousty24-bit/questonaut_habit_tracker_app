@@ -4,10 +4,10 @@ class BadgesController < ApplicationController
 
   def index
     @habits = current_user.habits.includes(:tags, :habit_logs).order(created_at: :desc)
-    @completed_logs = HabitLog.joins(:habit).where(habits: { user_id: current_user.id }, completed: true)
+    @completed_logs = HabitLog.joins(:habit).where(habits: { user_id: current_user.id })
 
     @success_rate = success_rate
-    @mission_days = @completed_logs.select(:date).distinct.count
+    @mission_days = @completed_logs.select(:validated_on).distinct.count
     @best_streak = @habits.map { |habit| streak_for(habit) }.max || 0
     @unlocked_badges_count = current_user.badges.count
     @total_badges_count = Badge.count
@@ -71,10 +71,9 @@ class BadgesController < ApplicationController
   end
 
   def success_rate
-    total_logs = HabitLog.joins(:habit).where(habits: { user_id: current_user.id }).count
-    return 0 if total_logs.zero?
+    return 0 if @habits.empty?
 
-    ((@completed_logs.count.to_f / total_logs) * 100).round
+    (@habits.sum(&:success_rate).to_f / @habits.size).round
   end
 
   def streak_for(habit)
@@ -92,16 +91,17 @@ class BadgesController < ApplicationController
   def weekly_progress
     week_start = Date.current.beginning_of_week(:monday)
     week_dates = (week_start..week_start.end_of_week(:monday)).to_a
-    completed_counts = @completed_logs.where(date: week_dates).group(:date).count
+    completed_counts = @completed_logs.where(validated_on: week_dates).group(:validated_on).count
     day_labels = %w[Monday Tuesday Wednesday Thursday Friday Saturday Sunday]
+    max_count = [completed_counts.values.max.to_i, 1].max
 
     week_dates.each_with_index.map do |date, index|
-      completed_value = completed_counts[date].to_i * 10
+      completed_value = completed_counts[date].to_i
 
       {
         label: day_labels[index],
         value: completed_value,
-        height_percent: [(completed_value * 100.0 / 50).round, 100].min
+        height_percent: [(completed_value * 100.0 / max_count).round, 100].min
       }
     end
   end

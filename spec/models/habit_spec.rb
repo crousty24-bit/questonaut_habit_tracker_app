@@ -38,34 +38,34 @@ RSpec.describe Habit do
   describe "#current_streak" do
     it "keeps yesterday's streak during the current 24-hour validation window" do
       habit = create(:habit, title: "Read")
-      create(:habit_log, habit: habit, date: Date.new(2026, 3, 17), completed: true)
-      create(:habit_log, habit: habit, date: Date.new(2026, 3, 18), completed: true)
+      create(:habit_log, habit: habit, validated_on: Date.new(2026, 3, 17))
+      create(:habit_log, habit: habit, validated_on: Date.new(2026, 3, 18))
 
       expect(habit.current_streak(as_of: Date.new(2026, 3, 19))).to eq(2)
     end
 
     it "resets the current streak to zero after a missed day" do
       habit = create(:habit, title: "Meditate")
-      create(:habit_log, habit: habit, date: Date.new(2026, 3, 16), completed: true)
-      create(:habit_log, habit: habit, date: Date.new(2026, 3, 17), completed: true)
-      create(:habit_log, habit: habit, date: Date.new(2026, 3, 18), completed: true)
+      create(:habit_log, habit: habit, validated_on: Date.new(2026, 3, 16))
+      create(:habit_log, habit: habit, validated_on: Date.new(2026, 3, 17))
+      create(:habit_log, habit: habit, validated_on: Date.new(2026, 3, 18))
 
       expect(habit.current_streak(as_of: Date.new(2026, 3, 20))).to eq(0)
     end
 
     it "tracks consecutive completed weeks for weekly missions" do
       habit = create(:habit, :weekly, title: "Weekly Review")
-      create(:habit_log, habit: habit, date: Date.new(2026, 3, 3), completed: true)
-      create(:habit_log, habit: habit, date: Date.new(2026, 3, 10), completed: true)
-      create(:habit_log, habit: habit, date: Date.new(2026, 3, 17), completed: true)
+      create(:habit_log, habit: habit, validated_on: Date.new(2026, 3, 3))
+      create(:habit_log, habit: habit, validated_on: Date.new(2026, 3, 10))
+      create(:habit_log, habit: habit, validated_on: Date.new(2026, 3, 17))
 
       expect(habit.current_streak(as_of: Date.new(2026, 3, 19))).to eq(3)
     end
 
     it "resets weekly streaks after a missed week" do
       habit = create(:habit, :weekly, title: "Weekly Review")
-      create(:habit_log, habit: habit, date: Date.new(2026, 3, 3), completed: true)
-      create(:habit_log, habit: habit, date: Date.new(2026, 3, 10), completed: true)
+      create(:habit_log, habit: habit, validated_on: Date.new(2026, 3, 3))
+      create(:habit_log, habit: habit, validated_on: Date.new(2026, 3, 10))
 
       expect(habit.current_streak(as_of: Date.new(2026, 3, 25))).to eq(0)
     end
@@ -74,9 +74,9 @@ RSpec.describe Habit do
   describe "#streak_reset_alert?" do
     it "flags a mission that missed yesterday after an active streak" do
       habit = create(:habit, title: "Workout")
-      create(:habit_log, habit: habit, date: Date.new(2026, 3, 16), completed: true)
-      create(:habit_log, habit: habit, date: Date.new(2026, 3, 17), completed: true)
-      create(:habit_log, habit: habit, date: Date.new(2026, 3, 18), completed: true)
+      create(:habit_log, habit: habit, validated_on: Date.new(2026, 3, 16))
+      create(:habit_log, habit: habit, validated_on: Date.new(2026, 3, 17))
+      create(:habit_log, habit: habit, validated_on: Date.new(2026, 3, 18))
 
       expect(habit.streak_reset_alert?(as_of: Date.new(2026, 3, 20))).to be(true)
       expect(habit.streak_before_reset(as_of: Date.new(2026, 3, 20))).to eq(3)

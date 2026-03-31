@@ -8,7 +8,6 @@ class HabitsController < ApplicationController
     @habit = current_user.habits.new(habit_params)
     respond_to do |format|
       if @habit.save
-        current_user.add_xp(20)
         BadgeAwarder.call(current_user, context: :habit_created, habit: @habit)
 
         format.turbo_stream { render_dashboard_update }
