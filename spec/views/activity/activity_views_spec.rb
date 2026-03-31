@@ -10,7 +10,7 @@ RSpec.describe "Activity views", type: :view do
   describe "habit_logs/index" do
     it "renders nested habit log links and the dashboard back link" do
       habit = create(:habit, title: "Hydrate")
-      log = create(:habit_log, habit: habit, date: Date.new(2026, 3, 23), completed: true)
+      log = create(:habit_log, habit: habit, validated_on: Date.new(2026, 3, 23), streak_days: 4)
       assign(:habit_logs, [log])
       assign(:notice, nil)
 
@@ -26,14 +26,14 @@ RSpec.describe "Activity views", type: :view do
   describe "habit_logs/show" do
     it "renders the log details and nested actions" do
       habit = create(:habit, title: "Hydrate")
-      log = create(:habit_log, habit: habit, date: Date.new(2026, 3, 23), completed: true)
+      log = create(:habit_log, habit: habit, validated_on: Date.new(2026, 3, 23), streak_days: 4)
       assign(:habit_log, log)
       assign(:notice, nil)
 
       render template: "habit_logs/show"
 
-      expect(parsed_html).to have_text("Date:")
-      expect(parsed_html).to have_text("Completed:")
+      expect(parsed_html).to have_text("Validated on:")
+      expect(parsed_html).to have_text("Streak days:")
       expect(parsed_html).to have_link("Back to habit logs", href: habit_habit_logs_path(habit))
       expect(parsed_html).to have_button("Destroy this habit log")
     end
@@ -41,12 +41,12 @@ RSpec.describe "Activity views", type: :view do
 
   describe "habit_logs/_habit_log" do
     it "renders the habit log fields" do
-      log = create(:habit_log, date: Date.new(2026, 3, 23), completed: false)
+      log = create(:habit_log, validated_on: Date.new(2026, 3, 23), streak_days: 1)
 
       render partial: "habit_logs/habit_log", locals: { habit_log: log }
 
       expect(parsed_html).to have_text("2026-03-23")
-      expect(parsed_html).to have_text("false")
+      expect(parsed_html).to have_text("1")
       expect(parsed_html).to have_text(log.habit_id.to_s)
     end
   end

@@ -2,7 +2,8 @@ one:
   email: one@example.com
   encrypted_password: <%= Devise::Encryptor.digest(User, "Password123!") %>
   name: Commander One
-  total_xp: 0
+  xp: 0
+  xp_total: 0
   level: 1
   avatar_key: avatar_marine
 
@@ -10,7 +11,8 @@ two:
   email: two@example.com
   encrypted_password: <%= Devise::Encryptor.digest(User, "Password123!") %>
   name: Commander Two
-  total_xp: 0
+  xp: 0
+  xp_total: 0
   level: 1
   avatar_key: avatar_alien
 # column: value

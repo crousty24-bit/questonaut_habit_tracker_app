@@ -26,7 +26,7 @@ class BadgeAwarder
   def award(name)
     badge = Badge.find_by(name: name)
     return unless badge
-    @user.user_badges.find_or_create_by(badge: badge)
+    @user.user_badges.find_or_create_by!(badge: badge)
   end
 
   def award_first_habit_badge

@@ -28,7 +28,7 @@ class BadgeAwarderTest < ActiveSupport::TestCase
     Badge.create!(name: "Level 10", image_key: "lvl10.png")
 
     user = create_user(email: "level-ten@example.com")
-    user.update!(total_xp: 900, level: 10)
+    user.update!(xp_total: GamifiedXp.xp_threshold_for_level(10), xp: 0, level: 10)
 
     BadgeAwarder.call(user, context: :login)
 
@@ -43,7 +43,8 @@ class BadgeAwarderTest < ActiveSupport::TestCase
       email: email,
       password: "password123",
       password_confirmation: "password123",
-      total_xp: 0,
+      xp: 0,
+      xp_total: 0,
       level: 1,
       login_streak: 0
     )

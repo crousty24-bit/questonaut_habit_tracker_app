@@ -33,7 +33,7 @@ RSpec.describe "Pages views", type: :view do
 
   describe "pages/dashboard" do
     it "wraps the dashboard content in a turbo frame" do
-      user = create(:user, login_streak: 4, total_xp: 40, level: 1)
+      user = create(:user, login_streak: 4, xp_total: 40, xp: 40, level: 1)
       habit = create(:habit, user: user, title: "Morning Stretch", category_name: "fitness")
       assign_dashboard_state(user: user, habits: [habit])
       stub_signed_in_user(user, current_path: dashboard_path)
@@ -60,10 +60,10 @@ RSpec.describe "Pages views", type: :view do
     end
 
     it "shows mission cards in the cockpit terminal when missions exist" do
-      user = create(:user, login_streak: 5, total_xp: 120, level: 2)
+      user = create(:user, login_streak: 5, xp_total: GamifiedXp.xp_threshold_for_level(2) + 20, xp: 20, level: 2)
       daily_habit = create(:habit, user: user, title: "Hydrate", category_name: "nutrition", frequency: "daily")
       weekly_habit = create(:habit, :weekly, user: user, title: "Weekly Review", category_name: "productivity")
-      create(:habit_log, habit: daily_habit, date: Date.current, completed: true)
+      create(:habit_log, habit: daily_habit, validated_on: Date.current)
       assign_dashboard_state(user: user, habits: [daily_habit, weekly_habit])
       stub_signed_in_user(user, current_path: dashboard_path)
 

@@ -1,10 +1,10 @@
 <%
-  total_xp = current_user.total_xp || 0
+  total_xp = current_user.xp_total || 0
   level = current_user.level || 1
-  next_level_xp = [level * 100, 100].max
-  xp_for_current_level = [(level - 1) * 100, 0].max
-  xp_in_current_level = [total_xp - xp_for_current_level, 0].max
+  next_level_xp = current_user.next_level_xp
+  xp_in_current_level = current_user.xp || 0
   progress_percent = [[current_user.xp_progress_percentage, 0].max, 100].min
+  max_level_reached = current_user.max_level?
   cockpit_habits = @dashboard_habits || @habits
   active_habits = cockpit_habits.count
   completed_today = @dashboard_completed_today || cockpit_habits.count { |habit| habit.completed_on?(@today) }
@@ -25,7 +25,7 @@
   throttle_metrics = [
     { css_class: "", value: [[login_streak, 20].min, 0].max, hover_text: "Streak: #{login_streak}" },
     { css_class: " cockpit-throttle--secondary", value: [[best_streak, 20].min, 0].max, hover_text: "Best streak: #{best_streak}" },
-    { css_class: " cockpit-throttle--tertiary", value: [[(progress_percent / 100.0 * 20).round, 20].min, 0].max, hover_text: "XP: #{xp_in_current_level}/100 to level #{level + 1}" }
+    { css_class: " cockpit-throttle--tertiary", value: [[(progress_percent / 100.0 * 20).round, 20].min, 0].max, hover_text: (max_level_reached ? "Level #{level}: MAX" : "XP: #{xp_in_current_level}/#{next_level_xp} to level #{level + 1}") }
   ]
   new_habit = @new_habit || current_user.habits.new(category_name: "health")
   editing_habit = @editing_habit || current_user.habits.new
@@ -168,7 +168,7 @@
                       <%= button_to "VALIDER",
                                     habit_habit_logs_path(habit),
                                     method: :post,
-                                    params: { habit_log: { date: @today, completed: true, habit_id: habit.id } },
+                                    params: { habit_log: { validated_on: @today, completed: true, habit_id: habit.id } },
                                     class: "cockpit-btn cockpit-btn--primary" %>
                     <% end %>
                     <button type="button"
@@ -269,7 +269,7 @@
 
           <div class="cockpit-xp-meta">
             <span>Level <%= level %></span>
-            <span><%= progress_percent %>% charge</span>
+            <span><%= max_level_reached ? "MAX RANK" : "#{xp_in_current_level}/#{next_level_xp} XP" %></span>
           </div>
         </article>
 

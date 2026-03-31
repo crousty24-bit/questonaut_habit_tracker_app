@@ -5,7 +5,8 @@ FactoryBot.define do
     password { TestDataHelpers::DEFAULT_PASSWORD }
     password_confirmation { password }
     terms_accepted { "1" }
-    total_xp { 0 }
+    xp { 0 }
+    xp_total { 0 }
     level { 1 }
     login_streak { 0 }
     last_daily_login { nil }

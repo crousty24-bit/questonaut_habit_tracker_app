@@ -45,7 +45,7 @@ RSpec.describe "Habit management" do
     expect(response).to have_http_status(:found)
     expect(created_habit.title).to eq("Morning Stretch")
     expect(created_habit.primary_category).to eq("fitness")
-    expect(user.reload.total_xp).to eq(20)
+    expect(user.reload.xp_total).to eq(0)
   end
 
   it "awards the First Mission badge when the user creates their first habit" do

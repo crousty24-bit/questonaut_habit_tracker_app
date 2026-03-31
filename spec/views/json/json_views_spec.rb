@@ -65,7 +65,8 @@ RSpec.describe "JSON views", type: :view do
 
       render template: "habit_logs/show"
 
-      expect(parsed_json["completed"]).to eq(habit_log.completed)
+      expect(parsed_json["validated_on"]).to eq(habit_log.validated_on.to_s)
+      expect(parsed_json["streak_days"]).to eq(habit_log.streak_days)
     end
   end
 

@@ -15,7 +15,7 @@ RSpec.describe "Habit completion" do
     expect do
       post habit_habit_logs_path(habit), params: {
         habit_log: {
-          date: Date.current,
+          validated_on: Date.current,
           completed: true,
           habit_id: habit.id
         }
@@ -25,28 +25,32 @@ RSpec.describe "Habit completion" do
     log = habit.habit_logs.order(:created_at).last
 
     expect(response).to have_http_status(:found)
-    expect(log.completed).to be(true)
-    expect(log.date).to eq(Date.current)
+    expect(log.validated_on).to eq(Date.current)
+    expect(log.streak_days).to eq(1)
   end
 
-  it "awards xp when an authenticated user validates a mission" do
-    user = create_user(email: "xp@example.com")
+  it "awards XP using the user's level and the current streak" do
+    xp_total = GamifiedXp.xp_threshold_for_level(3) + 25
+    user = create_user(email: "xp@example.com", level: 3, xp_total: xp_total, xp: 25)
     habit = create_habit(user: user, title: "Practice guitar")
+    create(:habit_log, habit: habit, validated_on: Date.current - 1.day)
 
     login_as(user)
     follow_redirect!
 
     post habit_habit_logs_path(habit), params: {
       habit_log: {
-        date: Date.current,
+        validated_on: Date.current,
         completed: true,
         habit_id: habit.id
       }
     }
 
+    expected_xp = GamifiedXp.xp_gain_for(level: 3, streak: 2)
+
     expect(response).to have_http_status(:found)
-    expect(user.reload.total_xp).to eq(10)
-    expect(user.level).to eq(1)
+    expect(user.reload.xp_total).to eq(xp_total + expected_xp)
+    expect(user.level).to eq(3)
   end
 
   it "prevents a mission from granting completion rewards twice on the same day" do
@@ -58,18 +62,18 @@ RSpec.describe "Habit completion" do
 
     post habit_habit_logs_path(habit), params: {
       habit_log: {
-        date: Date.current,
+        validated_on: Date.current,
         completed: true,
         habit_id: habit.id
       }
     }
 
-    expect(user.reload.total_xp).to eq(10)
+    expect(user.reload.xp_total).to eq(GamifiedXp.xp_gain_for(level: 1, streak: 1))
     expect(habit.habit_logs.count).to eq(1)
 
     post habit_habit_logs_path(habit), params: {
       habit_log: {
-        date: Date.current,
+        validated_on: Date.current,
         completed: true,
         habit_id: habit.id
       }
@@ -77,30 +81,8 @@ RSpec.describe "Habit completion" do
 
     expect(response).to have_http_status(:found)
     expect(response.headers["Location"]).to include("/dashboard")
-    expect(user.reload.total_xp).to eq(10)
+    expect(user.reload.xp_total).to eq(GamifiedXp.xp_gain_for(level: 1, streak: 1))
     expect(habit.habit_logs.count).to eq(1)
-  end
-
-  it "allows an existing incomplete log to be validated once and awards xp only once" do
-    user = create_user(email: "existing-log@example.com")
-    habit = create_habit(user: user, title: "Study")
-    HabitLog.create!(habit: habit, date: Date.current, completed: false)
-
-    login_as(user)
-    follow_redirect!
-
-    post habit_habit_logs_path(habit), params: {
-      habit_log: {
-        date: Date.current,
-        completed: true,
-        habit_id: habit.id
-      }
-    }
-
-    expect(response).to have_http_status(:found)
-    expect(habit.habit_logs.count).to eq(1)
-    expect(habit.habit_logs.first.completed).to be(true)
-    expect(user.reload.total_xp).to eq(10)
   end
 
   it "awards streak and category badges when a backfilled completion reaches a 30-day category streak" do
@@ -114,15 +96,16 @@ RSpec.describe "Habit completion" do
       habit = create_habit(user: user, title: "Workout", category_name: "fitness")
 
       29.times do |offset|
-        HabitLog.create!(habit: habit, date: Date.new(2026, 3, 1) + offset, completed: true)
+        HabitLog.create!(habit: habit, validated_on: Date.new(2026, 3, 1) + offset, streak_days: 0)
       end
+      habit.recalculate_streaks!
 
       login_as(user)
       follow_redirect!
 
       post habit_habit_logs_path(habit), params: {
         habit_log: {
-          date: Date.new(2026, 3, 30),
+          validated_on: Date.new(2026, 3, 30),
           completed: true,
           habit_id: habit.id
         }
@@ -150,7 +133,7 @@ RSpec.describe "Habit completion" do
     expect do
       post habit_habit_logs_path(habit), params: {
         habit_log: {
-          date: "not-a-date",
+          validated_on: "not-a-date",
           completed: true,
           habit_id: habit.id
         }
@@ -163,15 +146,15 @@ RSpec.describe "Habit completion" do
   it "redirects habit log update and destroy actions back to the dashboard" do
     user = create_user(email: "log-redirects@example.com")
     habit = create_habit(user: user, title: "Journal")
-    habit_log = HabitLog.create!(habit: habit, date: Date.current, completed: false)
+    habit_log = HabitLog.create!(habit: habit, validated_on: Date.current, streak_days: 1)
 
     login_as(user)
     follow_redirect!
 
     patch habit_habit_log_path(habit, habit_log), params: {
       habit_log: {
-        completed: true,
-        date: Date.current
+        validated_on: Date.current + 1.day,
+        streak_days: 1
       }
     }
 

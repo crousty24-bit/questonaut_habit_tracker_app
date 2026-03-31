@@ -17,8 +17,9 @@ RSpec.describe BadgeAwarder do
       final_day = Date.new(2026, 3, 31)
 
       90.times do |offset|
-        HabitLog.create!(habit: habit, date: final_day - (89 - offset).days, completed: true)
+        HabitLog.create!(habit: habit, validated_on: final_day - (89 - offset).days, streak_days: 0)
       end
+      habit.recalculate_streaks!
 
       described_class.call(user, context: :habit_logged, habit: habit, awarded_on: final_day)
 

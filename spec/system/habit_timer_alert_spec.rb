@@ -36,7 +36,7 @@ RSpec.describe "Habit timer and missed streak alerts" do
     travel_to(Time.zone.parse("2026-03-19 10:15:00")) do
       user = create_user(email: "timer-completed@example.com")
       habit = create_habit(user: user, title: "Read 20 pages")
-      HabitLog.create!(habit: habit, date: Date.new(2026, 3, 19), completed: true)
+      HabitLog.create!(habit: habit, validated_on: Date.new(2026, 3, 19), streak_days: 1)
 
       sign_in_via_ui(user)
       visit dashboard_path
@@ -51,9 +51,9 @@ RSpec.describe "Habit timer and missed streak alerts" do
     travel_to(Time.zone.parse("2026-03-20 09:00:00")) do
       user = create_user(email: "alert-reset@example.com")
       habit = create_habit(user: user, title: "Daily Run")
-      HabitLog.create!(habit: habit, date: Date.new(2026, 3, 16), completed: true)
-      HabitLog.create!(habit: habit, date: Date.new(2026, 3, 17), completed: true)
-      HabitLog.create!(habit: habit, date: Date.new(2026, 3, 18), completed: true)
+      HabitLog.create!(habit: habit, validated_on: Date.new(2026, 3, 16), streak_days: 1)
+      HabitLog.create!(habit: habit, validated_on: Date.new(2026, 3, 17), streak_days: 2)
+      HabitLog.create!(habit: habit, validated_on: Date.new(2026, 3, 18), streak_days: 3)
 
       sign_in_via_ui(user)
       visit dashboard_path

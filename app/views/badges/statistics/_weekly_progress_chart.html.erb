@@ -1,12 +1,15 @@
 <div class="glass-panel statistics-panel">
   <h2 class="statistics-panel__title">Weekly Progress</h2>
   <% if habits.any? %>
+    <% chart_values = Array(weekly_progress).map { |day| day[:value].to_i } %>
+    <% max_value = [chart_values.max.to_i, 1].max %>
+    <% axis_ticks = 5.downto(0).map { |step| ((max_value.to_f * step) / 5).round } %>
     <div class="statistics-weekly-chart"
          role="img"
          aria-label="Weekly progress by day"
          data-statistics-charts-target="weeklyChart">
       <div class="statistics-weekly-chart__axis">
-        <% [50, 40, 30, 20, 10, 0].each do |tick| %>
+        <% axis_ticks.each do |tick| %>
           <span class="statistics-weekly-chart__tick"><%= tick %></span>
         <% end %>
       </div>
