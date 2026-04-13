@@ -60,7 +60,7 @@
            src="<%= current_avatar[:asset] %>"
            alt="<%= current_avatar[:name] %>">
       <div class="dashboard-cockpit__pilot-meta">
-        <strong id="current-avatar-name"><%= current_avatar[:name] %></strong>
+        <strong id="current-avatar-name"></strong>
         <span><%= current_user.name.presence || current_user.email %></span>
       </div>
     </div>
@@ -76,18 +76,6 @@
           <p class="dashboard-subtitle dashboard-subtitle--cockpit">
             Day <%= [login_streak, 1].max %> of your exploration mission
           </p>
-          <div class="dashboard-streaks dashboard-streaks--cockpit">
-            <div class="dashboard-streak-chip dashboard-streak-chip--orange">
-              <span class="dashboard-streak-chip__icon">🔥</span>
-              <span class="dashboard-streak-chip__label">Login streak</span>
-              <strong><%= login_streak %> days</strong>
-            </div>
-            <div class="dashboard-streak-chip dashboard-streak-chip--cyan">
-              <span class="dashboard-streak-chip__icon">⚡</span>
-              <span class="dashboard-streak-chip__label">Best streak</span>
-              <strong><%= best_streak %> days</strong>
-            </div>
-          </div>
         </div>
 
         <button type="button" class="btn btn-primary btn-md dashboard-cta dashboard-cta--cockpit" data-action="dashboard#openCreateModal">
@@ -163,9 +151,9 @@
 
                   <div class="cockpit-quest-card__actions">
                     <% if completed %>
-                      <button type="button" class="cockpit-btn cockpit-btn--primary" disabled>COMPLÉTÉE</button>
+                      <button type="button" class="cockpit-btn cockpit-btn--primary" disabled>COMPLETED</button>
                     <% else %>
-                      <%= button_to "VALIDER",
+                      <%= button_to "VALIDATE",
                                     habit_habit_logs_path(habit),
                                     method: :post,
                                     params: { habit_log: { validated_on: @today, completed: true, habit_id: habit.id } },
@@ -179,11 +167,11 @@
                             data-habit-title="<%= habit.title %>"
                             data-habit-description="<%= habit.description.to_s %>"
                             data-habit-frequency="<%= habit.frequency %>"
-                            data-habit-category="<%= category %>">MODIFIER</button>
+                            data-habit-category="<%= category %>">EDIT</button>
                     <%= link_to dashboard_path(delete_mission_id: habit.id),
                                 class: "cockpit-btn cockpit-btn--danger habit-action-btn delete",
                                 data: { action: "dashboard#openDeleteModal", habit_delete_path: habit_path(habit), habit_title: habit.title } do %>
-                      SUPPRIMER
+                      DELETE
                     <% end %>
                   </div>
                 </article>
@@ -199,7 +187,7 @@
                   </div>
                 </div>
                 <div class="cockpit-quest-card__actions">
-                  <button type="button" class="cockpit-btn cockpit-btn--primary" data-action="dashboard#openCreateModal">LANCER UNE MISSION</button>
+                  <button type="button" class="cockpit-btn cockpit-btn--primary" data-action="dashboard#openCreateModal">LAUNCH MISSION</button>
                 </div>
               </article>
             <% end %>
