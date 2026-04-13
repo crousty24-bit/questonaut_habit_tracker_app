@@ -1064,6 +1064,7 @@
   display: flex;
   flex-direction: column;
   gap: clamp(0.9rem, 1.6vw, 1.3rem);
+  padding-top: clamp(9.8rem, 14vw, 11.4rem);
   font-family: "Rajdhani", sans-serif;
 }
 
@@ -1107,7 +1108,7 @@
 
 .dashboard-cockpit__pilot {
   position: absolute;
-  top: 2rem;
+  top: clamp(4rem, 6.6vw, 5.2rem);
   left: 50%;
   z-index: 2;
   display: flex;
@@ -1174,8 +1175,8 @@
 }
 
 .dashboard-cockpit__planet {
-  inset: auto 12% -44% 12%;
-  height: 90%;
+  inset: auto -2% -34% -2%;
+  height: 78%;
   transform: translate3d(calc(var(--cockpit-pan-x) * -0.25), calc(var(--cockpit-pan-y) * -0.18), 0);
   background:
     radial-gradient(circle at 50% 12%, rgba(0, 243, 255, 0.28) 0%, rgba(0, 243, 255, 0.08) 14%, rgba(0, 243, 255, 0) 24%),
@@ -1234,12 +1235,14 @@
 }
 
 .dashboard-cockpit__header {
-  position: relative;
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 3;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: clamp(1rem, 2vw, 1.5rem);
-  padding: 0.35rem 0 0.15rem;
+  padding: 0;
 }
 
 .dashboard-title--cockpit,
@@ -1288,8 +1291,9 @@
 
 .dashboard-cockpit__grid {
   display: grid;
-  grid-template-columns: minmax(200px, 0.82fr) minmax(0, 1.45fr) minmax(210px, 0.88fr);
+  grid-template-columns: minmax(150px, 0.615fr) minmax(0, 1.655fr) minmax(210px, 0.88fr);
   gap: 0.9rem;
+  margin-top: clamp(4.4rem, 6vw, 6.2rem);
 }
 
 .cockpit-widget {
@@ -1426,6 +1430,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.8rem;
+  min-height: 0;
 }
 
 .cockpit-terminal__header {
@@ -1456,9 +1461,10 @@
 
 .cockpit-terminal__list {
   display: flex;
+  flex: 1 1 auto;
   flex-direction: column;
   gap: 0.75rem;
-  max-height: 31rem;
+  min-height: 0;
   overflow-y: auto;
   padding-right: 0.35rem;
   scrollbar-width: thin;
@@ -1889,7 +1895,7 @@
   }
 
   .dashboard-cockpit__pilot {
-    top: 1.5rem;
+    top: 3.5rem;
   }
 }
 
@@ -1929,7 +1935,7 @@
   }
 
   .dashboard-cockpit__pilot {
-    top: 1.2rem;
+    top: 2.8rem;
   }
 
   .dashboard-cockpit__pilot-image {
